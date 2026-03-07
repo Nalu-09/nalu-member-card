@@ -115,15 +115,33 @@
         status.textContent = "プロフィール取得中...";
         const profile = await liff.getProfile();
 
-        status.textContent = "会員情報取得中...";
-const res = await fetch(API_URL, {
-  method: "POST",
-  body: new URLSearchParams({
-    lineUserId: profile.userId,
-    name: profile.displayName
-  })
+status.textContent = "会員情報取得中...";
+
+const callbackName = "jsonpCallback_" + Date.now();
+
+const data = await new Promise((resolve, reject) => {
+  window[callbackName] = function(response) {
+    resolve(response);
+    delete window[callbackName];
+    script.remove();
+  };
+
+  const script = document.createElement("script");
+
+  script.src =
+    API_URL +
+    "?callback=" + callbackName +
+    "&lineUserId=" + encodeURIComponent(profile.userId) +
+    "&name=" + encodeURIComponent(profile.displayName);
+
+  script.onerror = function() {
+    reject(new Error("会員情報の取得に失敗しました"));
+    delete window[callbackName];
+    script.remove();
+  };
+
+  document.body.appendChild(script);
 });
-        const data = await res.json();
 
         if (!data.ok) {
           document.getElementById("name").textContent = "エラー";
