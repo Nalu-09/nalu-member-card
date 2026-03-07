@@ -7,57 +7,119 @@
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
     body{
+      margin:0;
       background:#000;
       color:#fff;
-      font-family:serif;
+      font-family: "Times New Roman", serif;
       text-align:center;
-      padding-top:120px;
+      padding:24px 16px 40px;
+    }
+
+    .wrap{
+      width:min(92vw, 420px);
+      margin:0 auto;
+    }
+
+    .card{
+      position:relative;
+      width:100%;
+      aspect-ratio: 1 / 1.58;
+      overflow:hidden;
+      border-radius:22px;
+      background:#111;
+      box-shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+
+    .card-bg{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .overlay{
+      position:absolute;
+      inset:0;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-end;
+      padding:0 24px 34px;
+      box-sizing:border-box;
+      text-shadow:0 2px 10px rgba(0,0,0,.5);
+    }
+
+    .rank{
+      font-size:42px;
+      letter-spacing:.08em;
+      margin:0 0 12px;
+    }
+
+    .memberNo{
+      font-size:18px;
+      margin:0 0 8px;
+    }
+
+    .name{
+      font-size:18px;
       margin:0;
     }
-    .card{
-      width:320px;
-      margin:auto;
-      border:1px solid rgba(255,255,255,0.2);
-      padding:30px;
-      border-radius:12px;
-    }
-    .rank{
-      font-size:40px;
-      letter-spacing:4px;
-      margin:20px 0;
+
+    .loading,.error{
+      margin-top:16px;
+      font-size:14px;
+      opacity:.9;
+      white-space:pre-wrap;
     }
   </style>
 </head>
 <body>
-  <h1>Nalu-09 Member</h1>
-
-  <div class="card">
-    <div id="rank" class="rank">WAVE</div>
-    <div id="no">No.------</div>
-    <div id="name">読み込み中...</div>
+  <div class="wrap">
+    <div class="card">
+      <img id="cardImage" class="card-bg" src="" alt="member card">
+      <div class="overlay">
+        <div id="rank" class="rank">WAVE</div>
+        <div id="memberNo" class="memberNo">No.------</div>
+        <div id="name" class="name">読み込み中...</div>
+      </div>
+    </div>
+    <div id="status" class="loading"></div>
   </div>
 
   <script>
     const LIFF_ID = "2007730715-HKGPvwvU";
-    const API_URL = "https://script.google.com/macros/s/AKfycbxOIqa-TOGIogMYIro9Qu0nG85vZ7ObLFT_YWLW3Q9XHbUmfbXVr9Oxk3zuUZxbtmXe/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbxOlqa-TOGlogMYIro9Qu0nG85vZ70bLFT_YWLW3Q9XHbuMfbXV90xk3zuUZxbtmXe/exec";
+
+    const CARD_IMAGES = {
+      WAVE:  "https://drive.google.com/uc?export=view&id=1KNoWb7PvnfUx9Y0DccClyjSrOhghLLdR",
+      EVEIL: "https://drive.google.com/uc?export=view&id=1gEsRw75qj17YhSwqenrz7D9LzIocpXuE",
+      ECLAT: "https://drive.google.com/uc?export=view&id=13KW2TwH8g82UDyxIqV5rMMnJzTpXQtiQ",
+      NALU:  "https://drive.google.com/uc?export=view&id=1_2hYsHsI76pzsD5jV2qHyV3CbsTz2wta"
+    };
 
     async function main() {
+      const status = document.getElementById("status");
+
       try {
+        status.textContent = "LIFF初期化中...";
         await liff.init({ liffId: LIFF_ID });
 
         if (!liff.isLoggedIn()) {
+          status.textContent = "LINEログイン中...";
           liff.login();
           return;
         }
 
+        status.textContent = "プロフィール取得中...";
         const profile = await liff.getProfile();
 
+        status.textContent = "会員情報取得中...";
         const res = await fetch(API_URL, {
           method: "POST",
           mode: "cors",
-          headers: {
-            "Content-Type": "application/json"
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             lineUserId: profile.userId,
             name: profile.displayName
@@ -66,11 +128,23 @@
 
         const data = await res.json();
 
-        document.getElementById("rank").textContent = data.rank || "WAVE";
-        document.getElementById("no").textContent = "No." + (data.memberNo || "------");
-        document.getElementById("name").textContent = profile.displayName;
+        if (!data.ok) {
+          document.getElementById("name").textContent = "エラー";
+          status.textContent = data.message || "会員情報を取得できませんでした";
+          return;
+        }
+
+        const rank = String(data.rank || "WAVE").toUpperCase();
+
+        document.getElementById("rank").textContent = rank;
+        document.getElementById("memberNo").textContent = "No." + String(data.memberNo || "------");
+        document.getElementById("name").textContent = data.name || profile.displayName || "";
+        document.getElementById("cardImage").src = CARD_IMAGES[rank] || CARD_IMAGES.WAVE;
+
+        status.textContent = "";
       } catch (e) {
         document.getElementById("name").textContent = "エラー";
+        status.textContent = String(e);
       }
     }
 
