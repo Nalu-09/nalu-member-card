@@ -152,7 +152,7 @@ const data = await new Promise((resolve, reject) => {
 
         const rank = String(data.rank || "WAVE").toUpperCase();
 
-        document.getElementById("rank").textContent = rank;
+
         document.getElementById("memberNo").textContent = "No." + String(data.memberNo || "------");
         document.getElementById("name").textContent = data.name || profile.displayName || "";
         document.getElementById("cardImage").src = CARD_IMAGES[rank] || CARD_IMAGES.WAVE;
