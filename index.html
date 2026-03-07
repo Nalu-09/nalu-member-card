@@ -98,6 +98,7 @@ const CARD_IMAGES = {
   ECLAT: "https://nalu-09.github.io/nalu-member-card/eclat.png",
   NALU: "https://nalu-09.github.io/nalu-member-card/nalu.png"
 };
+    document.getElementById("cardImage").src = CARD_IMAGES[rank] || CARD_IMAGES.WAVE;
 
     async function main() {
       const status = document.getElementById("status");
