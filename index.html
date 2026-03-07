@@ -1,94 +1,79 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>Nalu Member Card</title>
-
-<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-
-<style>
-
-body{
-background:#000;
-color:#fff;
-font-family:serif;
-text-align:center;
-padding-top:120px;
-}
-
-.card{
-width:320px;
-margin:auto;
-border:1px solid rgba(255,255,255,0.2);
-padding:30px;
-border-radius:12px;
-}
-
-.rank{
-font-size:40px;
-letter-spacing:4px;
-margin:20px 0;
-}
-
-</style>
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nalu Member Card</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    body{
+      background:#000;
+      color:#fff;
+      font-family:serif;
+      text-align:center;
+      padding-top:120px;
+      margin:0;
+    }
+    .card{
+      width:320px;
+      margin:auto;
+      border:1px solid rgba(255,255,255,0.2);
+      padding:30px;
+      border-radius:12px;
+    }
+    .rank{
+      font-size:40px;
+      letter-spacing:4px;
+      margin:20px 0;
+    }
+  </style>
 </head>
-
 <body>
+  <h1>Nalu-09 Member</h1>
 
-<h1>Nalu-09 Member</h1>
+  <div class="card">
+    <div id="rank" class="rank">WAVE</div>
+    <div id="no">No.------</div>
+    <div id="name">読み込み中...</div>
+  </div>
 
-<div class="card">
+  <script>
+    const LIFF_ID = "2007730715-HKGPvwvU";
+    const API_URL = "https://script.google.com/macros/s/AKfycbxOlqa-TOGlogMYIro9Qu0nG85vZ70bLFT_YWLW3Q9XHbuMfbXV90xk3zuUZxbtmXe/exec";
 
-<div id="rank" class="rank">WAVE</div>
+    async function main() {
+      try {
+        await liff.init({ liffId: LIFF_ID });
 
-<div id="no">No.------</div>
+        if (!liff.isLoggedIn()) {
+          liff.login();
+          return;
+        }
 
-<div id="name">読み込み中...</div>
+        const profile = await liff.getProfile();
 
-</div>
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            lineUserId: profile.userId,
+            name: profile.displayName
+          })
+        });
 
-<script>
+        const data = await res.json();
 
-const LIFF_ID="2007730715-HKGPvwvU"
+        document.getElementById("rank").textContent = data.rank || "WAVE";
+        document.getElementById("no").textContent = "No." + (data.memberNo || "------");
+        document.getElementById("name").textContent = profile.displayName;
+      } catch (e) {
+        document.getElementById("name").textContent = "エラー";
+      }
+    }
 
-const API_URL="https://script.google.com/macros/s/AKfycbxOlqa-TOGlogMYIro9QuOnG85vZ70bLFT_YWLW3Q9XHbUmfbXVr90xk3zuUZxbtmXe/exec"
-
-async function main(){
-
-await liff.init({liffId:LIFF_ID})
-
-if(!liff.isLoggedIn()){
-liff.login()
-return
-}
-
-const profile=await liff.getProfile()
-
-const res=await fetch(API_URL,{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-lineUserId:profile.userId,
-name:profile.displayName
-})
-})
-
-const data=await res.json()
-
-document.getElementById("rank").textContent=data.rank
-document.getElementById("no").textContent="No."+data.memberNo
-document.getElementById("name").textContent=profile.displayName
-
-}
-
-main()
-
-</script>
-
+    main();
+  </script>
 </body>
 </html>
