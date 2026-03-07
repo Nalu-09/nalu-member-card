@@ -116,16 +116,13 @@
         const profile = await liff.getProfile();
 
         status.textContent = "会員情報取得中...";
-        const res = await fetch(API_URL, {
-          method: "POST",
-          mode: "cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            lineUserId: profile.userId,
-            name: profile.displayName
-          })
-        });
-
+const res = await fetch(API_URL, {
+  method: "POST",
+  body: new URLSearchParams({
+    lineUserId: profile.userId,
+    name: profile.displayName
+  })
+});
         const data = await res.json();
 
         if (!data.ok) {
