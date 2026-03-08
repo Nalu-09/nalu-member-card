@@ -4,7 +4,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Nalu Check-in</title>
-  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
     body{
       margin:0;
@@ -52,81 +51,69 @@
 <body>
   <div class="wrap">
     <h1>Nalu Check-in</h1>
-    <input id="memberNo" type="text" placeholder="会員番号 例: 000123">
+    <input id="memberNo" type="text" placeholder="会員番号 例: 000000">
     <button id="plusBtn">来店 +1</button>
     <div id="status" class="status"></div>
   </div>
 
   <script>
-    const LIFF_ID = "2007730715-HKGPwvvU";
     const API_URL = "https://script.google.com/macros/s/AKfycbxOIqa-TOGIogMYIro9Qu0nG85vZ7ObLFT_YWLW3Q9XHbUmfbXVr9Oxk3zuUZxbtmXe/exec";
-    
-    async function main() {
-      await liff.init({ liffId: LIFF_ID });
+    const ADMIN_USER_ID = "Uac1faf835c39c8020d78fcbe818fe254";
 
-      if (!liff.isLoggedIn()) {
-        liff.login();
+    document.getElementById("plusBtn").addEventListener("click", async () => {
+      const memberNo = document.getElementById("memberNo").value.trim();
+      const status = document.getElementById("status");
+
+      if (!memberNo) {
+        status.textContent = "会員番号を入力してください";
         return;
       }
 
-      const profile = await liff.getProfile();
+      status.textContent = "更新中...";
 
-      document.getElementById("plusBtn").addEventListener("click", async () => {
-        const memberNo = document.getElementById("memberNo").value.trim();
-        const status = document.getElementById("status");
+      const callbackName = "jsonpCallback_" + Date.now();
 
-        if (!memberNo) {
-          status.textContent = "会員番号を入力してください";
+      try {
+        const data = await new Promise((resolve, reject) => {
+          const script = document.createElement("script");
+
+          window[callbackName] = function(response) {
+            resolve(response);
+            delete window[callbackName];
+            script.remove();
+          };
+
+          script.src =
+            API_URL +
+            "?callback=" + callbackName +
+            "&action=plusOne" +
+            "&memberNo=" + encodeURIComponent(memberNo) +
+            "&adminUserId=" + encodeURIComponent(ADMIN_USER_ID);
+
+          script.onerror = function() {
+            reject(new Error("更新に失敗しました"));
+            delete window[callbackName];
+            script.remove();
+          };
+
+          document.body.appendChild(script);
+        });
+
+        if (!data.ok) {
+          status.textContent = data.message || "エラー";
           return;
         }
 
-        status.textContent = "更新中...";
+        status.textContent =
+          "更新完了\n" +
+          "会員番号: " + data.memberNo + "\n" +
+          "名前: " + data.name + "\n" +
+          "来店回数: " + data.visits;
 
-        const callbackName = "jsonpCallback_" + Date.now();
-
-        try {
-          const data = await new Promise((resolve, reject) => {
-            window[callbackName] = function(response) {
-              resolve(response);
-              delete window[callbackName];
-              script.remove();
-            };
-
-            const script = document.createElement("script");
-            script.src =
-              API_URL +
-              "?callback=" + callbackName +
-              "&action=plusOne" +
-              "&memberNo=" + encodeURIComponent(memberNo) +
-              "&adminUserId=" + encodeURIComponent(profile.userId);
-
-            script.onerror = function() {
-              reject(new Error("更新に失敗しました"));
-              delete window[callbackName];
-              script.remove();
-            };
-
-            document.body.appendChild(script);
-          });
-
-          if (!data.ok) {
-            status.textContent = data.message || "エラー";
-            return;
-          }
-
-          status.textContent =
-            "更新完了\n" +
-            "会員番号: " + data.memberNo + "\n" +
-            "名前: " + data.name + "\n" +
-            "来店回数: " + data.visits;
-
-        } catch (e) {
-          status.textContent = String(e);
-        }
-      });
-    }
-
-    main();
+      } catch (e) {
+        status.textContent = String(e);
+      }
+    });
   </script>
 </body>
 </html>
