@@ -10,7 +10,7 @@
       margin:0;
       background:#000;
       color:#fff;
-      font-family: "Times New Roman", serif;
+      font-family:"Times New Roman", serif;
       text-align:center;
       padding:24px 16px 40px;
     }
@@ -23,7 +23,7 @@
     .card{
       position:relative;
       width:100%;
-      aspect-ratio: 1 / 1.58;
+      aspect-ratio:1 / 1.58;
       overflow:hidden;
       border-radius:22px;
       background:#111;
@@ -51,12 +51,6 @@
       text-shadow:0 2px 10px rgba(0,0,0,.5);
     }
 
-    .rank{
-      font-size:42px;
-      letter-spacing:.08em;
-      margin:0 0 12px;
-    }
-
     .memberNo{
       font-size:18px;
       margin:0 0 8px;
@@ -67,11 +61,12 @@
       margin:0;
     }
 
-    .loading,.error{
+    .status{
       margin-top:16px;
       font-size:14px;
-      opacity:.9;
+      opacity:.95;
       white-space:pre-wrap;
+      line-height:1.8;
     }
   </style>
 </head>
@@ -80,29 +75,76 @@
     <div class="card">
       <img id="cardImage" class="card-bg" src="" alt="member card">
       <div class="overlay">
-         
         <div id="memberNo" class="memberNo">No.------</div>
         <div id="name" class="name">読み込み中...</div>
       </div>
     </div>
-    <div id="status" class="loading"></div>
+    <div id="status" class="status"></div>
   </div>
 
   <script>
     const LIFF_ID = "2007730715-HKGPvwvU";
-const API_URL ="https://script.google.com/macros/s/AKfycbxOIqa-TOGIogMYIro9Qu0nG85vZ7ObLFT_YWLW3Q9XHbUmfbXVr9Oxk3zuUZxbtmXe/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbxOIqa-TOGIogMYIro9Qu0nG85vZ7ObLFT_YWLW3Q9XHbUmfbXVr9Oxk3zuUZxbtmXe/exec";
 
-const CARD_IMAGES = {
-  WAVE: "https://nalu-09.github.io/nalu-member-card/wave.png",
-  EVEIL: "https://nalu-09.github.io/nalu-member-card/eveil.png",
-  ECLAT: "https://nalu-09.github.io/nalu-member-card/eclat.png",
-  NALU: "https://nalu-09.github.io/nalu-member-card/nalu.png"
-};
+    const CARD_IMAGES = {
+      WAVE:  "https://nalu-09.github.io/nalu-member-card/wave.png",
+      EVEIL: "https://nalu-09.github.io/nalu-member-card/eveil.png",
+      ECLAT: "https://nalu-09.github.io/nalu-member-card/eclat.png",
+      NALU:  "https://nalu-09.github.io/nalu-member-card/nalu.png"
+    };
+
+    function setCard(rank, memberNo, name) {
+      const normalizedRank = String(rank || "WAVE").toUpperCase();
+      document.getElementById("cardImage").src = CARD_IMAGES[normalizedRank] || CARD_IMAGES.WAVE;
+      document.getElementById("memberNo").textContent = "No." + String(memberNo || "------");
+      document.getElementById("name").textContent = name || "";
+    }
+
+    function showNotMember() {
+      setCard("WAVE", "------", "未登録");
+      document.getElementById("status").textContent =
+        "会員情報がありません\n現在このLINEアカウントは会員登録されていません。\nご不明点は店舗へご確認ください。";
+    }
+
+    function showGenericError() {
+      setCard("WAVE", "------", "エラー");
+      document.getElementById("status").textContent =
+        "会員情報を取得できませんでした。\n時間をおいて再度お試しください。";
+    }
+
+    async function fetchMemberData(profile) {
+      const callbackName = "jsonpCallback_" + Date.now() + "_" + Math.floor(Math.random() * 10000);
+
+      return await new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+
+        window[callbackName] = function(response) {
+          resolve(response);
+          try { delete window[callbackName]; } catch (_) {}
+          script.remove();
+        };
+
+        script.src =
+          API_URL +
+          "?callback=" + callbackName +
+          "&lineUserId=" + encodeURIComponent(profile.userId) +
+          "&name=" + encodeURIComponent(profile.displayName);
+
+        script.onerror = function() {
+          reject(new Error("会員情報の取得に失敗しました"));
+          try { delete window[callbackName]; } catch (_) {}
+          script.remove();
+        };
+
+        document.body.appendChild(script);
+      });
+    }
 
     async function main() {
       const status = document.getElementById("status");
 
       try {
+        setCard("WAVE", "------", "読み込み中...");
         status.textContent = "LIFF初期化中...";
         await liff.init({ liffId: LIFF_ID });
 
@@ -115,51 +157,29 @@ const CARD_IMAGES = {
         status.textContent = "プロフィール取得中...";
         const profile = await liff.getProfile();
 
-status.textContent = "会員情報取得中...";
-
-const callbackName = "jsonpCallback_" + Date.now();
-
-const data = await new Promise((resolve, reject) => {
-  window[callbackName] = function(response) {
-    resolve(response);
-    delete window[callbackName];
-    script.remove();
-  };
-
-  const script = document.createElement("script");
-
-  script.src =
-    API_URL +
-    "?callback=" + callbackName +
-    "&lineUserId=" + encodeURIComponent(profile.userId) +
-    "&name=" + encodeURIComponent(profile.displayName);
-
-  script.onerror = function() {
-    reject(new Error("会員情報の取得に失敗しました"));
-    delete window[callbackName];
-    script.remove();
-  };
-
-  document.body.appendChild(script);
-});
+        status.textContent = "会員情報取得中...";
+        const data = await fetchMemberData(profile);
 
         if (!data.ok) {
-          document.getElementById("name").textContent = "エラー";
-          status.textContent = data.message || "会員情報を取得できませんでした";
+          if (data.message === "member_not_found") {
+            showNotMember();
+            return;
+          }
+
+          showGenericError();
           return;
         }
 
         const rank = String(data.rank || "WAVE").toUpperCase();
-
-
-        document.getElementById("memberNo").textContent = "No." + String(data.memberNo || "------");
-        document.getElementById("name").textContent = data.name || profile.displayName || "";
-        document.getElementById("cardImage").src = CARD_IMAGES[rank] || CARD_IMAGES.WAVE;
+        setCard(
+          rank,
+          String(data.memberNo || "------"),
+          data.name || profile.displayName || ""
+        );
 
         status.textContent = "";
       } catch (e) {
-        document.getElementById("name").textContent = "エラー";
-        status.textContent = String(e);
+        showGenericError();
       }
     }
 
