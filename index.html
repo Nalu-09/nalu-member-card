@@ -168,15 +168,22 @@
         status.textContent = "会員情報取得中...";
         const data = await fetchMemberData(profile);
 
-        if (!data.ok) {
-          if (data.message === "member_not_found") {
-            showNotMember();
-            return;
-          }
+     if (!data.ok) {
 
-          showGenericError();
-          return;
-        }
+  if (data.message === "system_stopped") {
+    document.getElementById("name").textContent = "利用停止中";
+    status.textContent = "現在この会員システムはご利用いただけません。";
+    return;
+  }
+
+  if (data.message === "member_not_found") {
+    showNoMember();
+    return;
+  }
+
+  showGenericError();
+  return;
+}
 
         const rank = String(data.rank || "WAVE").toUpperCase();
         setCard(
