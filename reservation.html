@@ -195,7 +195,21 @@ Lumière Nalu ご予約申込ページです。
   </div>
 
   <script>
-  document.getElementById("status").textContent = "HTML反映確認 v1";
+  window.onerror = function(message, source, lineno, colno, error) {
+    document.getElementById("status").textContent =
+      "JSエラー:\n" +
+      message + "\n" +
+      "line: " + lineno + "\n" +
+      "col: " + colno;
+  };
+
+  window.addEventListener("unhandledrejection", function(event) {
+    document.getElementById("status").textContent =
+      "Promiseエラー:\n" +
+      (event.reason && event.reason.message ? event.reason.message : event.reason);
+  });
+
+  document.getElementById("status").textContent = "HTML反映確認 v2";
 </script>
 
  <script>
