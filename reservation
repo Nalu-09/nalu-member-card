@@ -195,7 +195,7 @@ Lumière Nalu ご予約申込ページです。
   </div>
 
   <script>
-    const LIFF_ID = "ここに予約用LIFF IDを入れる";
+    const LIFF_ID = "2007730715-wxTZ582n";
     const API_URL = "https://script.google.com/macros/s/AKfycbxOIqa-TOGIogMYYro9Qu0nG85vZ7ObLFT_YVLV3q9XHbUmfbXVr9Oxk32uUZxbtmXe/exec";
 
     let currentProfile = null;
