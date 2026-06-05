@@ -197,7 +197,24 @@ Lumière Nalu ご予約申込ページです。
  <script>
   const LIFF_ID = "2007730715-wxTZ582n";
   const API_URL = "https://script.google.com/macros/s/AKfycbxOIqa-TOGIogMYIro9Qu0nG85vZ7ObLFT_YWLW3Q9XHbUmfbXVr9Oxk3zuUZxbtmXev/exec";
-  const SOURCE = "lumiere";
+  function getSource() {
+  const params = new URLSearchParams(window.location.search);
+
+  const directSource = params.get("source");
+  if (directSource) {
+    return directSource;
+  }
+
+  const liffState = params.get("liff.state");
+  if (liffState) {
+    const stateParams = new URLSearchParams(liffState.replace(/^\?/, ""));
+    return stateParams.get("source") || "lumiere";
+  }
+
+  return "lumiere";
+}
+
+const SOURCE = getSource();
 
   let currentProfile = null;
   let currentMember = null;
