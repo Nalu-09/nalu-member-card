@@ -232,6 +232,7 @@ Lumière Nalu ご予約申込ページです。
           body: new URLSearchParams({
             action: "getReservationOptions",
             lineUserId: currentProfile.userId
+            source: SOURCE
           })
         });
 
@@ -335,6 +336,7 @@ Lumière Nalu ご予約申込ページです。
             action: "submitReservation",
             lineUserId: currentProfile.userId,
             displayName: currentProfile.displayName || "",
+            source: SOURCE
             memberNo: memberNo,
             inputName: inputName,
             serviceId: serviceId,
