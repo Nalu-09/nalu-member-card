@@ -42,6 +42,35 @@
       margin:0 0 22px;
     }
 
+    .field{
+      margin:0 0 18px;
+      text-align:left;
+    }
+
+    .field label{
+      display:block;
+      font-size:13px;
+      margin:0 0 8px;
+      opacity:.9;
+    }
+
+    .field input{
+      width:100%;
+      box-sizing:border-box;
+      background:#050505;
+      color:#fff;
+      border:1px solid rgba(255,255,255,.16);
+      border-radius:14px;
+      padding:12px 14px;
+      font-size:14px;
+      font-family:"Times New Roman", serif;
+      outline:none;
+    }
+
+    .field input::placeholder{
+      color:rgba(255,255,255,.45);
+    }
+
     .button{
       display:inline-block;
       background:#fff;
@@ -72,13 +101,27 @@
   <div class="wrap">
     <div class="box">
       <h1 class="title">Membership Application</h1>
+
       <p class="text" id="introText">
 ご案内ありがとうございます。
 こちらのページは、会員申請のための専用ページです。
 
-内容を確認のうえ、
+会員証の申請には
+運営よりご案内している申請パスワードが必要です。
+
+内容を確認のうえ
 承認後に会員証をご利用いただけます。
       </p>
+
+      <div class="field">
+        <label for="applicationPassword">申請パスワード</label>
+        <input
+          type="password"
+          id="applicationPassword"
+          placeholder="申請パスワードを入力"
+          autocomplete="off"
+        >
+      </div>
 
       <button id="applyBtn" class="button">会員申請を送信する</button>
       <div id="status" class="status"></div>
@@ -115,9 +158,17 @@
     async function submitApplication() {
       const btn = document.getElementById("applyBtn");
       const status = document.getElementById("status");
+      const passwordInput = document.getElementById("applicationPassword");
 
       if (!currentProfile) {
         status.textContent = "プロフィールを取得できていません。";
+        return;
+      }
+
+      const applicationPassword = passwordInput.value.trim();
+
+      if (!applicationPassword) {
+        status.textContent = "申請パスワードをご入力ください。";
         return;
       }
 
@@ -128,7 +179,8 @@
         const body = new URLSearchParams({
           action: "submitApplication",
           lineUserId: currentProfile.userId,
-          displayName: currentProfile.displayName || ""
+          displayName: currentProfile.displayName || "",
+          applicationPassword: applicationPassword
         });
 
         const res = await fetch(API_URL, {
@@ -139,10 +191,19 @@
         const data = await res.json();
 
         if (!data.ok) {
+          if (data.message === "invalid_password") {
+            status.textContent =
+              "申請パスワードが正しくありません。\nご確認のうえ、再度お試しください。";
+            btn.disabled = false;
+            btn.textContent = "会員申請を送信する";
+            return;
+          }
+
           if (data.message === "already_applied") {
             status.textContent =
               "このLINEアカウントは、すでに申請済みまたは承認済みです。\nご案内をお待ちください。";
             btn.style.display = "none";
+            passwordInput.disabled = true;
             return;
           }
 
@@ -155,7 +216,9 @@
 
         status.textContent =
           "会員申請を受け付けました。\n内容を確認のうえ、承認後にご利用いただけます。\nしばらくお待ちください。";
+
         btn.style.display = "none";
+        passwordInput.disabled = true;
 
       } catch (e) {
         status.textContent =
