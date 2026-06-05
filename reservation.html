@@ -207,10 +207,11 @@ Lumière Nalu ご予約申込ページです。
   }
 
   const liffState = params.get("liff.state");
-  if (liffState) {
-    const stateParams = new URLSearchParams(liffState.replace(/^\?/, ""));
-    return stateParams.get("source") || "lumiere";
-  }
+if (liffState) {
+  const decodedState = decodeURIComponent(liffState);
+  const stateParams = new URLSearchParams(decodedState.replace(/^\?/, ""));
+  return stateParams.get("source") || "lumiere";
+}
 
   return "lumiere";
 }
