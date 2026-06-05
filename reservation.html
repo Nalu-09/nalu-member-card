@@ -249,9 +249,9 @@ Lumière Nalu ご予約申込ページです。
         currentMember = data.member;
 
         memberInfo.textContent =
-          "Member No. " + currentMember.memberNo + "\n" +
-          "Rank： " + currentMember.rank + "\n" +
-          "Name： " + currentMember.name;
+  "Member No. " + currentMember.memberNo + "\n" +
+  "Rank： " + currentMember.rank + "\n" +
+  "Name： " + (currentMember.cardName || currentMember.name);
 
         serviceSelect.innerHTML = "";
 
