@@ -196,7 +196,7 @@ Lumière Nalu ご予約申込ページです。
 
  <script>
   const LIFF_ID = "2007730715-wxTZ582n";
-  const API_URL = "https://script.google.com/macros/s/AKfycbxOIqa-TOGIogMYIro9Qu0nG85vZ7ObLFT_YWLW3Q9XHbUmfbXVr9Oxk3zuUZxbtmXe/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbxOIqa-TOGIogMYIro9Qu0nG85vZ7ObLFT_YWLW3Q9XHbUmfbXVr9Oxk3zuUZxbtmXev/exec";
   const SOURCE = "lumiere";
 
   let currentProfile = null;
@@ -209,9 +209,9 @@ Lumière Nalu ご予約申込ページです。
     const serviceSelect = document.getElementById("serviceId");
 
     try {
-      status.textContent = "LIFF初期化中...";
+      status.textContent = "LIFF初期化中...\nLIFF_ID: " + LIFF_ID;
 
-      await liff.init({ liffId: LIFF_ID });
+await liff.init({ liffId: LIFF_ID });
 
       if (!liff.isLoggedIn()) {
         status.textContent = "LINEログイン中...";
@@ -389,3 +389,4 @@ Lumière Nalu ご予約申込ページです。
     initReservation();
   });
 </script>
+  
