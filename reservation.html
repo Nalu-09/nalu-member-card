@@ -194,8 +194,8 @@ Lumière Nalu ご予約申込ページです。
     </div>
   </div>
 
-    <script>
-  const LIFF_ID = "2007730715-wxTZ582n";
+ <script>
+  const LIFF_ID = "2007730715-wXTz582n";
   const API_URL = "https://script.google.com/macros/s/AKfycbxOIqa-TOGIogMYIro9Qu0nG85vZ7ObLFT_YWLW3Q9XHbUmfbXVr9Oxk3zuUZxbtmXe/exec";
 
   const params = new URLSearchParams(window.location.search);
@@ -204,190 +204,190 @@ Lumière Nalu ご予約申込ページです。
   let currentProfile = null;
   let currentMember = null;
 
-    async function initReservation() {
-      const status = document.getElementById("status");
-      const formArea = document.getElementById("formArea");
-      const memberInfo = document.getElementById("memberInfo");
-      const serviceSelect = document.getElementById("serviceId");
+  async function initReservation() {
+    const status = document.getElementById("status");
+    const formArea = document.getElementById("formArea");
+    const memberInfo = document.getElementById("memberInfo");
+    const serviceSelect = document.getElementById("serviceId");
 
-      try {
-        status.textContent = "LIFF初期化中...";
+    try {
+      status.textContent = "LIFF初期化中...";
 
-        await liff.init({ liffId: LIFF_ID });
+      await liff.init({ liffId: LIFF_ID });
 
-        if (!liff.isLoggedIn()) {
-          status.textContent = "LINEログイン中...";
-          liff.login();
-          return;
-        }
-
-        status.textContent = "プロフィール取得中...";
-        currentProfile = await liff.getProfile();
-
-        status.textContent = "会員情報を確認中...";
-
-        const res = await fetch(API_URL, {
-          method: "POST",
-          body: new URLSearchParams({
-            action: "getReservationOptions",
-            lineUserId: currentProfile.userId
-            source: SOURCE
-          })
-        });
-
-        const data = await res.json();
-
-        if (!data.ok) {
-          if (data.message === "member_not_found") {
-            status.textContent =
-              "会員情報が確認できませんでした。\n会員証発行後にご利用ください。";
-            return;
-          }
-
-          status.textContent =
-            "予約フォームを表示できませんでした。\n" +
-            "エラー内容：" + (data.message || "unknown_error");
-          return;
-        }
-
-        currentMember = data.member;
-
-        memberInfo.textContent =
-  "Member No. " + currentMember.memberNo + "\n" +
-  "Rank： " + currentMember.rank + "\n" +
-  "Name： " + (currentMember.cardName || currentMember.name);
-
-        serviceSelect.innerHTML = "";
-
-        const defaultOption = document.createElement("option");
-        defaultOption.value = "";
-        defaultOption.textContent = "選択してください";
-        serviceSelect.appendChild(defaultOption);
-
-        if (!data.services || data.services.length === 0) {
-          const option = document.createElement("option");
-          option.value = "";
-          option.textContent = "現在選択可能な内容がありません";
-          serviceSelect.appendChild(option);
-        } else {
-          data.services.forEach(function(service) {
-            const option = document.createElement("option");
-            option.value = service.serviceId;
-            option.textContent = service.serviceName;
-            serviceSelect.appendChild(option);
-          });
-        }
-
-        formArea.classList.remove("hidden");
-        status.textContent = "";
-
-      } catch (e) {
-        status.textContent =
-          "読み込み中にエラーが発生しました。\n" +
-          "エラー内容：" + e.message;
+      if (!liff.isLoggedIn()) {
+        status.textContent = "LINEログイン中...";
+        liff.login();
+        return;
       }
+
+      status.textContent = "プロフィール取得中...";
+      currentProfile = await liff.getProfile();
+
+      status.textContent = "会員情報を確認中...";
+
+      const res = await fetch(API_URL, {
+        method: "POST",
+        body: new URLSearchParams({
+          action: "getReservationOptions",
+          lineUserId: currentProfile.userId,
+          source: SOURCE
+        })
+      });
+
+      const data = await res.json();
+
+      if (!data.ok) {
+        status.textContent =
+          "予約フォームを表示できませんでした。\n" +
+          "エラー内容：" + (data.message || "unknown_error");
+        return;
+      }
+
+      currentMember = data.member;
+
+      memberInfo.textContent =
+        "Member No. " + currentMember.memberNo + "\n" +
+        "Rank： " + currentMember.rank + "\n" +
+        "Name： " + (currentMember.cardName || currentMember.name);
+
+      serviceSelect.innerHTML = "";
+
+      const defaultOption = document.createElement("option");
+      defaultOption.value = "";
+      defaultOption.textContent = "選択してください";
+      serviceSelect.appendChild(defaultOption);
+
+      if (!data.services || data.services.length === 0) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "現在選択可能な内容がありません";
+        serviceSelect.appendChild(option);
+      } else {
+        data.services.forEach(function(service) {
+          const option = document.createElement("option");
+          option.value = service.serviceId;
+          option.textContent = service.serviceName;
+          serviceSelect.appendChild(option);
+        });
+      }
+
+      formArea.classList.remove("hidden");
+      status.textContent = "";
+
+    } catch (e) {
+      status.textContent =
+        "読み込み中にエラーが発生しました。\n" +
+        "エラー内容：" + e.message;
+    }
+  }
+
+  async function submitReservation() {
+    const status = document.getElementById("status");
+    const btn = document.getElementById("submitBtn");
+
+    const memberNo = document.getElementById("memberNo").value.trim();
+    const inputName = document.getElementById("inputName").value.trim();
+    const serviceId = document.getElementById("serviceId").value;
+    const people = document.getElementById("people").value;
+    const allergy = document.getElementById("allergy").value.trim();
+    const dislike = document.getElementById("dislike").value.trim();
+    const message = document.getElementById("message").value.trim();
+
+    if (!currentProfile) {
+      status.textContent = "LINEプロフィールを取得できていません。";
+      return;
     }
 
-    async function submitReservation() {
-      const status = document.getElementById("status");
-      const btn = document.getElementById("submitBtn");
+    if (!memberNo) {
+      status.textContent = "会員番号をご入力ください。";
+      return;
+    }
 
-      const memberNo = document.getElementById("memberNo").value.trim();
-      const inputName = document.getElementById("inputName").value.trim();
-      const serviceId = document.getElementById("serviceId").value;
-      const people = document.getElementById("people").value;
-      const allergy = document.getElementById("allergy").value.trim();
-      const dislike = document.getElementById("dislike").value.trim();
-      const message = document.getElementById("message").value.trim();
+    if (!inputName) {
+      status.textContent = "お名前をご入力ください。";
+      return;
+    }
 
-      if (!currentProfile) {
-        status.textContent = "LINEプロフィールを取得できていません。";
-        return;
-      }
+    if (!serviceId) {
+      status.textContent = "イベント / 店舗名を選択してください。";
+      return;
+    }
 
-      if (!memberNo) {
-        status.textContent = "会員番号をご入力ください。";
-        return;
-      }
+    if (!people) {
+      status.textContent = "人数を選択してください。";
+      return;
+    }
 
-      if (!inputName) {
-        status.textContent = "お名前をご入力ください。";
-        return;
-      }
+    try {
+      btn.disabled = true;
+      btn.textContent = "送信中...";
 
-      if (!serviceId) {
-        status.textContent = "イベント / 店舗名を選択してください。";
-        return;
-      }
+      const res = await fetch(API_URL, {
+        method: "POST",
+        body: new URLSearchParams({
+          action: "submitReservation",
+          lineUserId: currentProfile.userId,
+          displayName: currentProfile.displayName || "",
+          source: SOURCE,
+          memberNo: memberNo,
+          inputName: inputName,
+          serviceId: serviceId,
+          people: people,
+          allergy: allergy,
+          dislike: dislike,
+          message: message
+        })
+      });
 
-      if (!people) {
-        status.textContent = "人数を選択してください。";
-        return;
-      }
+      const data = await res.json();
 
-      try {
-        btn.disabled = true;
-        btn.textContent = "送信中...";
-
-        const res = await fetch(API_URL, {
-          method: "POST",
-          body: new URLSearchParams({
-            action: "submitReservation",
-            lineUserId: currentProfile.userId,
-            displayName: currentProfile.displayName || "",
-            source: SOURCE
-            memberNo: memberNo,
-            inputName: inputName,
-            serviceId: serviceId,
-            people: people,
-            allergy: allergy,
-            dislike: dislike,
-            message: message
-          })
-        });
-
-        const data = await res.json();
-
-        if (!data.ok) {
-          if (data.message === "member_not_found") {
-            status.textContent =
-              "会員情報が確認できませんでした。\n会員証発行後にご利用ください。";
-          } else if (data.message === "member_no_mismatch") {
-            status.textContent =
-              "会員番号が一致しません。\n会員証をご確認のうえ、再度お試しください。";
-          } else if (data.message === "name_mismatch") {
-            status.textContent =
-              "お名前が会員情報と一致しません。\n会員証の表記をご確認ください。";
-          } else if (data.message === "service_not_allowed") {
-            status.textContent =
-              "現在のランクでは、選択された内容にお申し込みいただけません。";
-          } else {
-            status.textContent =
-              "予約申込を受け付けできませんでした。\n" +
-              "エラー内容：" + (data.message || "unknown_error");
-          }
-
-          btn.disabled = false;
-          btn.textContent = "予約申込を送信する";
-          return;
+      if (!data.ok) {
+        if (data.message === "member_not_found") {
+          status.textContent =
+            "会員情報が確認できませんでした。\n会員証発行後にご利用ください。";
+        } else if (data.message === "member_no_mismatch") {
+          status.textContent =
+            "会員番号が一致しません。\n会員証をご確認のうえ、再度お試しください。";
+        } else if (data.message === "name_mismatch") {
+          status.textContent =
+            "お名前が会員情報と一致しません。\n会員証の表記をご確認ください。";
+        } else if (data.message === "service_not_allowed") {
+          status.textContent =
+            "現在のランクでは、選択された内容にお申し込みいただけません。";
+        } else {
+          status.textContent =
+            "予約申込を受け付けできませんでした。\n" +
+            "エラー内容：" + (data.message || "unknown_error");
         }
-
-        status.textContent =
-          "予約申込を受け付けました。\n内容を確認のうえ、運営よりご案内いたします。";
-
-        btn.style.display = "none";
-
-      } catch (e) {
-        status.textContent =
-          "予約申込を受け付けできませんでした。\n" +
-          "エラー内容：" + e.message;
 
         btn.disabled = false;
         btn.textContent = "予約申込を送信する";
+        return;
       }
+
+      status.textContent =
+        "予約申込を受け付けました。\n内容を確認のうえ、運営よりご案内いたします。";
+
+      btn.style.display = "none";
+
+    } catch (e) {
+      status.textContent =
+        "予約申込を受け付けできませんでした。\n" +
+        "エラー内容：" + e.message;
+
+      btn.disabled = false;
+      btn.textContent = "予約申込を送信する";
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    const btn = document.getElementById("submitBtn");
+
+    if (btn) {
+      btn.addEventListener("click", submitReservation);
     }
 
-    document.getElementById("submitBtn").addEventListener("click", submitReservation);
-
     initReservation();
-  </script>
+  });
+</script>
