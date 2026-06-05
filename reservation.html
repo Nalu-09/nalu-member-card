@@ -196,28 +196,24 @@ Lumière Nalu ご予約申込ページです。
 
   <script>
   window.onerror = function(message, source, lineno, colno, error) {
-    document.getElementById("status").textContent =
-      "JSエラー:\n" +
-      message + "\n" +
-      "line: " + lineno + "\n" +
-      "col: " + colno;
+    const status = document.getElementById("status");
+    if (status) {
+      status.textContent =
+        "JSエラー:\n" +
+        message + "\n\n" +
+        "line: " + lineno + "\n" +
+        "col: " + colno;
+    }
   };
 
-  window.addEventListener("unhandledrejection", function(event) {
-    document.getElementById("status").textContent =
-      "Promiseエラー:\n" +
-      (event.reason && event.reason.message ? event.reason.message : event.reason);
-  });
-
-  document.getElementById("status").textContent = "HTML反映確認 v2";
-</script>
-
- <script>
   const LIFF_ID = "2007730715-wxTZ582n";
-  const API_URL = "https://script.google.com/macros/s/AKfycbxOIqa-TOGIogMYIro9Qu0nG85vZ7ObLFT_YWLW3Q9XHbUmfbXVr9Oxk3zuUZxbtmXev/exec";
-   
-  const SOURCE = "lumiere";
-  
+  const API_URL = "https://script.google.com/macros/s/AKfycbxOIqa-TOGIogMYIro9Qu0nG85vZ7ObLFT_YWLW3Q9XHbUmfbXVr9Oxk3zuUZxbtmXe/exec";
+
+  const rawParams = new URLSearchParams(window.location.search);
+  const rawState = rawParams.get("liff.state");
+  const stateParams = new URLSearchParams((rawState || "").replace(/^\?/, ""));
+  const SOURCE = rawParams.get("source") || stateParams.get("source") || "lumiere";
+
   let currentProfile = null;
   let currentMember = null;
 
@@ -228,9 +224,9 @@ Lumière Nalu ご予約申込ページです。
     const serviceSelect = document.getElementById("serviceId");
 
     try {
-      status.textContent = "LIFF初期化中...;
+      status.textContent = "LIFF初期化中...";
 
-await liff.init({ liffId: LIFF_ID });
+      await liff.init({ liffId: LIFF_ID });
 
       if (!liff.isLoggedIn()) {
         status.textContent = "LINEログイン中...";
@@ -255,6 +251,12 @@ await liff.init({ liffId: LIFF_ID });
       const data = await res.json();
 
       if (!data.ok) {
+        if (data.message === "member_not_found") {
+          status.textContent =
+            "会員情報が確認できませんでした。\n会員証発行後にご利用ください。";
+          return;
+        }
+
         status.textContent =
           "予約フォームを表示できませんでした。\n" +
           "エラー内容：" + (data.message || "unknown_error");
@@ -408,4 +410,3 @@ await liff.init({ liffId: LIFF_ID });
     initReservation();
   });
 </script>
-  
