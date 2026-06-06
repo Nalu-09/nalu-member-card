@@ -168,6 +168,15 @@ Lumière Nalu ご予約申込ページです。
         </div>
 
         <div class="field">
+  <label for="inputKana">お名前（カナ）</label>
+  <input
+    type="text"
+    id="inputKana"
+    placeholder="例：オナマエ"
+  >
+</div>
+
+        <div class="field">
           <label for="serviceId">イベント / 店舗名</label>
           <select id="serviceId">
             <option value="">読み込み中...</option>
@@ -186,10 +195,13 @@ Lumière Nalu ご予約申込ページです。
           </select>
         </div>
 
-        <div class="field">
-          <label for="allergy">ご同行される方のお名前</label>
-          <textarea id="allergy" placeholder=""></textarea>
-        </div>
+       <div class="field">
+  <label for="companionName">ご同行される方のお名前</label>
+  <textarea
+    id="companionName"
+    placeholder="2名以上でお申し込みの場合、ご同行者様のお名前をカナと併せてご入力ください"
+  ></textarea>
+</div>
         
         <div class="field">
           <label for="allergy">アレルギー</label>
@@ -371,8 +383,10 @@ Lumière Nalu ご予約申込ページです。
 
       const memberNo = document.getElementById("memberNo").value.trim();
       const inputName = document.getElementById("inputName").value.trim();
+      const inputKana = document.getElementById("inputKana").value.trim();
       const serviceId = document.getElementById("serviceId").value;
       const people = document.getElementById("people").value;
+      const companionName = document.getElementById("companionName").value.trim();
       const allergy = document.getElementById("allergy").value.trim();
       const dislike = document.getElementById("dislike").value.trim();
       const message = document.getElementById("message").value.trim();
@@ -392,6 +406,11 @@ Lumière Nalu ご予約申込ページです。
         return;
       }
 
+      if (!inputKana) {
+        status.textContent = "お名前（カナ）をご入力ください。";
+        return;
+      }
+
       if (!serviceId) {
         status.textContent = "イベント / 店舗名を選択してください。";
         return;
@@ -402,6 +421,11 @@ Lumière Nalu ご予約申込ページです。
         return;
       }
 
+      if (Number(people) >= 2 && !companionName) {
+        status.textContent = "2名以上でお申し込みの場合、ご同行される方のお名前をカナと併せてご入力ください。";
+        return;
+      }
+
       try {
         btn.disabled = true;
         btn.textContent = "送信中...";
@@ -409,18 +433,20 @@ Lumière Nalu ご予約申込ページです。
         const res = await fetch(API_URL, {
           method: "POST",
           body: new URLSearchParams({
-            action: "submitReservation",
-            lineUserId: currentProfile.userId,
-            displayName: currentProfile.displayName || "",
-            source: SOURCE,
-            memberNo: memberNo,
-            inputName: inputName,
-            serviceId: serviceId,
-            people: people,
-            allergy: allergy,
-            dislike: dislike,
-            message: message
-          })
+          action: "submitReservation",
+          lineUserId: currentProfile.userId,
+          displayName: currentProfile.displayName || "",
+          source: SOURCE,
+          memberNo: memberNo,
+          inputName: inputName,
+          inputKana: inputKana,
+          serviceId: serviceId,
+          people: people,
+          companionName: companionName,
+          allergy: allergy,
+          dislike: dislike,
+          message: message
+        })
         });
 
         const data = await res.json();
@@ -436,6 +462,12 @@ Lumière Nalu ご予約申込ページです。
             status.textContent =
               "お名前が会員情報と一致しません。\n会員証の表記をご確認ください。";
           } else if (data.message === "service_not_allowed") {
+          } else if (data.message === "kana_required") {
+              status.textContent =
+               "お名前（カナ）をご入力ください。";
+          } else if (data.message === "companion_required") {
+              status.textContent =
+                 "2名以上でお申し込みの場合、ご同行される方のお名前をご入力ください。";
             status.textContent =
               "現在のランクでは、選択された内容にお申し込みいただけません。";
           } else if (data.message === "deadline_closed") {
