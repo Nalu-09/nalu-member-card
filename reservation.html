@@ -273,11 +273,16 @@ Lumière Nalu ご予約申込ページです。
         serviceSelect.appendChild(option);
       } else {
         data.services.forEach(function(service) {
-          const option = document.createElement("option");
-          option.value = service.serviceId;
-          option.textContent = service.serviceName;
-          serviceSelect.appendChild(option);
-        });
+  const option = document.createElement("option");
+  option.value = service.serviceId;
+  option.textContent = service.label || service.serviceName;
+
+  if (!service.selectable) {
+    option.disabled = true;
+  }
+
+  serviceSelect.appendChild(option);
+});
       }
 
       formArea.classList.remove("hidden");
@@ -367,7 +372,12 @@ Lumière Nalu ご予約申込ページです。
           status.textContent =
             "予約申込を受け付けできませんでした。\n" +
             "エラー内容：" + (data.message || "unknown_error");
-        }
+        } else if (data.message === "deadline_closed") {
+  status.textContent =
+    "このお申し込みは受付終了しています。";
+} else if (data.message === "service_full") {
+  status.textContent =
+    "このお申し込みは現在満席です。";
 
         btn.disabled = false;
         btn.textContent = "予約申込を送信する";
