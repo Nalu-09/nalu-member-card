@@ -117,6 +117,20 @@
     .hidden{
       display:none;
     }
+
+    .service-detail{
+  margin-top:14px;
+  padding:16px 18px;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:16px;
+  color:rgba(255,255,255,.84);
+  font-size:14px;
+  line-height:1.9;
+  text-align:left;
+  white-space:pre-line;
+  display:none;
+}
+    
   </style>
 </head>
 
@@ -159,6 +173,7 @@ Lumière Nalu ご予約申込ページです。
           <select id="serviceId">
             <option value="">読み込み中...</option>
           </select>
+          <div id="serviceDetail" class="service-detail"></div>
         </div>
 
         <div class="field">
@@ -205,7 +220,8 @@ Lumière Nalu ご予約申込ページです。
 
   let currentProfile = null;
   let currentMember = null;
-
+  let currentServices = [];
+    
   async function initReservation() {
     const status = document.getElementById("status");
     const formArea = document.getElementById("formArea");
@@ -253,6 +269,7 @@ Lumière Nalu ご予約申込ページです。
       }
 
       currentMember = data.member;
+      currentServices = data.services || [];
 
       memberInfo.textContent =
         "Member No. " + currentMember.memberNo + "\n" +
@@ -272,10 +289,10 @@ Lumière Nalu ご予約申込ページです。
         option.textContent = "現在選択可能な内容がありません";
         serviceSelect.appendChild(option);
       } else {
-        data.services.forEach(function(service) {
+        currentServices.forEach(function(service) {
   const option = document.createElement("option");
   option.value = service.serviceId;
-  option.textContent = service.label || service.serviceName;
+  option.textContent = service.serviceName;
 
   if (!service.selectable) {
     option.disabled = true;
@@ -400,12 +417,62 @@ Lumière Nalu ご予約申込ページです。
   }
 
   document.addEventListener("DOMContentLoaded", function() {
-    const btn = document.getElementById("submitBtn");
+  const btn = document.getElementById("submitBtn");
+  const serviceSelect = document.getElementById("serviceId");
 
-    if (btn) {
-      btn.addEventListener("click", submitReservation);
-    }
+  if (btn) {
+    btn.addEventListener("click", submitReservation);
+  }
 
-    initReservation();
+  if (serviceSelect) {
+    serviceSelect.addEventListener("change", updateServiceDetail);
+  }
+
+  initReservation();
+});
+
+    function updateServiceDetail() {
+  const serviceSelect = document.getElementById("serviceId");
+  const detail = document.getElementById("serviceDetail");
+
+  if (!serviceSelect || !detail) return;
+
+  const serviceId = serviceSelect.value;
+
+  if (!serviceId) {
+    detail.style.display = "none";
+    detail.textContent = "";
+    return;
+  }
+
+  const service = currentServices.find(function(item) {
+    return String(item.serviceId) === String(serviceId);
   });
+
+  if (!service) {
+    detail.style.display = "none";
+    detail.textContent = "";
+    return;
+  }
+
+  let statusText = "受付中";
+
+  if (service.status === "closed") {
+    statusText = "受付終了";
+  } else if (service.status === "full") {
+    statusText = "現在満席です";
+  }
+
+  let text =
+    service.serviceName + "\n\n" +
+    "受付状況：" + statusText;
+
+  if (service.deadlineText) {
+    text += "\n申込締切：" + service.deadlineText;
+  }
+
+  detail.textContent = text;
+  detail.style.display = "block";
+}
+    
 </script>
