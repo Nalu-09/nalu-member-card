@@ -93,6 +93,36 @@
       white-space:pre-wrap;
       opacity:.9;
     }
+
+    .reservation-list{
+  display:grid;
+  gap:14px;
+  margin-top:18px;
+}
+
+.reservation-card{
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:18px;
+  padding:16px 14px;
+  background:rgba(255,255,255,.03);
+  font-size:13px;
+  line-height:1.8;
+}
+
+.reservation-card .name{
+  font-size:16px;
+  margin-bottom:6px;
+}
+
+.reservation-card .status{
+  opacity:.85;
+  margin-top:8px;
+}
+
+.reservation-card .small{
+  opacity:.72;
+  font-size:12px;
+}
   </style>
 </head>
 
@@ -104,7 +134,7 @@
 
       <div class="menu">
         <button onclick="location.href='checkin.html'">チェックイン</button>
-        <button onclick="showPanel('reservation')">予約管理</button>
+        <button onclick="loadReservations()">予約管理</button>
         <button onclick="showPanel('service')">受付設定</button>
         <button onclick="showPanel('rank')">ランク設定</button>
       </div>
@@ -117,13 +147,13 @@
         </p>
       </div>
 
-      <div id="reservation" class="panel">
-        <h2>Reservation</h2>
-        <p>
-          予約申込履歴を確認する画面です。<br>
-          pending / confirmed / cancelled の管理もここに集約します。
-        </p>
-      </div>
+    <div id="reservation" class="panel">
+  <h2>Reservation</h2>
+
+  <div id="reservationList" class="reservation-list">
+    読み込み前です。
+  </div>
+</div>
 
       <div id="service" class="panel">
         <h2>Service Setting</h2>
@@ -146,6 +176,66 @@
   </div>
 
   <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbxOIqa-TOGIogMYIro9Qu0nG85vZ7ObLFT_YWLW3Q9XHbUmfbXVr9Oxk3zuUZxbtmXe/exec";
+    async function loadReservations() {
+  showPanel("reservation");
+
+  const list = document.getElementById("reservationList");
+  list.textContent = "予約履歴を読み込み中...";
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: new URLSearchParams({
+        action: "getReservations"
+      })
+    });
+
+    const data = await res.json();
+
+    if (!data.ok) {
+      list.textContent = "予約履歴を取得できませんでした。\n" + (data.message || "");
+      return;
+    }
+
+    if (!data.reservations || data.reservations.length === 0) {
+      list.textContent = "現在、予約申込はありません。";
+      return;
+    }
+
+    list.innerHTML = data.reservations.map(function(r) {
+      return `
+        <div class="reservation-card">
+          <div class="name">${escapeHtml(r.name || "")} 様</div>
+          <div>申込内容：${escapeHtml(r.serviceName || "")}</div>
+          <div>人数：${escapeHtml(String(r.people || ""))}名</div>
+          <div>会員番号：${escapeHtml(r.memberNo || "")}</div>
+          <div>ランク：${escapeHtml(r.rank || "")}</div>
+          <div>カナ：${escapeHtml(r.kana || "")}</div>
+          <div>同行者：${escapeHtml(r.companionName || "なし")}</div>
+          <div>アレルギー：${escapeHtml(r.allergy || "なし")}</div>
+          <div>苦手食材：${escapeHtml(r.dislike || "なし")}</div>
+          <div>連絡事項：${escapeHtml(r.message || "なし")}</div>
+          <div class="status">ステータス：${escapeHtml(r.status || "")}</div>
+          <div class="small">申込日時：${escapeHtml(r.createdAt || "")}</div>
+        </div>
+      `;
+    }).join("");
+
+  } catch (err) {
+    list.textContent = "予約履歴の取得中にエラーが発生しました。\n" + err.message;
+  }
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+    
     function showPanel(id) {
       const panels = document.querySelectorAll(".panel");
 
