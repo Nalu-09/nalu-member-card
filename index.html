@@ -6,89 +6,128 @@
   <title>Nalu Member Card</title>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
-    body{
-      margin:0;
-      background:#000;
-      color:#fff;
-      font-family:"Times New Roman", serif;
-      text-align:center;
-      padding:24px 16px 40px;
-    }
+    body {
+  margin: 0;
+  background: #000;
+  color: #fff;
+  font-family: "Times New Roman", serif;
+  text-align: center;
+  padding: 32px 16px 40px;
+}
 
-    .wrap{
-      width:min(92vw, 420px);
-      margin:0 auto;
-    }
+.wrap {
+  width: min(92vw, 420px);
+  margin: 0 auto;
+}
 
-    .card{
-      position:relative;
-      width:100%;
-      aspect-ratio:1 / 1.58;
-      overflow:hidden;
-      border-radius:22px;
-      background:#111;
-      box-shadow:0 10px 30px rgba(0,0,0,.35);
-    }
+.box {
+  background: #0f0f0f;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 22px;
+  padding: 34px 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.35);
+}
 
-    .card-bg{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      display:block;
-    }
+.title {
+  font-size: 30px;
+  letter-spacing: .12em;
+  margin: 0 0 10px;
+}
 
-    .overlay{
-      position:absolute;
-      inset:0;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:flex-end;
-      padding:0 24px 34px;
-      box-sizing:border-box;
-      text-shadow:0 2px 10px rgba(0,0,0,.5);
-    }
+.subtitle {
+  font-size: 14px;
+  opacity: .72;
+  margin: 0 0 34px;
+}
 
-    .memberNo{
-      font-size:18px;
-      margin:0 0 8px;
-    }
+.member-block {
+  border-top: 1px solid rgba(255,255,255,.12);
+  border-bottom: 1px solid rgba(255,255,255,.12);
+  padding: 26px 0;
+  margin: 0 0 28px;
+}
 
-    .name{
-      font-size:18px;
-      margin:0;
-    }
+.member-row {
+  font-size: 18px;
+  line-height: 2;
+  letter-spacing: .04em;
+}
 
-    .status{
-      margin-top:16px;
-      font-size:14px;
-      opacity:.95;
-      white-space:pre-wrap;
-      line-height:1.8;
-    }
-    .time{
-  font-size:14px;
-  margin-top:8px;
-  opacity:.8;
-  letter-spacing:.05em;
+.message {
+  font-size: 14px;
+  line-height: 1.9;
+  opacity: .86;
+  white-space: pre-wrap;
+  margin: 0 0 26px;
+}
+
+.button {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  background: #fff;
+  color: #000;
+  border: none;
+  border-radius: 999px;
+  padding: 13px 18px;
+  font-size: 14px;
+  font-family: "Times New Roman", serif;
+  text-decoration: none;
+  margin-top: 12px;
+}
+
+.sub-button {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 999px;
+  padding: 13px 18px;
+  font-size: 14px;
+  font-family: "Times New Roman", serif;
+  text-decoration: none;
+  margin-top: 12px;
+}
+
+.status {
+  margin-top: 18px;
+  font-size: 14px;
+  line-height: 1.8;
+  opacity: .8;
 }
     
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="card">
-      <img id="cardImage" class="card-bg" src="" alt="member card">
-     <div class="overlay">
-  <div id="memberNo" class="memberNo">No.------</div>
-  <div id="name" class="name">読み込み中...</div>
-  <div id="time" class="time"></div>
-</div>
+  <div class="box">
+    <h1 class="title">Member Card</h1>
+    <p class="subtitle">Nalu-09 会員証</p>
+
+    <div class="member-block">
+      <div class="member-row">Member No. <span id="memberNo">000000</span></div>
+      <div class="member-row">Rank： <span id="rank">NALU</span></div>
+      <div class="member-row">Name： <span id="name">Nalu-09 🌊</span></div>
     </div>
+
+    <p class="message">
+ご予約・ご参加の際は、
+こちらの会員証をご提示ください。
+    </p>
+
+    <a class="button" href="reservation.html?source=lumiere">
+      予約へ進む
+    </a>
+
+    <a class="sub-button" href="https://lin.ee/CSEGvvb">
+      LINEへ戻る
+    </a>
+
     <div id="status" class="status"></div>
   </div>
+</div>
 
   <script>
     const LIFF_ID = "2007730715-HKGPvwvU";
