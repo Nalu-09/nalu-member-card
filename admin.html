@@ -175,6 +175,41 @@
   margin-bottom:18px;
   cursor:pointer;
 }
+
+    .service-list{
+  display:grid;
+  gap:14px;
+  margin-top:18px;
+}
+
+.service-card{
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:18px;
+  padding:16px 14px;
+  background:rgba(255,255,255,.03);
+  font-size:13px;
+  line-height:1.8;
+}
+
+.service-card .service-name{
+  font-size:16px;
+  margin-bottom:8px;
+  letter-spacing:.04em;
+}
+
+.service-card .status-active{
+  color:#fff;
+}
+
+.service-card .status-paused{
+  opacity:.6;
+}
+
+.service-card .small{
+  opacity:.72;
+  font-size:12px;
+}
+    
   </style>
 </head>
 
@@ -187,7 +222,7 @@
       <div class="menu">
         <button onclick="location.href='checkin.html'">チェックイン</button>
         <button onclick="loadReservations()">予約管理</button>
-        <button onclick="showPanel('service')">受付設定</button>
+        <button onclick="loadServiceSettings()">受付設定</button>
         <button onclick="showPanel('rank')">ランク設定</button>
       </div>
 
@@ -208,13 +243,13 @@
 </div>
 
       <div id="service" class="panel">
-        <h2>Service Setting</h2>
-        <p>
-          申込上限人数、申込期限、受付状態を設定する画面です。<br>
-          service_master シートへ自動反映します。
-        </p>
-      </div>
+  <h2>Service Setting</h2>
 
+  <div id="serviceList" class="service-list">
+    読み込み前です。
+  </div>
+</div>
+      
       <div id="rank" class="panel">
         <h2>Rank Setting</h2>
         <p>
@@ -429,6 +464,58 @@ function hasText(value) {
 
   return true;
 }
+
+    async function loadServiceSettings() {
+  showPanel("service");
+
+  const list = document.getElementById("serviceList");
+  list.textContent = "受付設定を読み込み中...";
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: new URLSearchParams({
+        action: "getAdminServices"
+      })
+    });
+
+    const data = await res.json();
+
+    if (!data.ok) {
+      list.textContent = "受付設定を取得できませんでした。\n" + (data.message || "");
+      return;
+    }
+
+    const services = data.services || [];
+
+    if (services.length === 0) {
+      list.textContent = "登録されているサービスはありません。";
+      return;
+    }
+
+    list.innerHTML = services.map(function(s) {
+      const statusClass = s.status === "active" ? "status-active" : "status-paused";
+      const statusLabel = s.status === "active" ? "受付中" : "停止中";
+
+      return `
+        <div class="service-card">
+          <div class="service-name">${escapeHtml(s.serviceName)}</div>
+          <div>受付状態：<span class="${statusClass}">${escapeHtml(statusLabel)}</span></div>
+          <div>表示元：${escapeHtml(s.source)}</div>
+          <div>対象ランク：${escapeHtml(s.requiredRank)}</div>
+          <div>申込期限：${escapeHtml(s.deadline || "未設定")}</div>
+          <div>上限人数：${escapeHtml(s.capacity || "無制限")}</div>
+          <div class="small">service_id：${escapeHtml(s.serviceId)}</div>
+          <div class="small">memo：${escapeHtml(s.memo || "")}</div>
+        </div>
+      `;
+    }).join("");
+
+  } catch (err) {
+    list.textContent = "受付設定の取得中にエラーが発生しました。\n" + err.message;
+  }
+}
+    
   </script>
 </body>
 </html>
