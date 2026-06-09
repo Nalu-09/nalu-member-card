@@ -395,6 +395,7 @@
     let html = "";
 
     services.forEach(function(s) {
+      const serviceId = escapeHtml(s.serviceId);
       const statusActive = s.status === "active" ? "selected" : "";
       const statusPaused = s.status === "paused" ? "selected" : "";
       const deadlineValue = toDateTimeLocalValue(s.deadline);
@@ -404,26 +405,36 @@
         + "<div class='service-name'>" + escapeHtml(s.serviceName) + "</div>"
 
         + "<label>受付状態</label>"
-        + "<select id='status-" + escapeHtml(s.serviceId) + "' class='admin-input'>"
+        + "<select id='status-" + serviceId + "' class='admin-input'>"
         + "<option value='active' " + statusActive + ">受付中</option>"
         + "<option value='paused' " + statusPaused + ">停止中</option>"
         + "</select>"
 
         + "<label>申込期限</label>"
-        + "<input id='deadline-" + escapeHtml(s.serviceId) + "' class='admin-input' type='datetime-local' value='" + escapeHtml(deadlineValue) + "'>"
+        + "<input id='deadline-" + serviceId + "' class='admin-input' type='datetime-local' value='" + escapeHtml(deadlineValue) + "'>"
 
         + "<label>上限人数</label>"
-       + "<input id='capacity-" + escapeHtml(s.serviceId) + "' class='admin-input' type='number' value='" + escapeHtml(s.capacity || "") + "' placeholder='無制限の場合は空欄'>"
-        
+        + "<input id='capacity-" + serviceId + "' class='admin-input' type='number' value='" + escapeHtml(s.capacity || "") + "' placeholder='無制限の場合は空欄'>"
+
         + "<div class='small'>表示元：" + escapeHtml(s.source) + "</div>"
         + "<div class='small'>対象ランク：" + escapeHtml(s.requiredRank) + "</div>"
-        + "<div class='small'>service_id：" + escapeHtml(s.serviceId) + "</div>"
+        + "<div class='small'>service_id：" + serviceId + "</div>"
         + "<div class='small'>memo：" + escapeHtml(s.memo || "") + "</div>"
-+ "<button class='save-button' onclick='saveServiceSetting(\"" + escapeHtml(s.serviceId) + "\")'>設定を保存</button>"
-+ "</div>";
+
+        + "<button class='save-button service-save-button' data-service-id='" + serviceId + "'>設定を保存</button>"
+        + "</div>";
     });
 
     list.innerHTML = html;
+
+    const buttons = document.querySelectorAll(".service-save-button");
+
+    buttons.forEach(function(button) {
+      button.addEventListener("click", function() {
+        const serviceId = button.getAttribute("data-service-id");
+        saveServiceSetting(serviceId);
+      });
+    });
 
   } catch (err) {
     list.textContent = "受付設定の取得中にエラーが発生しました。\n" + err.message;
@@ -480,6 +491,7 @@
 
   return String(value).replace("T", " ").replaceAll("-", "/");
 }
+    
   const str = String(value).trim();
 
   if (str.includes("/") && str.includes(" ")) {
