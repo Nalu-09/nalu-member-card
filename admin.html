@@ -140,8 +140,11 @@
       margin-bottom:16px;
     }
 
-    .admin-input{
+   .admin-input{
+  display:block;
   width:100%;
+  max-width:100%;
+  min-width:0;
   box-sizing:border-box;
   margin:6px 0 12px;
   padding:11px 12px;
@@ -149,7 +152,7 @@
   border:1px solid rgba(255,255,255,.18);
   background:#050505;
   color:#fff;
-  font-size:14px;
+  font-size:16px;
   font-family:"Times New Roman", serif;
 }
 
@@ -173,6 +176,16 @@
   cursor:pointer;
 }
 
+    .service-card{
+  box-sizing:border-box;
+  overflow:hidden;
+}
+
+input[type="datetime-local"]{
+  -webkit-appearance:none;
+  appearance:none;
+}
+    
   </style>
 </head>
 
