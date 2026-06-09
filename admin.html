@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nalu Admin</title>
+
+  <style>
+    body{
+      margin:0;
+      background:#000;
+      color:#fff;
+      font-family:"Times New Roman", serif;
+      text-align:center;
+      padding:32px 16px 40px;
+    }
+
+    .wrap{
+      width:min(92vw, 420px);
+      margin:0 auto;
+    }
+
+    .box{
+      background:#0f0f0f;
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:22px;
+      padding:30px 22px;
+      box-shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+
+    .title{
+      font-size:30px;
+      letter-spacing:.12em;
+      margin:0 0 10px;
+    }
+
+    .subtitle{
+      font-size:14px;
+      opacity:.72;
+      margin:0 0 28px;
+    }
+
+    .menu{
+      display:grid;
+      gap:14px;
+      margin-top:24px;
+    }
+
+    .menu button{
+      width:100%;
+      background:#fff;
+      color:#000;
+      border:none;
+      border-radius:999px;
+      padding:14px 18px;
+      font-size:15px;
+      font-family:"Times New Roman", serif;
+      cursor:pointer;
+    }
+
+    .menu button.secondary{
+      background:transparent;
+      color:#fff;
+      border:1px solid rgba(255,255,255,.18);
+    }
+
+    .panel{
+      display:none;
+      text-align:left;
+      margin-top:26px;
+      padding-top:22px;
+      border-top:1px solid rgba(255,255,255,.12);
+      font-size:14px;
+      line-height:1.9;
+    }
+
+    .panel.active{
+      display:block;
+    }
+
+    .panel h2{
+      font-size:18px;
+      font-weight:normal;
+      margin:0 0 14px;
+      letter-spacing:.08em;
+      text-align:center;
+    }
+
+    .status{
+      margin-top:20px;
+      font-size:14px;
+      line-height:1.8;
+      white-space:pre-wrap;
+      opacity:.9;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="box">
+      <h1 class="title">Nalu Admin</h1>
+      <p class="subtitle">管理者メニュー</p>
+
+      <div class="menu">
+        <button onclick="showPanel('checkin')">チェックイン</button>
+        <button onclick="showPanel('reservation')">予約管理</button>
+        <button onclick="showPanel('service')">受付設定</button>
+        <button onclick="showPanel('rank')">ランク設定</button>
+      </div>
+
+      <div id="checkin" class="panel">
+        <h2>Check-in</h2>
+        <p>
+          会員番号を入力して、来店回数を更新する画面です。<br>
+          次の段階で、既存のチェックイン処理をここに接続します。
+        </p>
+      </div>
+
+      <div id="reservation" class="panel">
+        <h2>Reservation</h2>
+        <p>
+          予約申込履歴を確認する画面です。<br>
+          pending / confirmed / cancelled の管理もここに集約します。
+        </p>
+      </div>
+
+      <div id="service" class="panel">
+        <h2>Service Setting</h2>
+        <p>
+          申込上限人数、申込期限、受付状態を設定する画面です。<br>
+          service_master シートへ自動反映します。
+        </p>
+      </div>
+
+      <div id="rank" class="panel">
+        <h2>Rank Setting</h2>
+        <p>
+          ランク別の表示条件を設定する画面です。<br>
+          required_rank を変更し、予約フォーム側へ反映します。
+        </p>
+      </div>
+
+      <div id="status" class="status"></div>
+    </div>
+  </div>
+
+  <script>
+    function showPanel(id) {
+      const panels = document.querySelectorAll(".panel");
+
+      panels.forEach(function(panel) {
+        panel.classList.remove("active");
+      });
+
+      const target = document.getElementById(id);
+
+      if (target) {
+        target.classList.add("active");
+      }
+    }
+  </script>
+</body>
+</html>
