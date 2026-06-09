@@ -384,6 +384,7 @@
     services.forEach(function(s) {
       const statusActive = s.status === "active" ? "selected" : "";
       const statusPaused = s.status === "paused" ? "selected" : "";
+      const deadlineValue = toDateTimeLocalValue(s.deadline);
 
       html += ""
         + "<div class='service-card'>"
@@ -394,10 +395,10 @@
         + "<option value='active' " + statusActive + ">受付中</option>"
         + "<option value='paused' " + statusPaused + ">停止中</option>"
         + "</select>"
-        
+
         + "<label>申込期限</label>"
-        + "<input class='admin-input' type='datetime-local' value='" + toDateTimeLocalValue(s.deadline) + "'>
-        
+        + "<input class='admin-input' type='datetime-local' value='" + escapeHtml(deadlineValue) + "'>"
+
         + "<label>上限人数</label>"
         + "<input class='admin-input' type='number' value='" + escapeHtml(s.capacity || "") + "' placeholder='無制限の場合は空欄'>"
 
@@ -465,17 +466,14 @@
 
   const str = String(value).trim();
 
-  // 例：2026/07/10 23:59 → 2026-07-10T23:59
   if (str.includes("/") && str.includes(" ")) {
     return str.replaceAll("/", "-").replace(" ", "T").slice(0, 16);
   }
 
-  // 例：2026-07-10 23:59 → 2026-07-10T23:59
   if (str.includes("-") && str.includes(" ")) {
     return str.replace(" ", "T").slice(0, 16);
   }
 
-  // すでに datetime-local 形式ならそのまま
   if (str.includes("T")) {
     return str.slice(0, 16);
   }
