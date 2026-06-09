@@ -58,12 +58,6 @@
       cursor:pointer;
     }
 
-    .menu button.secondary{
-      background:transparent;
-      color:#fff;
-      border:1px solid rgba(255,255,255,.18);
-    }
-
     .panel{
       display:none;
       text-align:left;
@@ -86,163 +80,65 @@
       text-align:center;
     }
 
-    .status{
-      margin-top:20px;
-      font-size:14px;
-      line-height:1.8;
-      white-space:pre-wrap;
+    .summary-list,
+    .service-list{
+      display:grid;
+      gap:14px;
+      margin-top:18px;
+    }
+
+    .summary-date{
+      font-size:15px;
+      letter-spacing:.08em;
+      text-align:center;
+      margin:22px 0 8px;
       opacity:.9;
     }
 
-    .reservation-list{
-  display:grid;
-  gap:14px;
-  margin-top:18px;
-}
+    .summary-card,
+    .reservation-card,
+    .service-card{
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:18px;
+      padding:16px 14px;
+      background:rgba(255,255,255,.03);
+      font-size:13px;
+      line-height:1.8;
+    }
 
-.reservation-card{
-  border:1px solid rgba(255,255,255,.14);
-  border-radius:18px;
-  padding:16px 14px;
-  background:rgba(255,255,255,.03);
-  font-size:13px;
-  line-height:1.8;
-}
+    .summary-card{
+      cursor:pointer;
+    }
 
-.reservation-card .name{
-  font-size:16px;
-  margin-bottom:6px;
-}
+    .service-name,
+    .reservation-card .name{
+      font-size:16px;
+      margin-bottom:8px;
+      letter-spacing:.04em;
+    }
 
-.reservation-card .status{
-  opacity:.85;
-  margin-top:8px;
-}
+    .small{
+      opacity:.72;
+      font-size:12px;
+    }
 
-.reservation-card .small{
-  opacity:.72;
-  font-size:12px;
-}
+    .back-button{
+      width:100%;
+      background:transparent;
+      color:#fff;
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:999px;
+      padding:12px 16px;
+      font-size:14px;
+      font-family:"Times New Roman", serif;
+      margin-bottom:18px;
+      cursor:pointer;
+    }
 
-    .summary-list{
-  display:grid;
-  gap:14px;
-  margin-top:18px;
-}
-
-.summary-date{
-  font-size:15px;
-  letter-spacing:.08em;
-  text-align:center;
-  margin:22px 0 8px;
-  opacity:.9;
-}
-
-.summary-card{
-  border:1px solid rgba(255,255,255,.14);
-  border-radius:18px;
-  padding:16px 14px;
-  background:rgba(255,255,255,.03);
-  font-size:13px;
-  line-height:1.8;
-  cursor:pointer;
-}
-
-.summary-card .service-name{
-  font-size:16px;
-  margin-bottom:8px;
-  letter-spacing:.04em;
-}
-
-.summary-card .meta{
-  opacity:.82;
-}
-
-.detail-header{
-  text-align:center;
-  margin-bottom:16px;
-}
-
-.back-button{
-  width:100%;
-  background:transparent;
-  color:#fff;
-  border:1px solid rgba(255,255,255,.18);
-  border-radius:999px;
-  padding:12px 16px;
-  font-size:14px;
-  font-family:"Times New Roman", serif;
-  margin-bottom:18px;
-  cursor:pointer;
-}
-
-    .service-list{
-  display:grid;
-  gap:14px;
-  margin-top:18px;
-}
-
-.service-card{
-  border:1px solid rgba(255,255,255,.14);
-  border-radius:18px;
-  padding:16px 14px;
-  background:rgba(255,255,255,.03);
-  font-size:13px;
-  line-height:1.8;
-}
-
-.service-card .service-name{
-  font-size:16px;
-  margin-bottom:8px;
-  letter-spacing:.04em;
-}
-
-.service-card .status-active{
-  color:#fff;
-}
-
-.service-card .status-paused{
-  opacity:.6;
-}
-
-.service-card .small{
-  opacity:.72;
-  font-size:12px;
-}
-
-    .admin-input{
-  width:100%;
-  box-sizing:border-box;
-  margin:6px 0 12px;
-  padding:11px 12px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,.18);
-  background:#050505;
-  color:#fff;
-  font-size:14px;
-  font-family:"Times New Roman", serif;
-}
-
-.service-card label{
-  display:block;
-  margin-top:10px;
-  opacity:.85;
-  font-size:13px;
-}
-
-.save-button{
-  width:100%;
-  margin-top:14px;
-  padding:12px 16px;
-  border:none;
-  border-radius:999px;
-  background:#fff;
-  color:#000;
-  font-size:14px;
-  font-family:"Times New Roman", serif;
-  cursor:pointer;
-}
-    
+    .detail-header{
+      text-align:center;
+      margin-bottom:16px;
+    }
   </style>
 </head>
 
@@ -259,313 +155,275 @@
         <button onclick="showPanel('rank')">ランク設定</button>
       </div>
 
-      <div id="checkin" class="panel">
-        <h2>Check-in</h2>
-        <p>
-          会員番号を入力して、来店回数を更新する画面です。<br>
-          次の段階で、既存のチェックイン処理をここに接続します。
-        </p>
+      <div id="reservation" class="panel">
+        <h2>Reservation</h2>
+        <div id="reservationList">読み込み前です。</div>
       </div>
-
-    <div id="reservation" class="panel">
-  <h2>Reservation</h2>
-
-  <div id="reservationList" class="reservation-list">
-    読み込み前です。
-  </div>
-</div>
 
       <div id="service" class="panel">
-  <h2>Service Setting</h2>
-
-  <div id="serviceList" class="service-list">
-    読み込み前です。
-  </div>
-</div>
-      
-      <div id="rank" class="panel">
-        <h2>Rank Setting</h2>
-        <p>
-          ランク別の表示条件を設定する画面です。<br>
-          required_rank を変更し、予約フォーム側へ反映します。
-        </p>
+        <h2>Service Setting</h2>
+        <div id="serviceList">読み込み前です。</div>
       </div>
 
-      <div id="status" class="status"></div>
+      <div id="rank" class="panel">
+        <h2>Rank Setting</h2>
+        <p>ランク設定は次に作成します。</p>
+      </div>
     </div>
   </div>
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxOIqa-TOGIogMYIro9Qu0nG85vZ7ObLFT_YWLW3Q9XHbUmfbXVr9Oxk3zuUZxbtmXe/exec";
+
     let allReservations = [];
 
-async function loadReservations() {
-  showPanel("reservation");
-
-  const list = document.getElementById("reservationList");
-  list.textContent = "予約履歴を読み込み中...";
-
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: new URLSearchParams({
-        action: "getReservations"
-      })
-    });
-
-    const data = await res.json();
-
-    if (!data.ok) {
-      list.textContent = "予約履歴を取得できませんでした。\n" + (data.message || "");
-      return;
-    }
-
-    allReservations = data.reservations || [];
-
-    if (allReservations.length === 0) {
-      list.textContent = "現在、予約申込はありません。";
-      return;
-    }
-
-    renderReservationSummary(allReservations);
-
-  } catch (err) {
-    list.textContent = "予約履歴の取得中にエラーが発生しました。\n" + err.message;
-  }
-}
-function escapeHtml(str) {
-  return String(str)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-function formatMemberNo(value) {
-  if (value === null || value === undefined || value === "") {
-    return "";
-  }
-
-  return String(value).padStart(6, "0");
-}
-    
     function showPanel(id) {
       const panels = document.querySelectorAll(".panel");
-
       panels.forEach(function(panel) {
         panel.classList.remove("active");
       });
 
       const target = document.getElementById(id);
-
       if (target) {
         target.classList.add("active");
       }
     }
+
+    async function loadReservations() {
+      showPanel("reservation");
+
+      const list = document.getElementById("reservationList");
+      list.textContent = "予約履歴を読み込み中...";
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          body: new URLSearchParams({
+            action: "getReservations"
+          })
+        });
+
+        const data = await res.json();
+
+        if (!data.ok) {
+          list.textContent = "予約履歴を取得できませんでした。\n" + (data.message || "");
+          return;
+        }
+
+        allReservations = data.reservations || [];
+
+        if (allReservations.length === 0) {
+          list.textContent = "現在、予約申込はありません。";
+          return;
+        }
+
+        renderReservationSummary(allReservations);
+
+      } catch (err) {
+        list.textContent = "予約履歴の取得中にエラーが発生しました。\n" + err.message;
+      }
+    }
+
     function renderReservationSummary(reservations) {
-  const list = document.getElementById("reservationList");
+      const list = document.getElementById("reservationList");
+      const grouped = {};
 
-  const grouped = {};
+      reservations.forEach(function(r) {
+        const date = getReservationDate(r.createdAt);
+        const serviceName = r.serviceName || "未設定";
+        const key = date + "___" + serviceName;
 
-  reservations.forEach(function(r) {
-    const date = getReservationDate(r.createdAt);
-    const serviceName = r.serviceName || "未設定";
+        if (!grouped[key]) {
+          grouped[key] = {
+            date: date,
+            serviceName: serviceName,
+            reservations: [],
+            totalPeople: 0,
+            noteCount: 0,
+            allergyCount: 0,
+            dislikeCount: 0
+          };
+        }
 
-    const key = date + "___" + serviceName;
+        grouped[key].reservations.push(r);
+        grouped[key].totalPeople += Number(r.people || 0);
 
-    if (!grouped[key]) {
-      grouped[key] = {
-        date: date,
-        serviceName: serviceName,
-        reservations: [],
-        totalPeople: 0,
-        noteCount: 0,
-        allergyCount: 0,
-        dislikeCount: 0
-      };
+        if (hasText(r.message)) grouped[key].noteCount += 1;
+        if (hasText(r.allergy)) grouped[key].allergyCount += 1;
+        if (hasText(r.dislike)) grouped[key].dislikeCount += 1;
+      });
+
+      const groups = Object.values(grouped);
+
+      groups.sort(function(a, b) {
+        return b.date.localeCompare(a.date);
+      });
+
+      window.reservationGroups = groups;
+
+      let html = `<div class="summary-list">`;
+      let currentDate = "";
+
+      groups.forEach(function(group, index) {
+        if (group.date !== currentDate) {
+          currentDate = group.date;
+          html += `<div class="summary-date">${escapeHtml(currentDate)}</div>`;
+        }
+
+        html += `
+          <div class="summary-card" onclick="renderReservationDetail(${index})">
+            <div class="service-name">${escapeHtml(group.serviceName)}</div>
+            <div>申込件数：${group.reservations.length}件</div>
+            <div>人数合計：${group.totalPeople}名</div>
+            <div>備考あり：${group.noteCount}件</div>
+            <div>アレルギーあり：${group.allergyCount}件</div>
+            <div>苦手食材あり：${group.dislikeCount}件</div>
+          </div>
+        `;
+      });
+
+      html += `</div>`;
+      list.innerHTML = html;
     }
 
-    grouped[key].reservations.push(r);
-    grouped[key].totalPeople += Number(r.people || 0);
+    function renderReservationDetail(index) {
+      const list = document.getElementById("reservationList");
+      const group = window.reservationGroups[index];
 
-    if (hasText(r.message)) grouped[key].noteCount += 1;
-    if (hasText(r.allergy) && r.allergy !== "なし") grouped[key].allergyCount += 1;
-    if (hasText(r.dislike) && r.dislike !== "なし") grouped[key].dislikeCount += 1;
-  });
+      if (!group) {
+        list.textContent = "詳細を表示できませんでした。";
+        return;
+      }
 
-  const groups = Object.values(grouped);
+      let html = `
+        <button class="back-button" onclick="renderReservationSummary(allReservations)">一覧に戻る</button>
 
-  groups.sort(function(a, b) {
-    return b.date.localeCompare(a.date);
-  });
+        <div class="detail-header">
+          <div>${escapeHtml(group.date)}</div>
+          <div>${escapeHtml(group.serviceName)}</div>
+          <div>人数合計：${group.totalPeople}名 / 申込：${group.reservations.length}件</div>
+        </div>
 
-  let html = `<div class="summary-list">`;
+        <div class="summary-list">
+      `;
 
-  let currentDate = "";
+      group.reservations.forEach(function(r) {
+        html += `
+          <div class="reservation-card">
+            <div class="name">${escapeHtml(r.name || "")} 様</div>
+            <div>申込内容：${escapeHtml(r.serviceName || "")}</div>
+            <div>人数：${escapeHtml(String(r.people || ""))}名</div>
+            <div>会員番号：${escapeHtml(formatMemberNo(r.memberNo))}</div>
+            <div>ランク：${escapeHtml(r.rank || "")}</div>
+            <div>カナ：${escapeHtml(r.kana || "")}</div>
+            <div>同行者：${escapeHtml(r.companionName || "なし")}</div>
+            <div>アレルギー：${escapeHtml(r.allergy || "なし")}</div>
+            <div>苦手食材：${escapeHtml(r.dislike || "なし")}</div>
+            <div>連絡事項：${escapeHtml(r.message || "なし")}</div>
+            <div>ステータス：${escapeHtml(r.status || "")}</div>
+            <div class="small">申込日時：${escapeHtml(r.createdAt || "")}</div>
+          </div>
+        `;
+      });
 
-  groups.forEach(function(group, index) {
-    if (group.date !== currentDate) {
-      currentDate = group.date;
-      html += `<div class="summary-date">${escapeHtml(currentDate)}</div>`;
+      html += `</div>`;
+      list.innerHTML = html;
     }
-
-    html += `
-      <div class="summary-card" onclick="renderReservationDetail(${index})">
-        <div class="service-name">${escapeHtml(group.serviceName)}</div>
-        <div class="meta">申込件数：${group.reservations.length}件</div>
-        <div class="meta">人数合計：${group.totalPeople}名</div>
-        <div class="meta">アレルギーあり：${group.allergyCount}件</div>
-        <div class="meta">苦手食材あり：${group.dislikeCount}件</div>
-        <div class="meta">備考あり：${group.noteCount}件</div>
-      </div>
-    `;
-  });
-
-  html += `</div>`;
-
-  list.innerHTML = html;
-
-  window.reservationGroups = groups;
-}
-
-function renderReservationDetail(index) {
-  const list = document.getElementById("reservationList");
-  const group = window.reservationGroups[index];
-
-  if (!group) {
-    list.textContent = "詳細を表示できませんでした。";
-    return;
-  }
-
-  let html = `
-    <button class="back-button" onclick="renderReservationSummary(allReservations)">一覧に戻る</button>
-
-    <div class="detail-header">
-      <div>${escapeHtml(group.date)}</div>
-      <div>${escapeHtml(group.serviceName)}</div>
-      <div>人数合計：${group.totalPeople}名 / 申込：${group.reservations.length}件</div>
-    </div>
-
-    <div class="reservation-list">
-  `;
-
-  group.reservations.forEach(function(r) {
-    html += `
-      <div class="reservation-card">
-        <div class="name">${escapeHtml(r.name || "")} 様</div>
-        <div>申込内容：${escapeHtml(r.serviceName || "")}</div>
-        <div>人数：${escapeHtml(String(r.people || ""))}名</div>
-        <div>会員番号：${escapeHtml(formatMemberNo(r.memberNo))}</div>
-        <div>ランク：${escapeHtml(r.rank || "")}</div>
-        <div>カナ：${escapeHtml(r.kana || "")}</div>
-        <div>同行者：${escapeHtml(r.companionName || "なし")}</div>
-        <div>アレルギー：${escapeHtml(r.allergy || "なし")}</div>
-        <div>苦手食材：${escapeHtml(r.dislike || "なし")}</div>
-        <div>連絡事項：${escapeHtml(r.message || "なし")}</div>
-        <div class="status">ステータス：${escapeHtml(r.status || "")}</div>
-        <div class="small">申込日時：${escapeHtml(r.createdAt || "")}</div>
-      </div>
-    `;
-  });
-
-  html += `</div>`;
-
-  list.innerHTML = html;
-}
-
-function getReservationDate(value) {
-  if (!value) return "日付未設定";
-
-  const str = String(value);
-
-  if (str.includes(" ")) {
-    return str.split(" ")[0];
-  }
-
-  return str;
-}
-
-function hasText(value) {
-  if (value === null || value === undefined) return false;
-
-  const text = String(value).trim();
-
-  if (!text) return false;
-  if (text === "なし") return false;
-  if (text === "-") return false;
-
-  return true;
-}
 
     async function loadServiceSettings() {
-  showPanel("service");
+      showPanel("service");
 
-  const list = document.getElementById("serviceList");
-  list.textContent = "受付設定を読み込み中...";
+      const list = document.getElementById("serviceList");
+      list.textContent = "受付設定を読み込み中...";
 
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: new URLSearchParams({
-        action: "getAdminServices"
-      })
-    });
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          body: new URLSearchParams({
+            action: "getAdminServices"
+          })
+        });
 
-    const data = await res.json();
+        const data = await res.json();
 
-    if (!data.ok) {
-      list.textContent = "受付設定を取得できませんでした。\n" + (data.message || "");
-      return;
+        if (!data.ok) {
+          list.textContent = "受付設定を取得できませんでした。\n" + (data.message || "");
+          return;
+        }
+
+        const services = data.services || [];
+
+        if (services.length === 0) {
+          list.textContent = "登録されているサービスはありません。";
+          return;
+        }
+
+        list.innerHTML = services.map(function(s) {
+          const statusLabel = s.status === "active" ? "受付中" : "停止中";
+
+          return `
+            <div class="service-card">
+              <div class="service-name">${escapeHtml(s.serviceName)}</div>
+              <div>受付状態：${escapeHtml(statusLabel)}</div>
+              <div>表示元：${escapeHtml(s.source)}</div>
+              <div>対象ランク：${escapeHtml(s.requiredRank)}</div>
+              <div>申込期限：${escapeHtml(s.deadline || "未設定")}</div>
+              <div>上限人数：${escapeHtml(s.capacity || "無制限")}</div>
+              <div class="small">service_id：${escapeHtml(s.serviceId)}</div>
+              <div class="small">memo：${escapeHtml(s.memo || "")}</div>
+            </div>
+          `;
+        }).join("");
+
+      } catch (err) {
+        list.textContent = "受付設定の取得中にエラーが発生しました。\n" + err.message;
+      }
     }
 
-    const services = data.services || [];
+    function getReservationDate(value) {
+      if (!value) return "日付未設定";
 
-    if (services.length === 0) {
-      list.textContent = "登録されているサービスはありません。";
-      return;
+      const str = String(value);
+
+      if (str.includes(" ")) {
+        return str.split(" ")[0];
+      }
+
+      return str;
     }
 
-    list.innerHTML = services.map(function(s) {
-      const statusClass = s.status === "active" ? "status-active" : "status-paused";
-      const statusLabel = s.status === "active" ? "受付中" : "停止中";
+    function hasText(value) {
+      if (value === null || value === undefined) return false;
 
-     return `
-  <div class="service-card">
-    <div class="service-name">${escapeHtml(s.serviceName)}</div>
+      const text = String(value)
+        .replace(/\s/g, "")
+        .trim();
 
-    <label>受付状態</label>
-    <select id="status-${s.serviceId}" class="admin-input">
-      <option value="active" ${s.status === "active" ? "selected" : ""}>受付中</option>
-      <option value="paused" ${s.status === "paused" ? "selected" : ""}>停止中</option>
-    </select>
+      if (!text) return false;
+      if (text === "なし") return false;
+      if (text === "-") return false;
+      if (text === "無し") return false;
+      if (text === "特になし") return false;
 
-    <label>申込期限</label>
-    <input
-      id="deadline-${s.serviceId}"
-      class="admin-input"
-      type="text"
-      value="${escapeHtml(s.deadline || "")}"
-      placeholder="例：2026/07/10 23:59"
-    >
+      return true;
+    }
 
-    <label>上限人数</label>
-    <input
-      id="capacity-${s.serviceId}"
-      class="admin-input"
-      type="number"
-      value="${escapeHtml(s.capacity || "")}"
-      placeholder="無制限の場合は空欄"
-    >
+    function formatMemberNo(value) {
+      if (value === null || value === undefined || value === "") {
+        return "";
+      }
 
-    <div class="small">表示元：${escapeHtml(s.source)}</div>
-    <div class="small">対象ランク：${escapeHtml(s.requiredRank)}</div>
-    <div class="small">service_id：${escapeHtml(s.serviceId)}</div>
-    <div class="small">memo：${escapeHtml(s.memo || "")}</div>
+      return String(value).padStart(6, "0");
+    }
 
-  </div>
-`;
-    
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
   </script>
 </body>
 </html>
