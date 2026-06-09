@@ -352,74 +352,69 @@
     }
 
     async function loadServiceSettings() {
-      showPanel("service");
+  showPanel("service");
 
-      const list = document.getElementById("serviceList");
-      list.textContent = "受付設定を読み込み中...";
+  const list = document.getElementById("serviceList");
+  list.textContent = "受付設定を読み込み中...";
 
-      try {
-        const res = await fetch(API_URL, {
-          method: "POST",
-          body: new URLSearchParams({
-            action: "getAdminServices"
-          })
-        });
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: new URLSearchParams({
+        action: "getAdminServices"
+      })
+    });
 
-        const data = await res.json();
+    const data = await res.json();
 
-        if (!data.ok) {
-          list.textContent = "受付設定を取得できませんでした。\n" + (data.message || "");
-          return;
-        }
-
-        const services = data.services || [];
-
-        if (services.length === 0) {
-          list.textContent = "登録されているサービスはありません。";
-          return;
-        }
-
-        list.innerHTML = services.map(function(s) {
-          const statusLabel = s.status === "active" ? "受付中" : "停止中";
-
-          return `
-  <div class="service-card">
-    <div class="service-name">${escapeHtml(s.serviceName)}</div>
-
-    <label>受付状態</label>
-    <select class="admin-input">
-      <option value="active" ${s.status === "active" ? "selected" : ""}>受付中</option>
-      <option value="paused" ${s.status === "paused" ? "selected" : ""}>停止中</option>
-    </select>
-
-    <label>申込期限</label>
-    <input
-      class="admin-input"
-      type="text"
-      value="${escapeHtml(s.deadline || "")}"
-      placeholder="例：2026/07/10 23:59"
-    >
-
-    <label>上限人数</label>
-    <input
-      class="admin-input"
-      type="number"
-      value="${escapeHtml(s.capacity || "")}"
-      placeholder="無制限の場合は空欄"
-    >
-
-    <div class="small">表示元：${escapeHtml(s.source)}</div>
-    <div class="small">対象ランク：${escapeHtml(s.requiredRank)}</div>
-    <div class="small">service_id：${escapeHtml(s.serviceId)}</div>
-    <div class="small">memo：${escapeHtml(s.memo || "")}</div>
-  </div>
-`;
-
-      } catch (err) {
-        list.textContent = "受付設定の取得中にエラーが発生しました。\n" + err.message;
-      }
+    if (!data.ok) {
+      list.textContent = "受付設定を取得できませんでした。\n" + (data.message || "");
+      return;
     }
 
+    const services = data.services || [];
+
+    if (services.length === 0) {
+      list.textContent = "登録されているサービスはありません。";
+      return;
+    }
+
+    let html = "";
+
+    services.forEach(function(s) {
+      const statusActive = s.status === "active" ? "selected" : "";
+      const statusPaused = s.status === "paused" ? "selected" : "";
+
+      html += ""
+        + "<div class='service-card'>"
+        + "<div class='service-name'>" + escapeHtml(s.serviceName) + "</div>"
+
+        + "<label>受付状態</label>"
+        + "<select class='admin-input'>"
+        + "<option value='active' " + statusActive + ">受付中</option>"
+        + "<option value='paused' " + statusPaused + ">停止中</option>"
+        + "</select>"
+
+        + "<label>申込期限</label>"
+        + "<input class='admin-input' type='text' value='" + escapeHtml(s.deadline || "") + "' placeholder='例：2026/07/10 23:59'>"
+
+        + "<label>上限人数</label>"
+        + "<input class='admin-input' type='number' value='" + escapeHtml(s.capacity || "") + "' placeholder='無制限の場合は空欄'>"
+
+        + "<div class='small'>表示元：" + escapeHtml(s.source) + "</div>"
+        + "<div class='small'>対象ランク：" + escapeHtml(s.requiredRank) + "</div>"
+        + "<div class='small'>service_id：" + escapeHtml(s.serviceId) + "</div>"
+        + "<div class='small'>memo：" + escapeHtml(s.memo || "") + "</div>"
+        + "</div>";
+    });
+
+    list.innerHTML = html;
+
+  } catch (err) {
+    list.textContent = "受付設定の取得中にエラーが発生しました。\n" + err.message;
+  }
+}
+    
     function getReservationDate(value) {
       if (!value) return "日付未設定";
 
