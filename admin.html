@@ -413,13 +413,14 @@
         + "<input class='admin-input' type='datetime-local' value='" + escapeHtml(deadlineValue) + "'>"
 
         + "<label>上限人数</label>"
-        + "<input class='admin-input' type='number' value='" + escapeHtml(s.capacity || "") + "' placeholder='無制限の場合は空欄'>"
+        + "<input id='capacity-" + escapeHtml(s.serviceId) + "' class='admin-input' type='number' value='" + escapeHtml(s.capacity || "") + "' placeholder='無制限の場合は空欄'>"
 
         + "<div class='small'>表示元：" + escapeHtml(s.source) + "</div>"
         + "<div class='small'>対象ランク：" + escapeHtml(s.requiredRank) + "</div>"
         + "<div class='small'>service_id：" + escapeHtml(s.serviceId) + "</div>"
         + "<div class='small'>memo：" + escapeHtml(s.memo || "") + "</div>"
 + "<button class='save-button' onclick='saveServiceStatus(\"" + escapeHtml(s.serviceId) + "\")'>受付状態を保存</button>"
++ "<button class='save-button' onclick='saveServiceCapacity(\"" + escapeHtml(s.serviceId) + "\")'>上限人数を保存</button>"
 + "</div>";
     });
 
@@ -523,6 +524,41 @@
     }
 
     alert("受付状態を保存しました");
+    loadServiceSettings();
+
+  } catch (err) {
+    alert("保存中にエラーが発生しました：" + err.message);
+  }
+}
+
+    async function saveServiceCapacity(serviceId) {
+  const capacityEl = document.getElementById("capacity-" + serviceId);
+
+  if (!capacityEl) {
+    alert("上限人数の入力欄が見つかりません。");
+    return;
+  }
+
+  const capacity = capacityEl.value;
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: new URLSearchParams({
+        action: "updateServiceCapacity",
+        serviceId: serviceId,
+        capacity: capacity
+      })
+    });
+
+    const data = await res.json();
+
+    if (!data.ok) {
+      alert("保存できませんでした：" + (data.message || ""));
+      return;
+    }
+
+    alert("上限人数を保存しました");
     loadServiceSettings();
 
   } catch (err) {
