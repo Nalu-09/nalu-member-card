@@ -410,17 +410,16 @@
         + "</select>"
 
         + "<label>申込期限</label>"
-        + "<input class='admin-input' type='datetime-local' value='" + escapeHtml(deadlineValue) + "'>"
+        + "<input id='deadline-" + escapeHtml(s.serviceId) + "' class='admin-input' type='datetime-local' value='" + escapeHtml(deadlineValue) + "'>"
 
         + "<label>上限人数</label>"
-        + "<input id='capacity-" + escapeHtml(s.serviceId) + "' class='admin-input' type='number' value='" + escapeHtml(s.capacity || "") + "' placeholder='無制限の場合は空欄'>"
-
+       + "<input id='capacity-" + escapeHtml(s.serviceId) + "' class='admin-input' type='number' value='" + escapeHtml(s.capacity || "") + "' placeholder='無制限の場合は空欄'>"
+        
         + "<div class='small'>表示元：" + escapeHtml(s.source) + "</div>"
         + "<div class='small'>対象ランク：" + escapeHtml(s.requiredRank) + "</div>"
         + "<div class='small'>service_id：" + escapeHtml(s.serviceId) + "</div>"
         + "<div class='small'>memo：" + escapeHtml(s.memo || "") + "</div>"
-+ "<button class='save-button' onclick='saveServiceStatus(\"" + escapeHtml(s.serviceId) + "\")'>受付状態を保存</button>"
-+ "<button class='save-button' onclick='saveServiceCapacity(\"" + escapeHtml(s.serviceId) + "\")'>上限人数を保存</button>"
++ "<button class='save-button' onclick='saveServiceSetting(\"" + escapeHtml(s.serviceId) + "\")'>設定を保存</button>"
 + "</div>";
     });
 
@@ -476,9 +475,11 @@
         .replaceAll("'", "&#039;");
     }
     
-    function toDateTimeLocalValue(value) {
+   function fromDateTimeLocalValue(value) {
   if (!value) return "";
 
+  return String(value).replace("T", " ").replaceAll("-", "/");
+}
   const str = String(value).trim();
 
   if (str.includes("/") && str.includes(" ")) {
@@ -565,6 +566,48 @@
     alert("保存中にエラーが発生しました：" + err.message);
   }
 }
+
+    async function saveServiceSetting(serviceId) {
+  const statusEl = document.getElementById("status-" + serviceId);
+  const deadlineEl = document.getElementById("deadline-" + serviceId);
+  const capacityEl = document.getElementById("capacity-" + serviceId);
+
+  if (!statusEl || !deadlineEl || !capacityEl) {
+    alert("入力欄が見つかりません。");
+    return;
+  }
+
+  const status = statusEl.value;
+  const deadline = fromDateTimeLocalValue(deadlineEl.value);
+  const capacity = capacityEl.value;
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: new URLSearchParams({
+        action: "updateServiceSetting",
+        serviceId: serviceId,
+        status: status,
+        deadline: deadline,
+        capacity: capacity
+      })
+    });
+
+    const data = await res.json();
+
+    if (!data.ok) {
+      alert("保存できませんでした：" + (data.message || ""));
+      return;
+    }
+
+    alert("設定を保存しました");
+    loadServiceSettings();
+
+  } catch (err) {
+    alert("保存中にエラーが発生しました：" + err.message);
+  }
+}
+    
   </script>
 </body>
 </html>
