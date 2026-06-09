@@ -530,19 +530,19 @@ function hasText(value) {
       const statusClass = s.status === "active" ? "status-active" : "status-paused";
       const statusLabel = s.status === "active" ? "受付中" : "停止中";
 
-      return `
+     return `
   <div class="service-card">
     <div class="service-name">${escapeHtml(s.serviceName)}</div>
 
     <label>受付状態</label>
-    <select id="status-${escapeHtml(s.serviceId)}" class="admin-input">
+    <select id="status-${s.serviceId}" class="admin-input">
       <option value="active" ${s.status === "active" ? "selected" : ""}>受付中</option>
       <option value="paused" ${s.status === "paused" ? "selected" : ""}>停止中</option>
     </select>
 
     <label>申込期限</label>
     <input
-      id="deadline-${escapeHtml(s.serviceId)}"
+      id="deadline-${s.serviceId}"
       class="admin-input"
       type="text"
       value="${escapeHtml(s.deadline || "")}"
@@ -551,7 +551,7 @@ function hasText(value) {
 
     <label>上限人数</label>
     <input
-      id="capacity-${escapeHtml(s.serviceId)}"
+      id="capacity-${s.serviceId}"
       class="admin-input"
       type="number"
       value="${escapeHtml(s.capacity || "")}"
@@ -563,7 +563,7 @@ function hasText(value) {
     <div class="small">service_id：${escapeHtml(s.serviceId)}</div>
     <div class="small">memo：${escapeHtml(s.memo || "")}</div>
 
-    <button class="save-button" onclick="saveServiceSetting('${escapeHtml(s.serviceId)}')">
+    <button class="save-button" onclick="saveServiceSetting('${s.serviceId}')">
       保存
     </button>
   </div>
