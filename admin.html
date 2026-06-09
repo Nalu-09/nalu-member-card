@@ -209,7 +209,7 @@
           <div class="name">${escapeHtml(r.name || "")} 様</div>
           <div>申込内容：${escapeHtml(r.serviceName || "")}</div>
           <div>人数：${escapeHtml(String(r.people || ""))}名</div>
-          <div>会員番号：${escapeHtml(r.memberNo || "")}</div>
+         <div>会員番号：${escapeHtml(formatMemberNo(r.memberNo))}</div>
           <div>ランク：${escapeHtml(r.rank || "")}</div>
           <div>カナ：${escapeHtml(r.kana || "")}</div>
           <div>同行者：${escapeHtml(r.companionName || "なし")}</div>
