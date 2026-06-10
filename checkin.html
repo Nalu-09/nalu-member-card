@@ -82,7 +82,6 @@
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxOIqa-TOGIogMYIro9Qu0nG85vZ7ObLFT_YWLW3Q9XHbUmfbXVr9Oxk3zuUZxbtmXe/exec";
-
     document.getElementById("plusBtn").addEventListener("click", async () => {
       const memberNo = document.getElementById("memberNo").value.trim();
       const status = document.getElementById("status");
@@ -111,7 +110,6 @@
             "?callback=" + callbackName +
             "&action=plusOne" +
             "&memberNo=" + encodeURIComponent(memberNo) +
-            "&adminUserId=" + encodeURIComponent(ADMIN_USER_ID);
 
           script.onerror = function() {
             reject(new Error("更新に失敗しました"));
