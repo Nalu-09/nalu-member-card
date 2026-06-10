@@ -109,7 +109,7 @@
             API_URL +
             "?callback=" + callbackName +
             "&action=plusOne" +
-            "&memberNo=" + encodeURIComponent(memberNo) +
+            "&memberNo=" + encodeURIComponent(memberNo) ;
 
           script.onerror = function() {
             reject(new Error("更新に失敗しました"));
