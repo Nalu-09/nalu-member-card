@@ -391,10 +391,29 @@ Lumière Nalu ご予約申込ページです。
         status.textContent = "";
 
       } catch (e) {
-        status.textContent =
-          "読み込み中にエラーが発生しました。\n" +
-          "エラー内容：" + e.message;
-      }
+  const errorMessage = String(e.message || "");
+
+  if (
+    errorMessage.includes("access token expired") ||
+    errorMessage.includes("The access token expired")
+  ) {
+    status.textContent = "ログイン情報を更新しています。少しお待ちください。";
+
+    try {
+      liff.logout();
+    } catch (logoutError) {}
+
+    setTimeout(function() {
+      liff.login();
+    }, 500);
+
+    return;
+  }
+
+  status.textContent =
+    "読み込み中にエラーが発生しました。\n" +
+    "エラー内容：" + errorMessage;
+}
     }
 
     async function submitReservation() {
