@@ -199,7 +199,7 @@ input[type="datetime-local"]{
         <button onclick="location.href='checkin.html'">チェックイン</button>
         <button onclick="loadReservations()">予約管理</button>
         <button onclick="loadServiceSettings()">受付設定</button>
-        <button onclick="showPanel('rank')">初期登録</button>
+        <button onclick="showServiceManagement()">サービス管理</button>
       </div>
 
       <div id="reservation" class="panel">
@@ -213,72 +213,62 @@ input[type="datetime-local"]{
       </div>
 
       <div id="rank" class="panel">
-  <h2>Initial Setup</h2>
+  <h2>Service Management</h2>
 
-  <div class="service-card">
-    <div class="service-name">新規サービス登録</div>
-
-    <label>サービス名</label>
-    <input
-      id="newServiceName"
-      class="admin-input"
-      type="text"
-      placeholder="例：Nalu Table"
-    >
-
-    <label>表示先</label>
-    <select id="newSource" class="admin-input">
-      <option value="lumiere" selected>Lumière Nalu</option>
-      <option value="event">Event</option>
-    </select>
-
-    <label>対象ランク</label>
-    <select id="newRequiredRank" class="admin-input">
-      <option value="WAVE">Wave</option>
-      <option value="EVEIL">Eveil</option>
-      <option value="ECLAT">Eclat</option>
-      <option value="NALU">Nalu</option>
-    </select>
-
-    <label>受付状態</label>
-    <select id="newStatus" class="admin-input">
-      <option value="active" selected>受付中</option>
-      <option value="paused">停止中</option>
-    </select>
-
-    <label>申込期限</label>
-    <input
-      id="newDeadline"
-      class="admin-input"
-      type="datetime-local"
-    >
-
-    <label>上限人数</label>
-    <input
-      id="newCapacity"
-      class="admin-input"
-      type="number"
-      placeholder="無制限の場合は空欄"
-    >
-
-    <label>memo</label>
-    <input
-      id="newMemo"
-      class="admin-input"
-      type="text"
-      placeholder="例：会員制フレンチ"
-    >
-
-    <button class="save-button" onclick="addNewService()">
-      新規登録する
-    </button>
+  <div id="serviceManagementMenu" class="menu">
+    <button onclick="showNewServiceForm()">新規サービス登録</button>
+    <button onclick="loadServiceBasicEdit()">既存サービス修正</button>
   </div>
 
-  <div id="addServiceStatus" class="small"></div>
-</div>
+  <div id="newServiceArea" style="display:none;">
+    <div class="service-card">
+      <div class="service-name">新規サービス登録</div>
+
+      <label>サービス名</label>
+      <input id="newServiceName" class="admin-input" type="text" placeholder="例：Nalu Table">
+
+      <label>表示先</label>
+      <select id="newSource" class="admin-input">
+        <option value="lumiere" selected>Lumière Nalu</option>
+        <option value="event">Event</option>
+      </select>
+
+      <label>対象ランク</label>
+      <select id="newRequiredRank" class="admin-input">
+        <option value="WAVE">WAVE</option>
+        <option value="Eveil">Eveil</option>
+        <option value="ECLAT">ECLAT</option>
+        <option value="Nalu">Nalu</option>
+      </select>
+
+      <label>受付状態</label>
+      <select id="newStatus" class="admin-input">
+        <option value="active" selected>受付中</option>
+        <option value="paused">停止中</option>
+      </select>
+
+      <label>申込期限</label>
+      <input id="newDeadline" class="admin-input" type="datetime-local">
+
+      <label>上限人数</label>
+      <input id="newCapacity" class="admin-input" type="number" placeholder="無制限の場合は空欄">
+
+      <label>memo</label>
+      <input id="newMemo" class="admin-input" type="text" placeholder="例：会員制フレンチ">
+
+      <button class="save-button" onclick="addNewService()">
+        登録する
+      </button>
     </div>
+
+    <div id="addServiceStatus" class="small"></div>
   </div>
 
+  <div id="editServiceArea" style="display:none;">
+    <div id="editServiceList">読み込み前です。</div>
+  </div>
+</div>
+      
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxOIqa-TOGIogMYIro9Qu0nG85vZ7ObLFT_YWLW3Q9XHbUmfbXVr9Oxk3zuUZxbtmXe/exec";
 
@@ -681,6 +671,213 @@ input[type="datetime-local"]{
   } catch (err) {
     statusArea.textContent = "";
     alert("登録中にエラーが発生しました：" + err.message);
+  }
+}
+
+    function showServiceManagement() {
+  showPanel("rank");
+
+  document.getElementById("serviceManagementMenu").style.display = "grid";
+  document.getElementById("newServiceArea").style.display = "none";
+  document.getElementById("editServiceArea").style.display = "none";
+}
+
+function showNewServiceForm() {
+  document.getElementById("newServiceArea").style.display = "block";
+  document.getElementById("editServiceArea").style.display = "none";
+}
+
+async function addNewService() {
+  const serviceName = document.getElementById("newServiceName").value.trim();
+  const source = document.getElementById("newSource").value;
+  const requiredRank = document.getElementById("newRequiredRank").value;
+  const status = document.getElementById("newStatus").value;
+  const deadline = fromDateTimeLocalValue(document.getElementById("newDeadline").value);
+  const capacity = document.getElementById("newCapacity").value;
+  const memo = document.getElementById("newMemo").value.trim();
+  const statusArea = document.getElementById("addServiceStatus");
+
+  if (!serviceName) {
+    alert("サービス名を入力してください。");
+    return;
+  }
+
+  try {
+    statusArea.textContent = "登録中...";
+
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: new URLSearchParams({
+        action: "addNewService",
+        serviceName: serviceName,
+        source: source,
+        requiredRank: requiredRank,
+        status: status,
+        deadline: deadline,
+        capacity: capacity,
+        memo: memo
+      })
+    });
+
+    const data = await res.json();
+
+    if (!data.ok) {
+      statusArea.textContent = "";
+      alert("登録できませんでした：" + (data.message || ""));
+      return;
+    }
+
+    statusArea.textContent = "登録しました。service_id：" + data.serviceId;
+
+    document.getElementById("newServiceName").value = "";
+    document.getElementById("newSource").value = "lumiere";
+    document.getElementById("newRequiredRank").value = "WAVE";
+    document.getElementById("newStatus").value = "active";
+    document.getElementById("newDeadline").value = "";
+    document.getElementById("newCapacity").value = "";
+    document.getElementById("newMemo").value = "";
+
+  } catch (err) {
+    statusArea.textContent = "";
+    alert("登録中にエラーが発生しました：" + err.message);
+  }
+}
+
+async function loadServiceBasicEdit() {
+  document.getElementById("newServiceArea").style.display = "none";
+  document.getElementById("editServiceArea").style.display = "block";
+
+  const list = document.getElementById("editServiceList");
+  list.textContent = "既存サービスを読み込み中...";
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: new URLSearchParams({
+        action: "getAdminServices"
+      })
+    });
+
+    const data = await res.json();
+
+    if (!data.ok) {
+      list.textContent = "既存サービスを取得できませんでした。\n" + (data.message || "");
+      return;
+    }
+
+    const services = data.services || [];
+
+    if (services.length === 0) {
+      list.textContent = "登録されているサービスはありません。";
+      return;
+    }
+
+    let html = "";
+
+    services.forEach(function(s) {
+      const serviceId = escapeHtml(s.serviceId);
+
+      const sourceLumiere = s.source === "lumiere" ? "selected" : "";
+      const sourceEvent = s.source === "event" ? "selected" : "";
+
+      const rankWave = s.requiredRank === "WAVE" ? "selected" : "";
+      const rankEveil = s.requiredRank === "Eveil" ? "selected" : "";
+      const rankEclat = s.requiredRank === "ECLAT" ? "selected" : "";
+      const rankNalu = s.requiredRank === "Nalu" ? "selected" : "";
+
+      html += ""
+        + "<div class='service-card'>"
+        + "<div class='service-name'>" + escapeHtml(s.serviceName) + "</div>"
+
+        + "<label>サービス名</label>"
+        + "<input id='editName-" + serviceId + "' class='admin-input' type='text' value='" + escapeHtml(s.serviceName) + "'>"
+
+        + "<label>表示先</label>"
+        + "<select id='editSource-" + serviceId + "' class='admin-input'>"
+        + "<option value='lumiere' " + sourceLumiere + ">Lumière Nalu</option>"
+        + "<option value='event' " + sourceEvent + ">Event</option>"
+        + "</select>"
+
+        + "<label>対象ランク</label>"
+        + "<select id='editRank-" + serviceId + "' class='admin-input'>"
+        + "<option value='WAVE' " + rankWave + ">WAVE</option>"
+        + "<option value='Eveil' " + rankEveil + ">Eveil</option>"
+        + "<option value='ECLAT' " + rankEclat + ">ECLAT</option>"
+        + "<option value='Nalu' " + rankNalu + ">Nalu</option>"
+        + "</select>"
+
+        + "<label>memo</label>"
+        + "<input id='editMemo-" + serviceId + "' class='admin-input' type='text' value='" + escapeHtml(s.memo || "") + "'>"
+
+        + "<div class='small'>service_id：" + serviceId + "</div>"
+        + "<div class='small'>受付状態・期限・上限人数は「受付設定」で変更</div>"
+
+        + "<button class='save-button service-basic-save-button' data-service-id='" + serviceId + "'>変更を保存する</button>"
+        + "</div>";
+    });
+
+    list.innerHTML = html;
+
+    const buttons = document.querySelectorAll(".service-basic-save-button");
+
+    buttons.forEach(function(button) {
+      button.addEventListener("click", function() {
+        const serviceId = button.getAttribute("data-service-id");
+        saveServiceBasic(serviceId);
+      });
+    });
+
+  } catch (err) {
+    list.textContent = "既存サービスの取得中にエラーが発生しました。\n" + err.message;
+  }
+}
+
+async function saveServiceBasic(serviceId) {
+  const nameEl = document.getElementById("editName-" + serviceId);
+  const sourceEl = document.getElementById("editSource-" + serviceId);
+  const rankEl = document.getElementById("editRank-" + serviceId);
+  const memoEl = document.getElementById("editMemo-" + serviceId);
+
+  if (!nameEl || !sourceEl || !rankEl || !memoEl) {
+    alert("入力欄が見つかりません。");
+    return;
+  }
+
+  const serviceName = nameEl.value.trim();
+  const source = sourceEl.value;
+  const requiredRank = rankEl.value;
+  const memo = memoEl.value.trim();
+
+  if (!serviceName) {
+    alert("サービス名を入力してください。");
+    return;
+  }
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: new URLSearchParams({
+        action: "updateServiceBasic",
+        serviceId: serviceId,
+        serviceName: serviceName,
+        source: source,
+        requiredRank: requiredRank,
+        memo: memo
+      })
+    });
+
+    const data = await res.json();
+
+    if (!data.ok) {
+      alert("保存できませんでした：" + (data.message || ""));
+      return;
+    }
+
+    alert("変更を保存しました");
+    loadServiceBasicEdit();
+
+  } catch (err) {
+    alert("保存中にエラーが発生しました：" + err.message);
   }
 }
     
