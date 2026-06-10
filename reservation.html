@@ -609,16 +609,19 @@ if (eventDateInput) {
     }
 
     if (!data.available || Number(data.remaining) <= 0) {
-      const option = document.createElement("option");
-      option.value = "";
-      option.textContent = "満席です";
-      peopleSelect.appendChild(option);
+  peopleSelect.innerHTML = "";
 
-      peopleSelect.disabled = true;
-      statusBox.textContent =
-        "この日程は現在満席です。\n別日をご選択ください。";
-      return;
-    }
+  const option = document.createElement("option");
+  option.value = "";
+  option.textContent = "満席です";
+  peopleSelect.appendChild(option);
+
+  peopleSelect.disabled = true;
+
+  statusBox.textContent =
+    "この日程は現在満席です。\n別日をご選択ください。";
+  return;
+}
 
     const maxSelectable = Math.min(Number(data.remaining), 4);
 
