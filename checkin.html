@@ -46,19 +46,42 @@
       white-space:pre-wrap;
       font-size:16px;
     }
+
+    .member-preview{
+  margin-top:22px;
+  padding:18px 16px;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:18px;
+  background:rgba(255,255,255,.03);
+  text-align:left;
+  font-size:15px;
+  line-height:1.9;
+  display:none;
+}
+
+.member-preview .name{
+  font-size:18px;
+  margin-bottom:8px;
+}
+
+.member-preview .small{
+  opacity:.75;
+  font-size:13px;
+}
+    
   </style>
 </head>
 <body>
   <div class="wrap">
     <h1>Nalu Check-in</h1>
     <input id="memberNo" type="text" placeholder="会員番号 例: 000000">
+    <div id="memberPreview" class="member-preview"></div>
     <button id="plusBtn">来店 +1</button>
     <div id="status" class="status"></div>
   </div>
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxOIqa-TOGIogMYIro9Qu0nG85vZ7ObLFT_YWLW3Q9XHbUmfbXVr9Oxk3zuUZxbtmXe/exec";
-    const ADMIN_USER_ID = "Uac1faf835c39c8020d78fcbe818fe254";
 
     document.getElementById("plusBtn").addEventListener("click", async () => {
       const memberNo = document.getElementById("memberNo").value.trim();
@@ -114,6 +137,83 @@
         status.textContent = String(e);
       }
     });
+
+    let checkinTimer = null;
+let currentMember = null;
+
+document.getElementById("memberNo").addEventListener("input", function() {
+  const value = this.value.trim();
+
+  currentMember = null;
+
+  clearTimeout(checkinTimer);
+
+  if (value.length < 6) {
+    hideMemberPreview();
+    return;
+  }
+
+  checkinTimer = setTimeout(function() {
+    loadMemberPreview(value);
+  }, 300);
+});
+
+    async function loadMemberPreview(memberNo) {
+  const preview = document.getElementById("memberPreview");
+
+  preview.style.display = "block";
+  preview.textContent = "会員情報を確認中...";
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: new URLSearchParams({
+        action: "getMemberForCheckin",
+        memberNo: memberNo
+      })
+    });
+
+    const data = await res.json();
+
+    if (!data.ok) {
+      currentMember = null;
+      preview.innerHTML = "該当する会員が見つかりません。";
+      return;
+    }
+
+    currentMember = data.member;
+
+    preview.innerHTML =
+      "<div class='name'>" + escapeHtml(data.member.name || "") + " 様</div>"
+      + "<div>会員番号：" + escapeHtml(data.member.memberNo || "") + "</div>"
+      + "<div>カナ：" + escapeHtml(data.member.kana || "") + "</div>"
+      + "<div>ランク：" + escapeHtml(data.member.rank || "") + "</div>"
+      + "<div>来店回数：" + escapeHtml(data.member.visitCount || "0") + "回</div>"
+      + "<div>最終来店日：" + escapeHtml(data.member.lastVisit || "未記録") + "</div>"
+      + "<div>誕生日：" + escapeHtml(data.member.birthday || "未登録") + "</div>"
+      + "<div class='small'>LINE表示名：" + escapeHtml(data.member.displayName || "") + "</div>";
+
+  } catch (err) {
+    currentMember = null;
+    preview.innerHTML = "会員情報の取得中にエラーが発生しました。<br>" + escapeHtml(err.message);
+  }
+}
+
+function hideMemberPreview() {
+  const preview = document.getElementById("memberPreview");
+  preview.style.display = "none";
+  preview.innerHTML = "";
+}
+
+    function escapeHtml(str) {
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+    
   </script>
 </body>
 </html>
