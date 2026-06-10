@@ -191,16 +191,13 @@ Lumière Nalu ご予約申込ページです。
     id="eventDate"
   >
 </div>
+        <div id="dateCapacityStatus" class="service-detail"></div>
         
         <div class="field">
           <label for="people">人数</label>
-          <select id="people">
-            <option value="">選択してください</option>
-            <option value="1">1名</option>
-            <option value="2">2名</option>
-            <option value="3">3名</option>
-            <option value="4">4名</option>
-          </select>
+          <select id="people" disabled>
+  <option value="">先に日程を選択してください</option>
+</select>
         </div>
 
        <div class="field">
@@ -526,11 +523,125 @@ Lumière Nalu ご予約申込ページです。
       }
 
       if (serviceSelect) {
-        serviceSelect.addEventListener("change", updateServiceDetail);
-      }
+  serviceSelect.addEventListener("change", function() {
+    updateServiceDetail();
+    checkDateCapacity();
+  });
+}
+      const eventDateInput = document.getElementById("eventDate");
+
+if (eventDateInput) {
+  eventDateInput.addEventListener("change", checkDateCapacity);
+}
 
       initReservation();
     });
+
+    async function checkDateCapacity() {
+  const statusBox = document.getElementById("dateCapacityStatus");
+  const serviceId = document.getElementById("serviceId").value;
+  const eventDate = document.getElementById("eventDate").value;
+  const peopleSelect = document.getElementById("people");
+  const submitBtn = document.getElementById("submitBtn");
+
+  peopleSelect.innerHTML = "";
+  peopleSelect.disabled = true;
+
+  const defaultOption = document.createElement("option");
+  defaultOption.value = "";
+  defaultOption.textContent = "選択してください";
+  peopleSelect.appendChild(defaultOption);
+
+  if (!serviceId || !eventDate) {
+    statusBox.style.display = "none";
+    statusBox.textContent = "";
+    peopleSelect.innerHTML = "";
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "先にイベント名と日程を選択してください";
+    peopleSelect.appendChild(option);
+    peopleSelect.disabled = true;
+    return;
+  }
+
+  statusBox.style.display = "block";
+  statusBox.textContent = "残席を確認中...";
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: new URLSearchParams({
+        action: "checkDateCapacity",
+        source: SOURCE,
+        serviceId: serviceId,
+        eventDate: eventDate
+      })
+    });
+
+    const data = await res.json();
+
+    if (!data.ok) {
+      statusBox.textContent =
+        "残席を確認できませんでした。\n" +
+        "エラー内容：" + (data.message || "unknown_error");
+      peopleSelect.disabled = true;
+      return;
+    }
+
+    peopleSelect.innerHTML = "";
+
+    const firstOption = document.createElement("option");
+    firstOption.value = "";
+    firstOption.textContent = "選択してください";
+    peopleSelect.appendChild(firstOption);
+
+    if (data.remaining === null) {
+      for (let i = 1; i <= 4; i++) {
+        const option = document.createElement("option");
+        option.value = String(i);
+        option.textContent = i + "名";
+        peopleSelect.appendChild(option);
+      }
+
+      peopleSelect.disabled = false;
+      statusBox.textContent = "この日程は受付可能です。";
+      return;
+    }
+
+    if (!data.available || Number(data.remaining) <= 0) {
+      const option = document.createElement("option");
+      option.value = "";
+      option.textContent = "満席です";
+      peopleSelect.appendChild(option);
+
+      peopleSelect.disabled = true;
+      statusBox.textContent =
+        "この日程は現在満席です。\n別日をご選択ください。";
+      return;
+    }
+
+    const maxSelectable = Math.min(Number(data.remaining), 4);
+
+    for (let i = 1; i <= maxSelectable; i++) {
+      const option = document.createElement("option");
+      option.value = String(i);
+      option.textContent = i + "名";
+      peopleSelect.appendChild(option);
+    }
+
+    peopleSelect.disabled = false;
+
+    statusBox.textContent =
+      "この日程は受付可能です。\n" +
+      "残り：" + data.remaining + "名";
+
+  } catch (e) {
+    statusBox.textContent =
+      "残席確認中にエラーが発生しました。\n" +
+      "エラー内容：" + e.message;
+    peopleSelect.disabled = true;
+  }
+}
   </script>
 </body>
 </html>
