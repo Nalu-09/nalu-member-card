@@ -199,7 +199,7 @@ input[type="datetime-local"]{
         <button onclick="location.href='checkin.html'">チェックイン</button>
         <button onclick="loadReservations()">予約管理</button>
         <button onclick="loadServiceSettings()">受付設定</button>
-        <button onclick="showPanel('rank')">ランク設定</button>
+        <button onclick="showPanel('rank')">初期登録</button>
       </div>
 
       <div id="reservation" class="panel">
@@ -213,9 +213,69 @@ input[type="datetime-local"]{
       </div>
 
       <div id="rank" class="panel">
-        <h2>Rank Setting</h2>
-        <p>ランク設定は次に作成します。</p>
-      </div>
+  <h2>Initial Setup</h2>
+
+  <div class="service-card">
+    <div class="service-name">新規サービス登録</div>
+
+    <label>サービス名</label>
+    <input
+      id="newServiceName"
+      class="admin-input"
+      type="text"
+      placeholder="例：Nalu Table"
+    >
+
+    <label>表示先</label>
+    <select id="newSource" class="admin-input">
+      <option value="lumiere" selected>Lumière Nalu</option>
+      <option value="event">Event</option>
+    </select>
+
+    <label>対象ランク</label>
+    <select id="newRequiredRank" class="admin-input">
+      <option value="WAVE">WAVE</option>
+      <option value="ECLAT">ECLAT</option>
+      <option value="NALU">NALU</option>
+      <option value="Nalu認定">Nalu認定</option>
+    </select>
+
+    <label>受付状態</label>
+    <select id="newStatus" class="admin-input">
+      <option value="active" selected>受付中</option>
+      <option value="paused">停止中</option>
+    </select>
+
+    <label>申込期限</label>
+    <input
+      id="newDeadline"
+      class="admin-input"
+      type="datetime-local"
+    >
+
+    <label>上限人数</label>
+    <input
+      id="newCapacity"
+      class="admin-input"
+      type="number"
+      placeholder="無制限の場合は空欄"
+    >
+
+    <label>memo</label>
+    <input
+      id="newMemo"
+      class="admin-input"
+      type="text"
+      placeholder="例：会員制フレンチ"
+    >
+
+    <button class="save-button" onclick="addNewService()">
+      新規登録する
+    </button>
+  </div>
+
+  <div id="addServiceStatus" class="small"></div>
+</div>
     </div>
   </div>
 
@@ -564,6 +624,63 @@ input[type="datetime-local"]{
 
   } catch (err) {
     alert("保存中にエラーが発生しました：" + err.message);
+  }
+}
+
+    async function addNewService() {
+  const serviceName = document.getElementById("newServiceName").value.trim();
+  const source = document.getElementById("newSource").value;
+  const requiredRank = document.getElementById("newRequiredRank").value;
+  const status = document.getElementById("newStatus").value;
+  const deadline = fromDateTimeLocalValue(document.getElementById("newDeadline").value);
+  const capacity = document.getElementById("newCapacity").value;
+  const memo = document.getElementById("newMemo").value.trim();
+  const statusArea = document.getElementById("addServiceStatus");
+
+  if (!serviceName) {
+    alert("サービス名を入力してください。");
+    return;
+  }
+
+  try {
+    statusArea.textContent = "登録中...";
+
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: new URLSearchParams({
+        action: "addNewService",
+        serviceName: serviceName,
+        source: source,
+        requiredRank: requiredRank,
+        status: status,
+        deadline: deadline,
+        capacity: capacity,
+        memo: memo
+      })
+    });
+
+    const data = await res.json();
+
+    if (!data.ok) {
+      statusArea.textContent = "";
+      alert("登録できませんでした：" + (data.message || ""));
+      return;
+    }
+
+    statusArea.textContent =
+      "登録しました。service_id：" + data.serviceId;
+
+    document.getElementById("newServiceName").value = "";
+    document.getElementById("newSource").value = "lumiere";
+    document.getElementById("newRequiredRank").value = "WAVE";
+    document.getElementById("newStatus").value = "active";
+    document.getElementById("newDeadline").value = "";
+    document.getElementById("newCapacity").value = "";
+    document.getElementById("newMemo").value = "";
+
+  } catch (err) {
+    statusArea.textContent = "";
+    alert("登録中にエラーが発生しました：" + err.message);
   }
 }
     
