@@ -185,6 +185,14 @@ Lumière Nalu ご予約申込ページです。
         </div>
 
         <div class="field">
+  <label for="eventDate">参加日</label>
+  <input
+    type="date"
+    id="eventDate"
+  >
+</div>
+        
+        <div class="field">
           <label for="people">人数</label>
           <select id="people">
             <option value="">選択してください</option>
@@ -385,6 +393,7 @@ Lumière Nalu ご予約申込ページです。
       const inputName = document.getElementById("inputName").value.trim();
       const inputKana = document.getElementById("inputKana").value.trim();
       const serviceId = document.getElementById("serviceId").value;
+      const eventDate = document.getElementById("eventDate").value;
       const people = document.getElementById("people").value;
       const companionName = document.getElementById("companionName").value.trim();
       const allergy = document.getElementById("allergy").value.trim();
@@ -416,6 +425,11 @@ Lumière Nalu ご予約申込ページです。
         return;
       }
 
+      if (!eventDate) {
+        status.textContent = "参加日を選択してください。";
+        return;
+      }
+
       if (!people) {
         status.textContent = "人数を選択してください。";
         return;
@@ -441,6 +455,7 @@ Lumière Nalu ご予約申込ページです。
           inputName: inputName,
           inputKana: inputKana,
           serviceId: serviceId,
+          eventDate: eventDate,
           people: people,
           companionName: companionName,
           allergy: allergy,
