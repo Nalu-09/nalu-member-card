@@ -452,40 +452,40 @@ Lumière Nalu ご予約申込ページです。
         const data = await res.json();
 
         if (!data.ok) {
-          if (data.message === "member_not_found") {
-            status.textContent =
-              "会員情報が確認できませんでした。\n会員証発行後にご利用ください。";
-          } else if (data.message === "member_no_mismatch") {
-            status.textContent =
-              "会員番号が一致しません。\n会員証をご確認のうえ、再度お試しください。";
-          } else if (data.message === "name_mismatch") {
-            status.textContent =
-              "お名前が会員情報と一致しません。\n会員証の表記をご確認ください。";
-          } else if (data.message === "service_not_allowed") {
-          } else if (data.message === "kana_required") {
-              status.textContent =
-               "お名前（カナ）をご入力ください。";
-          } else if (data.message === "companion_required") {
-              status.textContent =
-                 "2名以上でお申し込みの場合、ご同行される方のお名前をご入力ください。";
-            status.textContent =
-              "現在のランクでは、選択された内容にお申し込みいただけません。";
-          } else if (data.message === "deadline_closed") {
-            status.textContent =
-              "このお申し込みは受付終了しています。";
-          } else if (data.message === "service_full") {
-            status.textContent =
-              "このお申し込みは現在満席です。";
-          } else {
-            status.textContent =
-              "予約申込を受け付けできませんでした。\n" +
-              "エラー内容：" + (data.message || "unknown_error");
-          }
+  if (data.message === "member_not_found") {
+    status.textContent =
+      "会員情報が確認できませんでした。\n会員証発行後にご利用ください。";
+  } else if (data.message === "member_no_mismatch") {
+    status.textContent =
+      "会員番号が一致しません。\n会員証をご確認のうえ、再度お試しください。";
+  } else if (data.message === "name_mismatch") {
+    status.textContent =
+      "お名前が会員情報と一致しません。\n会員証の表記をご確認ください。";
+  } else if (data.message === "service_not_allowed") {
+    status.textContent =
+      "現在のランクでは、選択された内容にお申し込みいただけません。";
+  } else if (data.message === "kana_required") {
+    status.textContent =
+      "お名前（カナ）をご入力ください。";
+  } else if (data.message === "companion_required") {
+    status.textContent =
+      "2名以上でお申し込みの場合、ご同行される方のお名前をご入力ください。";
+  } else if (data.message === "deadline_closed") {
+    status.textContent =
+      "このお申し込みは受付終了しています。";
+  } else if (data.message === "service_full" || data.message === "capacity_full") {
+    status.textContent =
+      "このお申し込みは現在満席です。";
+  } else {
+    status.textContent =
+      "予約申込を受け付けできませんでした。\n" +
+      "エラー内容：" + (data.message || "unknown_error");
+  }
 
-          btn.disabled = false;
-          btn.textContent = "予約申込を送信する";
-          return;
-        }
+  btn.disabled = false;
+  btn.textContent = "予約申込を送信する";
+  return;
+}
 
         status.textContent =
           "予約申込を受け付けました。\n内容を確認のうえ、運営よりご案内いたします。";
