@@ -104,6 +104,8 @@
       background:rgba(255,255,255,.03);
       font-size:13px;
       line-height:1.8;
+      box-sizing:border-box;
+      overflow:hidden;
     }
 
     .summary-card{
@@ -140,52 +142,46 @@
       margin-bottom:16px;
     }
 
-   .admin-input{
-  display:block;
-  width:100%;
-  max-width:100%;
-  min-width:0;
-  box-sizing:border-box;
-  margin:6px 0 12px;
-  padding:11px 12px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,.18);
-  background:#050505;
-  color:#fff;
-  font-size:16px;
-  font-family:"Times New Roman", serif;
-}
+    .admin-input{
+      display:block;
+      width:100%;
+      max-width:100%;
+      min-width:0;
+      box-sizing:border-box;
+      margin:6px 0 12px;
+      padding:11px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.18);
+      background:#050505;
+      color:#fff;
+      font-size:16px;
+      font-family:"Times New Roman", serif;
+    }
 
-.service-card label{
-  display:block;
-  margin-top:10px;
-  opacity:.85;
-  font-size:13px;
-}
+    .service-card label{
+      display:block;
+      margin-top:10px;
+      opacity:.85;
+      font-size:13px;
+    }
 
     .save-button{
-  width:100%;
-  margin-top:14px;
-  padding:12px 16px;
-  border:none;
-  border-radius:999px;
-  background:#fff;
-  color:#000;
-  font-size:14px;
-  font-family:"Times New Roman", serif;
-  cursor:pointer;
-}
+      width:100%;
+      margin-top:14px;
+      padding:12px 16px;
+      border:none;
+      border-radius:999px;
+      background:#fff;
+      color:#000;
+      font-size:14px;
+      font-family:"Times New Roman", serif;
+      cursor:pointer;
+    }
 
-    .service-card{
-  box-sizing:border-box;
-  overflow:hidden;
-}
-
-input[type="datetime-local"]{
-  -webkit-appearance:none;
-  appearance:none;
-}
-    
+    input[type="datetime-local"]{
+      -webkit-appearance:none;
+      appearance:none;
+    }
   </style>
 </head>
 
@@ -213,74 +209,77 @@ input[type="datetime-local"]{
       </div>
 
       <div id="rank" class="panel">
-  <h2>Service Management</h2>
+        <h2>Service Management</h2>
 
-  <div id="serviceManagementMenu" class="menu">
-    <button onclick="showNewServiceForm()">新規サービス登録</button>
-    <button onclick="loadServiceBasicEdit()">既存サービス修正</button>
-  </div>
+        <div id="serviceManagementMenu" class="menu">
+          <button onclick="showNewServiceForm()">新規サービス登録</button>
+          <button onclick="loadServiceBasicEdit()">既存サービス修正</button>
+        </div>
 
-  <div id="newServiceArea" style="display:none;">
-    <div class="service-card">
-      <div class="service-name">新規サービス登録</div>
+        <div id="newServiceArea" style="display:none;">
+          <div class="service-card">
+            <div class="service-name">新規サービス登録</div>
 
-      <label>サービス名</label>
-      <input id="newServiceName" class="admin-input" type="text" placeholder="例：Nalu Table">
+            <label>サービス名</label>
+            <input id="newServiceName" class="admin-input" type="text" placeholder="例：Nalu Table">
 
-      <label>表示先</label>
-      <select id="newSource" class="admin-input">
-        <option value="lumiere" selected>Lumière Nalu</option>
-        <option value="event">Event</option>
-      </select>
+            <label>表示先</label>
+            <select id="newSource" class="admin-input">
+              <option value="lumiere" selected>Lumière Nalu</option>
+              <option value="event">Event</option>
+            </select>
 
-      <label>対象ランク</label>
-      <select id="newRequiredRank" class="admin-input">
-        <option value="WAVE">Wave</option>
-        <option value="EVEIL">Eveil</option>
-        <option value="ECLAT">Eclat</option>
-        <option value="NALU">Nalu</option>
-      </select>
+            <label>対象ランク</label>
+            <select id="newRequiredRank" class="admin-input">
+              <option value="WAVE">WAVE</option>
+              <option value="EVEIL">EVEIL</option>
+              <option value="ECLAT">ECLAT</option>
+              <option value="NALU">NALU</option>
+            </select>
 
-      <label>受付状態</label>
-      <select id="newStatus" class="admin-input">
-        <option value="active" selected>受付中</option>
-        <option value="paused">停止中</option>
-      </select>
+            <label>受付状態</label>
+            <select id="newStatus" class="admin-input">
+              <option value="active" selected>受付中</option>
+              <option value="paused">停止中</option>
+            </select>
 
-      <label>申込期限</label>
-      <input id="newDeadline" class="admin-input" type="datetime-local">
+            <label>申込期限</label>
+            <input id="newDeadline" class="admin-input" type="datetime-local">
 
-      <label>上限人数</label>
-      <input id="newCapacity" class="admin-input" type="number" placeholder="無制限の場合は空欄">
+            <label>上限人数</label>
+            <input id="newCapacity" class="admin-input" type="number" placeholder="無制限の場合は空欄">
 
-      <label>memo</label>
-      <input id="newMemo" class="admin-input" type="text" placeholder="例：会員制フレンチ">
+            <label>memo</label>
+            <input id="newMemo" class="admin-input" type="text" placeholder="例：会員制フレンチ">
 
-      <button class="save-button" onclick="addNewService()">
-        登録する
-      </button>
+            <button class="save-button" onclick="addNewService()">登録する</button>
+          </div>
+
+          <div id="addServiceStatus" class="small"></div>
+        </div>
+
+        <div id="editServiceArea" style="display:none;">
+          <div id="editServiceList">読み込み前です。</div>
+        </div>
+      </div>
     </div>
-
-    <div id="addServiceStatus" class="small"></div>
   </div>
 
-  <div id="editServiceArea" style="display:none;">
-    <div id="editServiceList">読み込み前です。</div>
-  </div>
-</div>
-      
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxOIqa-TOGIogMYIro9Qu0nG85vZ7ObLFT_YWLW3Q9XHbUmfbXVr9Oxk3zuUZxbtmXe/exec";
 
     let allReservations = [];
+    window.reservationGroups = [];
 
     function showPanel(id) {
       const panels = document.querySelectorAll(".panel");
+
       panels.forEach(function(panel) {
         panel.classList.remove("active");
       });
 
       const target = document.getElementById(id);
+
       if (target) {
         target.classList.add("active");
       }
@@ -353,33 +352,32 @@ input[type="datetime-local"]{
       const groups = Object.values(grouped);
 
       groups.sort(function(a, b) {
-        return b.date.localeCompare(a.date);
+        return String(b.date).localeCompare(String(a.date));
       });
 
       window.reservationGroups = groups;
 
-      let html = `<div class="summary-list">`;
+      let html = "<div class='summary-list'>";
       let currentDate = "";
 
       groups.forEach(function(group, index) {
         if (group.date !== currentDate) {
           currentDate = group.date;
-          html += `<div class="summary-date">${escapeHtml(currentDate)}</div>`;
+          html += "<div class='summary-date'>" + escapeHtml(currentDate) + "</div>";
         }
 
-        html += `
-          <div class="summary-card" onclick="renderReservationDetail(${index})">
-            <div class="service-name">${escapeHtml(group.serviceName)}</div>
-            <div>申込件数：${group.reservations.length}件</div>
-            <div>人数合計：${group.totalPeople}名</div>
-            <div>備考あり：${group.noteCount}件</div>
-            <div>アレルギーあり：${group.allergyCount}件</div>
-            <div>苦手食材あり：${group.dislikeCount}件</div>
-          </div>
-        `;
+        html += ""
+          + "<div class='summary-card' onclick='renderReservationDetail(" + index + ")'>"
+          + "<div class='service-name'>" + escapeHtml(group.serviceName) + "</div>"
+          + "<div>申込件数：" + group.reservations.length + "件</div>"
+          + "<div>人数合計：" + group.totalPeople + "名</div>"
+          + "<div>備考あり：" + group.noteCount + "件</div>"
+          + "<div>アレルギーあり：" + group.allergyCount + "件</div>"
+          + "<div>苦手食材あり：" + group.dislikeCount + "件</div>"
+          + "</div>";
       });
 
-      html += `</div>`;
+      html += "</div>";
       list.innerHTML = html;
     }
 
@@ -392,118 +390,362 @@ input[type="datetime-local"]{
         return;
       }
 
-      let html = `
-        <button class="back-button" onclick="renderReservationSummary(allReservations)">一覧に戻る</button>
-
-        <div class="detail-header">
-          <div>${escapeHtml(group.date)}</div>
-          <div>${escapeHtml(group.serviceName)}</div>
-          <div>人数合計：${group.totalPeople}名 / 申込：${group.reservations.length}件</div>
-        </div>
-
-        <div class="summary-list">
-      `;
+      let html = ""
+        + "<button class='back-button' onclick='renderReservationSummary(allReservations)'>一覧に戻る</button>"
+        + "<div class='detail-header'>"
+        + "<div>" + escapeHtml(group.date) + "</div>"
+        + "<div>" + escapeHtml(group.serviceName) + "</div>"
+        + "<div>人数合計：" + group.totalPeople + "名 / 申込：" + group.reservations.length + "件</div>"
+        + "</div>"
+        + "<div class='summary-list'>";
 
       group.reservations.forEach(function(r) {
-        html += `
-          <div class="reservation-card">
-            <div class="name">${escapeHtml(r.name || "")} 様</div>
-            <div>申込内容：${escapeHtml(r.serviceName || "")}</div>
-            <div>人数：${escapeHtml(String(r.people || ""))}名</div>
-            <div>会員番号：${escapeHtml(formatMemberNo(r.memberNo))}</div>
-            <div>ランク：${escapeHtml(r.rank || "")}</div>
-            <div>カナ：${escapeHtml(r.kana || "")}</div>
-            <div>同行者：${escapeHtml(r.companionName || "なし")}</div>
-            <div>苦手食材：${escapeHtml(r.dislike || "なし")}</div>
-            <div>アレルギー：${escapeHtml(r.allergy || "なし")}</div>
-            <div>連絡事項：${escapeHtml(r.message || "なし")}</div>
-            <div>ステータス：${escapeHtml(r.status || "")}</div>
-            <div class="small">申込日時：${escapeHtml(r.createdAt || "")}</div>
-          </div>
-        `;
+        html += ""
+          + "<div class='reservation-card'>"
+          + "<div class='name'>" + escapeHtml(r.name || "") + " 様</div>"
+          + "<div>申込内容：" + escapeHtml(r.serviceName || "") + "</div>"
+          + "<div>人数：" + escapeHtml(String(r.people || "")) + "名</div>"
+          + "<div>会員番号：" + escapeHtml(formatMemberNo(r.memberNo)) + "</div>"
+          + "<div>ランク：" + escapeHtml(r.rank || "") + "</div>"
+          + "<div>カナ：" + escapeHtml(r.kana || "") + "</div>"
+          + "<div>同行者：" + escapeHtml(r.companionName || "なし") + "</div>"
+          + "<div>苦手食材：" + escapeHtml(r.dislike || "なし") + "</div>"
+          + "<div>アレルギー：" + escapeHtml(r.allergy || "なし") + "</div>"
+          + "<div>連絡事項：" + escapeHtml(r.message || "なし") + "</div>"
+          + "<div>ステータス：" + escapeHtml(r.status || "") + "</div>"
+          + "<div class='small'>申込日時：" + escapeHtml(r.createdAt || "") + "</div>"
+          + "</div>";
       });
 
-      html += `</div>`;
+      html += "</div>";
       list.innerHTML = html;
     }
 
     async function loadServiceSettings() {
-  showPanel("service");
+      showPanel("service");
 
-  const list = document.getElementById("serviceList");
-  list.textContent = "受付設定を読み込み中...";
+      const list = document.getElementById("serviceList");
+      list.textContent = "受付設定を読み込み中...";
 
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: new URLSearchParams({
-        action: "getAdminServices"
-      })
-    });
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          body: new URLSearchParams({
+            action: "getAdminServices"
+          })
+        });
 
-    const data = await res.json();
+        const data = await res.json();
 
-    if (!data.ok) {
-      list.textContent = "受付設定を取得できませんでした。\n" + (data.message || "");
-      return;
+        if (!data.ok) {
+          list.textContent = "受付設定を取得できませんでした。\n" + (data.message || "");
+          return;
+        }
+
+        const services = data.services || [];
+
+        if (services.length === 0) {
+          list.textContent = "登録されているサービスはありません。";
+          return;
+        }
+
+        let html = "";
+
+        services.forEach(function(s) {
+          const serviceId = escapeHtml(s.serviceId);
+          const statusActive = s.status === "active" ? "selected" : "";
+          const statusPaused = s.status === "paused" ? "selected" : "";
+          const deadlineValue = toDateTimeLocalValue(s.deadline);
+
+          html += ""
+            + "<div class='service-card'>"
+            + "<div class='service-name'>" + escapeHtml(s.serviceName) + "</div>"
+
+            + "<label>受付状態</label>"
+            + "<select id='status-" + serviceId + "' class='admin-input'>"
+            + "<option value='active' " + statusActive + ">受付中</option>"
+            + "<option value='paused' " + statusPaused + ">停止中</option>"
+            + "</select>"
+
+            + "<label>申込期限</label>"
+            + "<input id='deadline-" + serviceId + "' class='admin-input' type='datetime-local' value='" + escapeHtml(deadlineValue) + "'>"
+
+            + "<label>上限人数</label>"
+            + "<input id='capacity-" + serviceId + "' class='admin-input' type='number' value='" + escapeHtml(s.capacity || "") + "' placeholder='無制限の場合は空欄'>"
+
+            + "<div class='small'>表示元：" + escapeHtml(s.source) + "</div>"
+            + "<div class='small'>対象ランク：" + escapeHtml(s.requiredRank) + "</div>"
+            + "<div class='small'>service_id：" + serviceId + "</div>"
+            + "<div class='small'>memo：" + escapeHtml(s.memo || "") + "</div>"
+
+            + "<button class='save-button service-save-button' data-service-id='" + serviceId + "'>設定を保存</button>"
+            + "</div>";
+        });
+
+        list.innerHTML = html;
+
+        const buttons = document.querySelectorAll(".service-save-button");
+
+        buttons.forEach(function(button) {
+          button.addEventListener("click", function() {
+            const serviceId = button.getAttribute("data-service-id");
+            saveServiceSetting(serviceId);
+          });
+        });
+
+      } catch (err) {
+        list.textContent = "受付設定の取得中にエラーが発生しました。\n" + err.message;
+      }
     }
 
-    const services = data.services || [];
+    async function saveServiceSetting(serviceId) {
+      const statusEl = document.getElementById("status-" + serviceId);
+      const deadlineEl = document.getElementById("deadline-" + serviceId);
+      const capacityEl = document.getElementById("capacity-" + serviceId);
 
-    if (services.length === 0) {
-      list.textContent = "登録されているサービスはありません。";
-      return;
+      if (!statusEl || !deadlineEl || !capacityEl) {
+        alert("入力欄が見つかりません。");
+        return;
+      }
+
+      const status = statusEl.value;
+      const deadline = fromDateTimeLocalValue(deadlineEl.value);
+      const capacity = capacityEl.value;
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          body: new URLSearchParams({
+            action: "updateServiceSetting",
+            serviceId: serviceId,
+            status: status,
+            deadline: deadline,
+            capacity: capacity
+          })
+        });
+
+        const data = await res.json();
+
+        if (!data.ok) {
+          alert("保存できませんでした：" + (data.message || ""));
+          return;
+        }
+
+        alert("設定を保存しました");
+        loadServiceSettings();
+
+      } catch (err) {
+        alert("保存中にエラーが発生しました：" + err.message);
+      }
     }
 
-    let html = "";
+    function showServiceManagement() {
+      showPanel("rank");
 
-    services.forEach(function(s) {
-      const serviceId = escapeHtml(s.serviceId);
-      const statusActive = s.status === "active" ? "selected" : "";
-      const statusPaused = s.status === "paused" ? "selected" : "";
-      const deadlineValue = toDateTimeLocalValue(s.deadline);
+      document.getElementById("serviceManagementMenu").style.display = "grid";
+      document.getElementById("newServiceArea").style.display = "none";
+      document.getElementById("editServiceArea").style.display = "none";
+    }
 
-      html += ""
-        + "<div class='service-card'>"
-        + "<div class='service-name'>" + escapeHtml(s.serviceName) + "</div>"
+    function showNewServiceForm() {
+      document.getElementById("newServiceArea").style.display = "block";
+      document.getElementById("editServiceArea").style.display = "none";
+    }
 
-        + "<label>受付状態</label>"
-        + "<select id='status-" + serviceId + "' class='admin-input'>"
-        + "<option value='active' " + statusActive + ">受付中</option>"
-        + "<option value='paused' " + statusPaused + ">停止中</option>"
-        + "</select>"
+    async function addNewService() {
+      const serviceName = document.getElementById("newServiceName").value.trim();
+      const source = document.getElementById("newSource").value;
+      const requiredRank = document.getElementById("newRequiredRank").value;
+      const status = document.getElementById("newStatus").value;
+      const deadline = fromDateTimeLocalValue(document.getElementById("newDeadline").value);
+      const capacity = document.getElementById("newCapacity").value;
+      const memo = document.getElementById("newMemo").value.trim();
+      const statusArea = document.getElementById("addServiceStatus");
 
-        + "<label>申込期限</label>"
-        + "<input id='deadline-" + serviceId + "' class='admin-input' type='datetime-local' value='" + escapeHtml(deadlineValue) + "'>"
+      if (!serviceName) {
+        alert("サービス名を入力してください。");
+        return;
+      }
 
-        + "<label>上限人数</label>"
-        + "<input id='capacity-" + serviceId + "' class='admin-input' type='number' value='" + escapeHtml(s.capacity || "") + "' placeholder='無制限の場合は空欄'>"
+      try {
+        statusArea.textContent = "登録中...";
 
-        + "<div class='small'>表示元：" + escapeHtml(s.source) + "</div>"
-        + "<div class='small'>対象ランク：" + escapeHtml(s.requiredRank) + "</div>"
-        + "<div class='small'>service_id：" + serviceId + "</div>"
-        + "<div class='small'>memo：" + escapeHtml(s.memo || "") + "</div>"
+        const res = await fetch(API_URL, {
+          method: "POST",
+          body: new URLSearchParams({
+            action: "addNewService",
+            serviceName: serviceName,
+            source: source,
+            requiredRank: requiredRank,
+            status: status,
+            deadline: deadline,
+            capacity: capacity,
+            memo: memo
+          })
+        });
 
-        + "<button class='save-button service-save-button' data-service-id='" + serviceId + "'>設定を保存</button>"
-        + "</div>";
-    });
+        const data = await res.json();
 
-    list.innerHTML = html;
+        if (!data.ok) {
+          statusArea.textContent = "";
+          alert("登録できませんでした：" + (data.message || ""));
+          return;
+        }
 
-    const buttons = document.querySelectorAll(".service-save-button");
+        statusArea.textContent = "登録しました。service_id：" + data.serviceId;
 
-    buttons.forEach(function(button) {
-      button.addEventListener("click", function() {
-        const serviceId = button.getAttribute("data-service-id");
-        saveServiceSetting(serviceId);
-      });
-    });
+        document.getElementById("newServiceName").value = "";
+        document.getElementById("newSource").value = "lumiere";
+        document.getElementById("newRequiredRank").value = "WAVE";
+        document.getElementById("newStatus").value = "active";
+        document.getElementById("newDeadline").value = "";
+        document.getElementById("newCapacity").value = "";
+        document.getElementById("newMemo").value = "";
 
-  } catch (err) {
-    list.textContent = "受付設定の取得中にエラーが発生しました。\n" + err.message;
-  }
-}
-    
+      } catch (err) {
+        statusArea.textContent = "";
+        alert("登録中にエラーが発生しました：" + err.message);
+      }
+    }
+
+    async function loadServiceBasicEdit() {
+      document.getElementById("newServiceArea").style.display = "none";
+      document.getElementById("editServiceArea").style.display = "block";
+
+      const list = document.getElementById("editServiceList");
+      list.textContent = "既存サービスを読み込み中...";
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          body: new URLSearchParams({
+            action: "getAdminServices"
+          })
+        });
+
+        const data = await res.json();
+
+        if (!data.ok) {
+          list.textContent = "既存サービスを取得できませんでした。\n" + (data.message || "");
+          return;
+        }
+
+        const services = data.services || [];
+
+        if (services.length === 0) {
+          list.textContent = "登録されているサービスはありません。";
+          return;
+        }
+
+        let html = "";
+
+        services.forEach(function(s) {
+          const serviceId = escapeHtml(s.serviceId);
+
+          const sourceLumiere = s.source === "lumiere" ? "selected" : "";
+          const sourceEvent = s.source === "event" ? "selected" : "";
+
+          const rankWave = s.requiredRank === "WAVE" ? "selected" : "";
+          const rankEveil = s.requiredRank === "EVEIL" ? "selected" : "";
+          const rankEclat = s.requiredRank === "ECLAT" ? "selected" : "";
+          const rankNalu = s.requiredRank === "NALU" ? "selected" : "";
+
+          html += ""
+            + "<div class='service-card'>"
+            + "<div class='service-name'>" + escapeHtml(s.serviceName) + "</div>"
+
+            + "<label>サービス名</label>"
+            + "<input id='editName-" + serviceId + "' class='admin-input' type='text' value='" + escapeHtml(s.serviceName) + "'>"
+
+            + "<label>表示先</label>"
+            + "<select id='editSource-" + serviceId + "' class='admin-input'>"
+            + "<option value='lumiere' " + sourceLumiere + ">Lumière Nalu</option>"
+            + "<option value='event' " + sourceEvent + ">Event</option>"
+            + "</select>"
+
+            + "<label>対象ランク</label>"
+            + "<select id='editRank-" + serviceId + "' class='admin-input'>"
+            + "<option value='WAVE' " + rankWave + ">WAVE</option>"
+            + "<option value='EVEIL' " + rankEveil + ">EVEIL</option>"
+            + "<option value='ECLAT' " + rankEclat + ">ECLAT</option>"
+            + "<option value='NALU' " + rankNalu + ">NALU</option>"
+            + "</select>"
+
+            + "<label>memo</label>"
+            + "<input id='editMemo-" + serviceId + "' class='admin-input' type='text' value='" + escapeHtml(s.memo || "") + "'>"
+
+            + "<div class='small'>service_id：" + serviceId + "</div>"
+            + "<div class='small'>受付状態・期限・上限人数は「受付設定」で変更</div>"
+
+            + "<button class='save-button service-basic-save-button' data-service-id='" + serviceId + "'>変更を保存する</button>"
+            + "</div>";
+        });
+
+        list.innerHTML = html;
+
+        const buttons = document.querySelectorAll(".service-basic-save-button");
+
+        buttons.forEach(function(button) {
+          button.addEventListener("click", function() {
+            const serviceId = button.getAttribute("data-service-id");
+            saveServiceBasic(serviceId);
+          });
+        });
+
+      } catch (err) {
+        list.textContent = "既存サービスの取得中にエラーが発生しました。\n" + err.message;
+      }
+    }
+
+    async function saveServiceBasic(serviceId) {
+      const nameEl = document.getElementById("editName-" + serviceId);
+      const sourceEl = document.getElementById("editSource-" + serviceId);
+      const rankEl = document.getElementById("editRank-" + serviceId);
+      const memoEl = document.getElementById("editMemo-" + serviceId);
+
+      if (!nameEl || !sourceEl || !rankEl || !memoEl) {
+        alert("入力欄が見つかりません。");
+        return;
+      }
+
+      const serviceName = nameEl.value.trim();
+      const source = sourceEl.value;
+      const requiredRank = rankEl.value;
+      const memo = memoEl.value.trim();
+
+      if (!serviceName) {
+        alert("サービス名を入力してください。");
+        return;
+      }
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          body: new URLSearchParams({
+            action: "updateServiceBasic",
+            serviceId: serviceId,
+            serviceName: serviceName,
+            source: source,
+            requiredRank: requiredRank,
+            memo: memo
+          })
+        });
+
+        const data = await res.json();
+
+        if (!data.ok) {
+          alert("保存できませんでした：" + (data.message || ""));
+          return;
+        }
+
+        alert("変更を保存しました");
+        loadServiceBasicEdit();
+
+      } catch (err) {
+        alert("保存中にエラーが発生しました：" + err.message);
+      }
+    }
+
     function getReservationDate(value) {
       if (!value) return "日付未設定";
 
@@ -548,339 +790,32 @@ input[type="datetime-local"]{
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
     }
-    
-   function fromDateTimeLocalValue(value) {
-  if (!value) return "";
 
-  return String(value).replace("T", " ").replaceAll("-", "/");
-}
-    
-  function toDateTimeLocalValue(value) {
-  if (!value) return "";
+    function fromDateTimeLocalValue(value) {
+      if (!value) return "";
 
-  const str = String(value).trim();
-
-  if (str.includes("/") && str.includes(" ")) {
-    return str.replaceAll("/", "-").replace(" ", "T").slice(0, 16);
-  }
-
-  if (str.includes("-") && str.includes(" ")) {
-    return str.replace(" ", "T").slice(0, 16);
-  }
-
-  if (str.includes("T")) {
-    return str.slice(0, 16);
-  }
-
-  return "";
-}
-
-    
-    async function saveServiceSetting(serviceId) {
-  const statusEl = document.getElementById("status-" + serviceId);
-  const deadlineEl = document.getElementById("deadline-" + serviceId);
-  const capacityEl = document.getElementById("capacity-" + serviceId);
-
-  if (!statusEl || !deadlineEl || !capacityEl) {
-    alert("入力欄が見つかりません。");
-    return;
-  }
-
-  const status = statusEl.value;
-  const deadline = fromDateTimeLocalValue(deadlineEl.value);
-  const capacity = capacityEl.value;
-
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: new URLSearchParams({
-        action: "updateServiceSetting",
-        serviceId: serviceId,
-        status: status,
-        deadline: deadline,
-        capacity: capacity
-      })
-    });
-
-    const data = await res.json();
-
-    if (!data.ok) {
-      alert("保存できませんでした：" + (data.message || ""));
-      return;
+      return String(value).replace("T", " ").replaceAll("-", "/");
     }
 
-    alert("設定を保存しました");
-    loadServiceSettings();
+    function toDateTimeLocalValue(value) {
+      if (!value) return "";
 
-  } catch (err) {
-    alert("保存中にエラーが発生しました：" + err.message);
-  }
-}
+      const str = String(value).trim();
 
-    async function addNewService() {
-  const serviceName = document.getElementById("newServiceName").value.trim();
-  const source = document.getElementById("newSource").value;
-  const requiredRank = document.getElementById("newRequiredRank").value;
-  const status = document.getElementById("newStatus").value;
-  const deadline = fromDateTimeLocalValue(document.getElementById("newDeadline").value);
-  const capacity = document.getElementById("newCapacity").value;
-  const memo = document.getElementById("newMemo").value.trim();
-  const statusArea = document.getElementById("addServiceStatus");
+      if (str.includes("/") && str.includes(" ")) {
+        return str.replaceAll("/", "-").replace(" ", "T").slice(0, 16);
+      }
 
-  if (!serviceName) {
-    alert("サービス名を入力してください。");
-    return;
-  }
+      if (str.includes("-") && str.includes(" ")) {
+        return str.replace(" ", "T").slice(0, 16);
+      }
 
-  try {
-    statusArea.textContent = "登録中...";
+      if (str.includes("T")) {
+        return str.slice(0, 16);
+      }
 
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: new URLSearchParams({
-        action: "addNewService",
-        serviceName: serviceName,
-        source: source,
-        requiredRank: requiredRank,
-        status: status,
-        deadline: deadline,
-        capacity: capacity,
-        memo: memo
-      })
-    });
-
-    const data = await res.json();
-
-    if (!data.ok) {
-      statusArea.textContent = "";
-      alert("登録できませんでした：" + (data.message || ""));
-      return;
+      return "";
     }
-
-    statusArea.textContent =
-      "登録しました。service_id：" + data.serviceId;
-
-    document.getElementById("newServiceName").value = "";
-    document.getElementById("newSource").value = "lumiere";
-    document.getElementById("newRequiredRank").value = "WAVE";
-    document.getElementById("newStatus").value = "active";
-    document.getElementById("newDeadline").value = "";
-    document.getElementById("newCapacity").value = "";
-    document.getElementById("newMemo").value = "";
-
-  } catch (err) {
-    statusArea.textContent = "";
-    alert("登録中にエラーが発生しました：" + err.message);
-  }
-}
-
-    function showServiceManagement() {
-  showPanel("rank");
-
-  document.getElementById("serviceManagementMenu").style.display = "grid";
-  document.getElementById("newServiceArea").style.display = "none";
-  document.getElementById("editServiceArea").style.display = "none";
-}
-
-function showNewServiceForm() {
-  document.getElementById("newServiceArea").style.display = "block";
-  document.getElementById("editServiceArea").style.display = "none";
-}
-
-async function addNewService() {
-  const serviceName = document.getElementById("newServiceName").value.trim();
-  const source = document.getElementById("newSource").value;
-  const requiredRank = document.getElementById("newRequiredRank").value;
-  const status = document.getElementById("newStatus").value;
-  const deadline = fromDateTimeLocalValue(document.getElementById("newDeadline").value);
-  const capacity = document.getElementById("newCapacity").value;
-  const memo = document.getElementById("newMemo").value.trim();
-  const statusArea = document.getElementById("addServiceStatus");
-
-  if (!serviceName) {
-    alert("サービス名を入力してください。");
-    return;
-  }
-
-  try {
-    statusArea.textContent = "登録中...";
-
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: new URLSearchParams({
-        action: "addNewService",
-        serviceName: serviceName,
-        source: source,
-        requiredRank: requiredRank,
-        status: status,
-        deadline: deadline,
-        capacity: capacity,
-        memo: memo
-      })
-    });
-
-    const data = await res.json();
-
-    if (!data.ok) {
-      statusArea.textContent = "";
-      alert("登録できませんでした：" + (data.message || ""));
-      return;
-    }
-
-    statusArea.textContent = "登録しました。service_id：" + data.serviceId;
-
-    document.getElementById("newServiceName").value = "";
-    document.getElementById("newSource").value = "lumiere";
-    document.getElementById("newRequiredRank").value = "WAVE";
-    document.getElementById("newStatus").value = "active";
-    document.getElementById("newDeadline").value = "";
-    document.getElementById("newCapacity").value = "";
-    document.getElementById("newMemo").value = "";
-
-  } catch (err) {
-    statusArea.textContent = "";
-    alert("登録中にエラーが発生しました：" + err.message);
-  }
-}
-
-async function loadServiceBasicEdit() {
-  document.getElementById("newServiceArea").style.display = "none";
-  document.getElementById("editServiceArea").style.display = "block";
-
-  const list = document.getElementById("editServiceList");
-  list.textContent = "既存サービスを読み込み中...";
-
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: new URLSearchParams({
-        action: "getAdminServices"
-      })
-    });
-
-    const data = await res.json();
-
-    if (!data.ok) {
-      list.textContent = "既存サービスを取得できませんでした。\n" + (data.message || "");
-      return;
-    }
-
-    const services = data.services || [];
-
-    if (services.length === 0) {
-      list.textContent = "登録されているサービスはありません。";
-      return;
-    }
-
-    let html = "";
-
-    services.forEach(function(s) {
-      const serviceId = escapeHtml(s.serviceId);
-
-      const sourceLumiere = s.source === "lumiere" ? "selected" : "";
-      const sourceEvent = s.source === "event" ? "selected" : "";
-
-      const rankWave = s.requiredRank === "WAVE" ? "selected" : "";
-      const rankEveil = s.requiredRank === "Eveil" ? "selected" : "";
-      const rankEclat = s.requiredRank === "ECLAT" ? "selected" : "";
-      const rankNalu = s.requiredRank === "Nalu" ? "selected" : "";
-
-      html += ""
-        + "<div class='service-card'>"
-        + "<div class='service-name'>" + escapeHtml(s.serviceName) + "</div>"
-
-        + "<label>サービス名</label>"
-        + "<input id='editName-" + serviceId + "' class='admin-input' type='text' value='" + escapeHtml(s.serviceName) + "'>"
-
-        + "<label>表示先</label>"
-        + "<select id='editSource-" + serviceId + "' class='admin-input'>"
-        + "<option value='lumiere' " + sourceLumiere + ">Lumière Nalu</option>"
-        + "<option value='event' " + sourceEvent + ">Event</option>"
-        + "</select>"
-
-        + "<label>対象ランク</label>"
-        + "<select id='editRank-" + serviceId + "' class='admin-input'>"
-        + "<option value='WAVE' " + rankWave + ">WAVE</option>"
-        + "<option value='Eveil' " + rankEveil + ">Eveil</option>"
-        + "<option value='ECLAT' " + rankEclat + ">ECLAT</option>"
-        + "<option value='Nalu' " + rankNalu + ">Nalu</option>"
-        + "</select>"
-
-        + "<label>memo</label>"
-        + "<input id='editMemo-" + serviceId + "' class='admin-input' type='text' value='" + escapeHtml(s.memo || "") + "'>"
-
-        + "<div class='small'>service_id：" + serviceId + "</div>"
-        + "<div class='small'>受付状態・期限・上限人数は「受付設定」で変更</div>"
-
-        + "<button class='save-button service-basic-save-button' data-service-id='" + serviceId + "'>変更を保存する</button>"
-        + "</div>";
-    });
-
-    list.innerHTML = html;
-
-    const buttons = document.querySelectorAll(".service-basic-save-button");
-
-    buttons.forEach(function(button) {
-      button.addEventListener("click", function() {
-        const serviceId = button.getAttribute("data-service-id");
-        saveServiceBasic(serviceId);
-      });
-    });
-
-  } catch (err) {
-    list.textContent = "既存サービスの取得中にエラーが発生しました。\n" + err.message;
-  }
-}
-
-async function saveServiceBasic(serviceId) {
-  const nameEl = document.getElementById("editName-" + serviceId);
-  const sourceEl = document.getElementById("editSource-" + serviceId);
-  const rankEl = document.getElementById("editRank-" + serviceId);
-  const memoEl = document.getElementById("editMemo-" + serviceId);
-
-  if (!nameEl || !sourceEl || !rankEl || !memoEl) {
-    alert("入力欄が見つかりません。");
-    return;
-  }
-
-  const serviceName = nameEl.value.trim();
-  const source = sourceEl.value;
-  const requiredRank = rankEl.value;
-  const memo = memoEl.value.trim();
-
-  if (!serviceName) {
-    alert("サービス名を入力してください。");
-    return;
-  }
-
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: new URLSearchParams({
-        action: "updateServiceBasic",
-        serviceId: serviceId,
-        serviceName: serviceName,
-        source: source,
-        requiredRank: requiredRank,
-        memo: memo
-      })
-    });
-
-    const data = await res.json();
-
-    if (!data.ok) {
-      alert("保存できませんでした：" + (data.message || ""));
-      return;
-    }
-
-    alert("変更を保存しました");
-    loadServiceBasicEdit();
-
-  } catch (err) {
-    alert("保存中にエラーが発生しました：" + err.message);
-  }
-}
-    
   </script>
 </body>
 </html>
