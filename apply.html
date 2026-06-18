@@ -119,6 +119,28 @@
       white-space:pre-wrap;
       opacity:.95;
     }
+
+    .field input[type="date"]{
+  width:100%;
+  box-sizing:border-box;
+  min-height:48px;
+  appearance:none;
+  -webkit-appearance:none;
+  border-radius:14px;
+  padding:12px 14px;
+  background:#050505;
+  color:#fff;
+}
+
+.field input[type="date"]::-webkit-date-and-time-value{
+  text-align:left;
+}
+
+.field input[type="date"]::-webkit-calendar-picker-indicator{
+  filter:invert(1);
+  opacity:.75;
+}
+    
   </style>
 </head>
 <body>
