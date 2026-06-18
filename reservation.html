@@ -51,6 +51,20 @@
       white-space:pre-wrap;
     }
 
+    .registered-food-info{
+      display:none;
+      margin:0 0 20px;
+      padding:14px 16px;
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:14px;
+      background:rgba(255,255,255,.04);
+      color:rgba(255,255,255,.86);
+      font-size:13px;
+      line-height:1.8;
+      text-align:left;
+      white-space:pre-wrap;
+    }
+
     .field{
       margin:0 0 16px;
       text-align:left;
@@ -67,6 +81,7 @@
     .field select,
     .field textarea{
       width:100%;
+      max-width:100%;
       box-sizing:border-box;
       background:#050505;
       color:#fff;
@@ -81,25 +96,33 @@
     .field textarea{
       min-height:88px;
       resize:vertical;
+      line-height:1.7;
     }
 
-    .field input,
-.field select,
-.field textarea {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-}
+    .field input::placeholder,
+    .field textarea::placeholder{
+      color:rgba(255,255,255,.45);
+    }
 
-#eventDate {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-  text-align: center;
-  appearance: none;
-  -webkit-appearance: none;
-}
+    #eventDate{
+      display:block;
+      width:100%;
+      max-width:100%;
+      box-sizing:border-box;
+      text-align:left;
+      appearance:none;
+      -webkit-appearance:none;
+      min-height:46px;
+    }
+
+    #eventDate::-webkit-date-and-time-value{
+      text-align:left;
+    }
+
+    #eventDate::-webkit-calendar-picker-indicator{
+      filter:invert(1);
+      opacity:.75;
+    }
 
     .service-detail{
       margin-top:14px;
@@ -143,8 +166,6 @@
     .hidden{
       display:none;
     }
-
-    
   </style>
 </head>
 
@@ -183,13 +204,13 @@ Lumière Nalu ご予約申込ページです。
         </div>
 
         <div class="field">
-  <label for="inputKana">お名前（カナ）</label>
-  <input
-    type="text"
-    id="inputKana"
-    placeholder="例：オナマエ"
-  >
-</div>
+          <label for="inputKana">お名前（カナ）</label>
+          <input
+            type="text"
+            id="inputKana"
+            placeholder="例：オナマエ"
+          >
+        </div>
 
         <div class="field">
           <label for="serviceId">イベント / 店舗名</label>
@@ -200,42 +221,54 @@ Lumière Nalu ご予約申込ページです。
         </div>
 
         <div class="field">
-  <label for="eventDate">参加日</label>
-  <input
-    type="date"
-    id="eventDate"
-  >
-</div>
+          <label for="eventDate">参加日</label>
+          <input
+            type="date"
+            id="eventDate"
+          >
+        </div>
+
         <div id="dateCapacityStatus" class="service-detail"></div>
-        
+
         <div class="field">
           <label for="people">人数</label>
           <select id="people" disabled>
-  <option value="">先に日程を選択してください</option>
-</select>
+            <option value="">先に日程を選択してください</option>
+          </select>
         </div>
 
-       <div class="field">
-  <label for="companionName">ご同行される方のお名前</label>
-  <textarea
-    id="companionName"
-    placeholder="2名以上でお申し込みの場合、ご同行者様のお名前をカナと併せてご入力ください"
-  ></textarea>
-</div>
-        
+        <div class="field">
+          <label for="companionName">ご同行される方のお名前</label>
+          <textarea
+            id="companionName"
+            placeholder="2名以上でお申し込みの場合、ご同行者様のお名前をカナと併せてご入力ください"
+          ></textarea>
+        </div>
+
+        <div id="registeredFoodInfo" class="registered-food-info"></div>
+
         <div class="field">
           <label for="allergy">アレルギー</label>
-          <textarea id="allergy" placeholder="ない場合は「なし」とご入力ください"></textarea>
+          <textarea
+            id="allergy"
+            placeholder="同行者様、または追加のアレルギーがある場合のみご入力ください"
+          ></textarea>
         </div>
 
         <div class="field">
           <label for="dislike">苦手食材</label>
-          <textarea id="dislike" placeholder="ない場合は「なし」とご入力ください"></textarea>
+          <textarea
+            id="dislike"
+            placeholder="同行者様、または追加の苦手食材がある場合のみご入力ください"
+          ></textarea>
         </div>
 
         <div class="field">
           <label for="message">連絡事項</label>
-          <textarea id="message" placeholder="ご希望や確認事項があればご入力ください"></textarea>
+          <textarea
+            id="message"
+            placeholder="ご希望や確認事項があればご入力ください"
+          ></textarea>
         </div>
 
         <button id="submitBtn" class="button">予約申込を送信する</button>
@@ -302,6 +335,57 @@ Lumière Nalu ご予約申込ページです。
       detail.style.display = "block";
     }
 
+    function renderRegisteredFoodInfo(member) {
+      const box = document.getElementById("registeredFoodInfo");
+
+      if (!box) return;
+
+      const allergy = member && member.allergy
+        ? String(member.allergy).trim()
+        : "";
+
+      const dislikedFoods = member && member.dislikedFoods
+        ? String(member.dislikedFoods).trim()
+        : "";
+
+      const lines = [];
+
+      if (allergy && !isNoneText(allergy)) {
+        lines.push("登録済みアレルギー：" + allergy + "（ご本人）");
+      }
+
+      if (dislikedFoods && !isNoneText(dislikedFoods)) {
+        lines.push("登録済み苦手食材：" + dislikedFoods + "（ご本人）");
+      }
+
+      if (lines.length === 0) {
+        box.style.display = "none";
+        box.textContent = "";
+        return;
+      }
+
+      box.textContent =
+        lines.join("\n") +
+        "\n\n同行者様、または追加事項がある場合のみ下記へご入力ください。";
+
+      box.style.display = "block";
+    }
+
+    function isNoneText(value) {
+      const text = String(value || "")
+        .replace(/\s/g, "")
+        .trim();
+
+      return (
+        text === "" ||
+        text === "なし" ||
+        text === "無し" ||
+        text === "無" ||
+        text === "-" ||
+        text === "特になし"
+      );
+    }
+
     async function initReservation() {
       const status = document.getElementById("status");
       const formArea = document.getElementById("formArea");
@@ -356,6 +440,8 @@ Lumière Nalu ご予約申込ページです。
           "Rank： " + currentMember.rank + "\n" +
           "Name： " + (currentMember.cardName || currentMember.name);
 
+        renderRegisteredFoodInfo(currentMember);
+
         serviceSelect.innerHTML = "";
 
         const defaultOption = document.createElement("option");
@@ -391,29 +477,29 @@ Lumière Nalu ご予約申込ページです。
         status.textContent = "";
 
       } catch (e) {
-  const errorMessage = String(e.message || "");
+        const errorMessage = String(e.message || "");
 
-  if (
-    errorMessage.includes("access token expired") ||
-    errorMessage.includes("The access token expired")
-  ) {
-    status.textContent = "ログイン情報を更新しています。少しお待ちください。";
+        if (
+          errorMessage.includes("access token expired") ||
+          errorMessage.includes("The access token expired")
+        ) {
+          status.textContent = "ログイン情報を更新しています。少しお待ちください。";
 
-    try {
-      liff.logout();
-    } catch (logoutError) {}
+          try {
+            liff.logout();
+          } catch (logoutError) {}
 
-    setTimeout(function() {
-      liff.login();
-    }, 500);
+          setTimeout(function() {
+            liff.login();
+          }, 500);
 
-    return;
-  }
+          return;
+        }
 
-  status.textContent =
-    "読み込み中にエラーが発生しました。\n" +
-    "エラー内容：" + errorMessage;
-}
+        status.textContent =
+          "読み込み中にエラーが発生しました。\n" +
+          "エラー内容：" + errorMessage;
+      }
     }
 
     async function submitReservation() {
@@ -478,60 +564,60 @@ Lumière Nalu ご予約申込ページです。
         const res = await fetch(API_URL, {
           method: "POST",
           body: new URLSearchParams({
-          action: "submitReservation",
-          lineUserId: currentProfile.userId,
-          displayName: currentProfile.displayName || "",
-          source: SOURCE,
-          memberNo: memberNo,
-          inputName: inputName,
-          inputKana: inputKana,
-          serviceId: serviceId,
-          eventDate: eventDate,
-          people: people,
-          companionName: companionName,
-          allergy: allergy,
-          dislike: dislike,
-          message: message
-        })
+            action: "submitReservation",
+            lineUserId: currentProfile.userId,
+            displayName: currentProfile.displayName || "",
+            source: SOURCE,
+            memberNo: memberNo,
+            inputName: inputName,
+            inputKana: inputKana,
+            serviceId: serviceId,
+            eventDate: eventDate,
+            people: people,
+            companionName: companionName,
+            allergy: allergy,
+            dislike: dislike,
+            message: message
+          })
         });
 
         const data = await res.json();
 
         if (!data.ok) {
-  if (data.message === "member_not_found") {
-    status.textContent =
-      "会員情報が確認できませんでした。\n会員証発行後にご利用ください。";
-  } else if (data.message === "member_no_mismatch") {
-    status.textContent =
-      "会員番号が一致しません。\n会員証をご確認のうえ、再度お試しください。";
-  } else if (data.message === "name_mismatch") {
-    status.textContent =
-      "お名前が会員情報と一致しません。\n会員証の表記をご確認ください。";
-  } else if (data.message === "service_not_allowed") {
-    status.textContent =
-      "現在のランクでは、選択された内容にお申し込みいただけません。";
-  } else if (data.message === "kana_required") {
-    status.textContent =
-      "お名前（カナ）をご入力ください。";
-  } else if (data.message === "companion_required") {
-    status.textContent =
-      "2名以上でお申し込みの場合、ご同行される方のお名前をご入力ください。";
-  } else if (data.message === "deadline_closed") {
-    status.textContent =
-      "このお申し込みは受付終了しています。";
-  } else if (data.message === "service_full" || data.message === "capacity_full") {
-    status.textContent =
-      "このお申し込みは現在満席です。";
-  } else {
-    status.textContent =
-      "予約申込を受け付けできませんでした。\n" +
-      "エラー内容：" + (data.message || "unknown_error");
-  }
+          if (data.message === "member_not_found") {
+            status.textContent =
+              "会員情報が確認できませんでした。\n会員証発行後にご利用ください。";
+          } else if (data.message === "member_no_mismatch") {
+            status.textContent =
+              "会員番号が一致しません。\n会員証をご確認のうえ、再度お試しください。";
+          } else if (data.message === "name_mismatch") {
+            status.textContent =
+              "お名前が会員情報と一致しません。\n会員証の表記をご確認ください。";
+          } else if (data.message === "service_not_allowed") {
+            status.textContent =
+              "現在のランクでは、選択された内容にお申し込みいただけません。";
+          } else if (data.message === "kana_required") {
+            status.textContent =
+              "お名前（カナ）をご入力ください。";
+          } else if (data.message === "companion_required") {
+            status.textContent =
+              "2名以上でお申し込みの場合、ご同行される方のお名前をご入力ください。";
+          } else if (data.message === "deadline_closed") {
+            status.textContent =
+              "このお申し込みは受付終了しています。";
+          } else if (data.message === "service_full" || data.message === "capacity_full") {
+            status.textContent =
+              "このお申し込みは現在満席です。";
+          } else {
+            status.textContent =
+              "予約申込を受け付けできませんでした。\n" +
+              "エラー内容：" + (data.message || "unknown_error");
+          }
 
-  btn.disabled = false;
-  btn.textContent = "予約申込を送信する";
-  return;
-}
+          btn.disabled = false;
+          btn.textContent = "予約申込を送信する";
+          return;
+        }
 
         status.textContent =
           "予約申込を受け付けました。\n内容を確認のうえ、運営よりご案内いたします。";
@@ -548,137 +634,139 @@ Lumière Nalu ご予約申込ページです。
       }
     }
 
+    async function checkDateCapacity() {
+      const statusBox = document.getElementById("dateCapacityStatus");
+      const serviceId = document.getElementById("serviceId").value;
+      const eventDate = document.getElementById("eventDate").value;
+      const peopleSelect = document.getElementById("people");
+
+      peopleSelect.innerHTML = "";
+      peopleSelect.disabled = true;
+
+      const defaultOption = document.createElement("option");
+      defaultOption.value = "";
+      defaultOption.textContent = "選択してください";
+      peopleSelect.appendChild(defaultOption);
+
+      if (!serviceId || !eventDate) {
+        statusBox.style.display = "none";
+        statusBox.textContent = "";
+
+        peopleSelect.innerHTML = "";
+
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "先にイベント名と日程を選択してください";
+        peopleSelect.appendChild(option);
+
+        peopleSelect.disabled = true;
+        return;
+      }
+
+      statusBox.style.display = "block";
+      statusBox.textContent = "残席を確認中...";
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          body: new URLSearchParams({
+            action: "checkDateCapacity",
+            source: SOURCE,
+            serviceId: serviceId,
+            eventDate: eventDate
+          })
+        });
+
+        const data = await res.json();
+
+        if (!data.ok) {
+          statusBox.textContent =
+            "残席を確認できませんでした。\n" +
+            "エラー内容：" + (data.message || "unknown_error");
+          peopleSelect.disabled = true;
+          return;
+        }
+
+        peopleSelect.innerHTML = "";
+
+        const firstOption = document.createElement("option");
+        firstOption.value = "";
+        firstOption.textContent = "選択してください";
+        peopleSelect.appendChild(firstOption);
+
+        if (data.remaining === null) {
+          for (let i = 1; i <= 4; i++) {
+            const option = document.createElement("option");
+            option.value = String(i);
+            option.textContent = i + "名";
+            peopleSelect.appendChild(option);
+          }
+
+          peopleSelect.disabled = false;
+          statusBox.textContent = "この日程は受付可能です。";
+          return;
+        }
+
+        if (!data.available || Number(data.remaining) <= 0) {
+          peopleSelect.innerHTML = "";
+
+          const option = document.createElement("option");
+          option.value = "";
+          option.textContent = "満席です";
+          peopleSelect.appendChild(option);
+
+          peopleSelect.disabled = true;
+
+          statusBox.textContent =
+            "この日程は現在満席です。\n別日をご選択ください。";
+          return;
+        }
+
+        const maxSelectable = Math.min(Number(data.remaining), 4);
+
+        for (let i = 1; i <= maxSelectable; i++) {
+          const option = document.createElement("option");
+          option.value = String(i);
+          option.textContent = i + "名";
+          peopleSelect.appendChild(option);
+        }
+
+        peopleSelect.disabled = false;
+
+        statusBox.textContent =
+          "この日程は受付可能です。\n" +
+          "残り：" + data.remaining + "名";
+
+      } catch (e) {
+        statusBox.textContent =
+          "残席確認中にエラーが発生しました。\n" +
+          "エラー内容：" + e.message;
+        peopleSelect.disabled = true;
+      }
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
       const btn = document.getElementById("submitBtn");
       const serviceSelect = document.getElementById("serviceId");
+      const eventDateInput = document.getElementById("eventDate");
 
       if (btn) {
         btn.addEventListener("click", submitReservation);
       }
 
       if (serviceSelect) {
-  serviceSelect.addEventListener("change", function() {
-    updateServiceDetail();
-    checkDateCapacity();
-  });
-}
-      const eventDateInput = document.getElementById("eventDate");
+        serviceSelect.addEventListener("change", function() {
+          updateServiceDetail();
+          checkDateCapacity();
+        });
+      }
 
-if (eventDateInput) {
-  eventDateInput.addEventListener("change", checkDateCapacity);
-}
+      if (eventDateInput) {
+        eventDateInput.addEventListener("change", checkDateCapacity);
+      }
 
       initReservation();
     });
-
-    async function checkDateCapacity() {
-  const statusBox = document.getElementById("dateCapacityStatus");
-  const serviceId = document.getElementById("serviceId").value;
-  const eventDate = document.getElementById("eventDate").value;
-  const peopleSelect = document.getElementById("people");
-  const submitBtn = document.getElementById("submitBtn");
-
-  peopleSelect.innerHTML = "";
-  peopleSelect.disabled = true;
-
-  const defaultOption = document.createElement("option");
-  defaultOption.value = "";
-  defaultOption.textContent = "選択してください";
-  peopleSelect.appendChild(defaultOption);
-
-  if (!serviceId || !eventDate) {
-    statusBox.style.display = "none";
-    statusBox.textContent = "";
-    peopleSelect.innerHTML = "";
-    const option = document.createElement("option");
-    option.value = "";
-    option.textContent = "先にイベント名と日程を選択してください";
-    peopleSelect.appendChild(option);
-    peopleSelect.disabled = true;
-    return;
-  }
-
-  statusBox.style.display = "block";
-  statusBox.textContent = "残席を確認中...";
-
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: new URLSearchParams({
-        action: "checkDateCapacity",
-        source: SOURCE,
-        serviceId: serviceId,
-        eventDate: eventDate
-      })
-    });
-
-    const data = await res.json();
-
-    if (!data.ok) {
-      statusBox.textContent =
-        "残席を確認できませんでした。\n" +
-        "エラー内容：" + (data.message || "unknown_error");
-      peopleSelect.disabled = true;
-      return;
-    }
-
-    peopleSelect.innerHTML = "";
-
-    const firstOption = document.createElement("option");
-    firstOption.value = "";
-    firstOption.textContent = "選択してください";
-    peopleSelect.appendChild(firstOption);
-
-    if (data.remaining === null) {
-      for (let i = 1; i <= 4; i++) {
-        const option = document.createElement("option");
-        option.value = String(i);
-        option.textContent = i + "名";
-        peopleSelect.appendChild(option);
-      }
-
-      peopleSelect.disabled = false;
-      statusBox.textContent = "この日程は受付可能です。";
-      return;
-    }
-
-    if (!data.available || Number(data.remaining) <= 0) {
-  peopleSelect.innerHTML = "";
-
-  const option = document.createElement("option");
-  option.value = "";
-  option.textContent = "満席です";
-  peopleSelect.appendChild(option);
-
-  peopleSelect.disabled = true;
-
-  statusBox.textContent =
-    "この日程は現在満席です。\n別日をご選択ください。";
-  return;
-}
-
-    const maxSelectable = Math.min(Number(data.remaining), 4);
-
-    for (let i = 1; i <= maxSelectable; i++) {
-      const option = document.createElement("option");
-      option.value = String(i);
-      option.textContent = i + "名";
-      peopleSelect.appendChild(option);
-    }
-
-    peopleSelect.disabled = false;
-
-    statusBox.textContent =
-      "この日程は受付可能です。\n" +
-      "残り：" + data.remaining + "名";
-
-  } catch (e) {
-    statusBox.textContent =
-      "残席確認中にエラーが発生しました。\n" +
-      "エラー内容：" + e.message;
-    peopleSelect.disabled = true;
-  }
-}
   </script>
 </body>
 </html>
