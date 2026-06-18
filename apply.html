@@ -10,7 +10,7 @@
       margin:0;
       background:#000;
       color:#fff;
-      font-family:"Times New Roman", serif;
+      font-family:"Times New Roman", "Yu Mincho", "Hiragino Mincho ProN", serif;
       text-align:center;
       padding:32px 16px 40px;
     }
@@ -32,6 +32,7 @@
       font-size:28px;
       margin:0 0 18px;
       letter-spacing:.04em;
+      line-height:1.35;
     }
 
     .text{
@@ -39,7 +40,7 @@
       line-height:1.9;
       opacity:.95;
       white-space:pre-wrap;
-      margin:0 0 22px;
+      margin:0 0 28px;
     }
 
     .field{
@@ -52,9 +53,11 @@
       font-size:13px;
       margin:0 0 8px;
       opacity:.9;
+      letter-spacing:.04em;
     }
 
-    .field input{
+    .field input,
+    .field textarea{
       width:100%;
       box-sizing:border-box;
       background:#050505;
@@ -63,12 +66,32 @@
       border-radius:14px;
       padding:12px 14px;
       font-size:14px;
-      font-family:"Times New Roman", serif;
+      font-family:"Times New Roman", "Yu Mincho", "Hiragino Mincho ProN", serif;
       outline:none;
     }
 
-    .field input::placeholder{
+    .field textarea{
+      min-height:82px;
+      resize:vertical;
+      line-height:1.7;
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder{
       color:rgba(255,255,255,.45);
+    }
+
+    .note{
+      margin:7px 0 0;
+      font-size:11px;
+      line-height:1.7;
+      color:rgba(255,255,255,.62);
+    }
+
+    .optional{
+      font-size:11px;
+      color:rgba(255,255,255,.55);
+      margin-left:4px;
     }
 
     .button{
@@ -79,8 +102,9 @@
       border-radius:999px;
       padding:12px 24px;
       font-size:14px;
-      font-family:"Times New Roman", serif;
+      font-family:"Times New Roman", "Yu Mincho", "Hiragino Mincho ProN", serif;
       cursor:pointer;
+      margin-top:6px;
     }
 
     .button:disabled{
@@ -100,7 +124,7 @@
 <body>
   <div class="wrap">
     <div class="box">
-      <h1 class="title">Membership Application</h1>
+      <h1 class="title">Membership<br>Application</h1>
 
       <p class="text" id="introText">
 ご案内ありがとうございます。
@@ -111,6 +135,71 @@
 申請内容を確認し
 審査通過後に会員証をご利用いただけます。
       </p>
+
+      <div class="field">
+        <label for="cardName">カード表記名</label>
+        <input
+          id="cardName"
+          name="cardName"
+          type="text"
+          maxlength="12"
+          placeholder="12文字以内・絵文字可"
+          required
+        >
+        <p class="note">会員証に表示されるお名前です。12文字以内でご入力ください。</p>
+      </div>
+
+      <div class="field">
+        <label for="realName">名前</label>
+        <input
+          id="realName"
+          name="realName"
+          type="text"
+          placeholder="お名前"
+          required
+        >
+      </div>
+
+      <div class="field">
+        <label for="nameKana">名前（カナ）</label>
+        <input
+          id="nameKana"
+          name="nameKana"
+          type="text"
+          placeholder="オナマエ"
+          required
+        >
+      </div>
+
+      <div class="field">
+        <label for="birthday">誕生日</label>
+        <input
+          id="birthday"
+          name="birthday"
+          type="date"
+          required
+        >
+      </div>
+
+      <div class="field">
+        <label for="dislikedFoods">苦手食材 <span class="optional">任意</span></label>
+        <textarea
+          id="dislikedFoods"
+          name="dislikedFoods"
+          placeholder="例：パクチー、牡蠣"
+        ></textarea>
+        <p class="note">苦手食材がございましたらご記入ください。</p>
+      </div>
+
+      <div class="field">
+        <label for="allergy">アレルギー <span class="optional">任意</span></label>
+        <textarea
+          id="allergy"
+          name="allergy"
+          placeholder="例：甲殻類、そば、卵"
+        ></textarea>
+        <p class="note">アレルギー食材がございましたらご記入ください。</p>
+      </div>
 
       <div class="field">
         <label for="applicationPassword">申請パスワード</label>
@@ -154,6 +243,44 @@
       }
     }
 
+    function getValue(id) {
+      return document.getElementById(id).value.trim();
+    }
+
+    function validateForm() {
+      const cardName = getValue("cardName");
+      const realName = getValue("realName");
+      const nameKana = getValue("nameKana");
+      const birthday = getValue("birthday");
+      const applicationPassword = getValue("applicationPassword");
+
+      if (!cardName) {
+        return "カード表記名をご入力ください。";
+      }
+
+      if ([...cardName].length > 12) {
+        return "カード表記名は12文字以内でご入力ください。";
+      }
+
+      if (!realName) {
+        return "名前をご入力ください。";
+      }
+
+      if (!nameKana) {
+        return "名前（カナ）をご入力ください。";
+      }
+
+      if (!birthday) {
+        return "誕生日をご入力ください。";
+      }
+
+      if (!applicationPassword) {
+        return "申請パスワードをご入力ください。";
+      }
+
+      return "";
+    }
+
     async function submitApplication() {
       const btn = document.getElementById("applyBtn");
       const status = document.getElementById("status");
@@ -164,22 +291,37 @@
         return;
       }
 
-      const applicationPassword = passwordInput.value.trim();
+      const errorMessage = validateForm();
 
-      if (!applicationPassword) {
-        status.textContent = "申請パスワードをご入力ください。";
+      if (errorMessage) {
+        status.textContent = errorMessage;
         return;
       }
+
+      const cardName = getValue("cardName");
+      const realName = getValue("realName");
+      const nameKana = getValue("nameKana");
+      const birthday = getValue("birthday");
+      const dislikedFoods = getValue("dislikedFoods");
+      const allergy = getValue("allergy");
+      const applicationPassword = getValue("applicationPassword");
 
       try {
         btn.disabled = true;
         btn.textContent = "送信中...";
+        status.textContent = "";
 
         const body = new URLSearchParams({
           action: "submitApplication",
           lineUserId: currentProfile.userId,
           displayName: currentProfile.displayName || "",
-          applicationPassword: applicationPassword
+          applicationPassword: applicationPassword,
+          cardName: cardName,
+          realName: realName,
+          nameKana: nameKana,
+          birthday: birthday,
+          dislikedFoods: dislikedFoods,
+          allergy: allergy
         });
 
         const res = await fetch(API_URL, {
@@ -206,6 +348,22 @@
             return;
           }
 
+          if (data.message === "invalid_card_name") {
+            status.textContent =
+              "カード表記名は12文字以内でご入力ください。";
+            btn.disabled = false;
+            btn.textContent = "会員申請を送信する";
+            return;
+          }
+
+          if (data.message === "missing_required_fields") {
+            status.textContent =
+              "未入力の必須項目があります。\n内容をご確認ください。";
+            btn.disabled = false;
+            btn.textContent = "会員申請を送信する";
+            return;
+          }
+
           status.textContent =
             "申請を受け付けできませんでした。\n時間をおいて再度お試しください。";
           btn.disabled = false;
@@ -217,6 +375,13 @@
           "会員申請を受け付けました。\n内容を確認のうえ、承認後にご利用いただけます。\nしばらくお待ちください。";
 
         btn.style.display = "none";
+
+        document.getElementById("cardName").disabled = true;
+        document.getElementById("realName").disabled = true;
+        document.getElementById("nameKana").disabled = true;
+        document.getElementById("birthday").disabled = true;
+        document.getElementById("dislikedFoods").disabled = true;
+        document.getElementById("allergy").disabled = true;
         passwordInput.disabled = true;
 
       } catch (e) {
