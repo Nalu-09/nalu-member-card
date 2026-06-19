@@ -459,15 +459,17 @@ Lumière Nalu ご予約申込ページです。
             const option = document.createElement("option");
             option.value = service.serviceId;
 
-            if (service.status === "closed") {
-              option.textContent = service.serviceName + "｜受付終了";
-              option.disabled = true;
-            } else if (service.status === "full") {
-              option.textContent = service.serviceName + "｜現在満席です";
-              option.disabled = true;
-            } else {
-              option.textContent = service.serviceName;
-            }
+            const minPeopleText = getMinPeopleText(service);
+
+if (service.status === "closed") {
+  option.textContent = service.serviceName + "｜" + minPeopleText + "｜受付終了";
+  option.disabled = true;
+} else if (service.status === "full") {
+  option.textContent = service.serviceName + "｜" + minPeopleText + "｜現在満席です";
+  option.disabled = true;
+} else {
+  option.textContent = service.serviceName + "｜" + minPeopleText;
+}
 
             serviceSelect.appendChild(option);
           });
@@ -767,6 +769,17 @@ Lumière Nalu ご予約申込ページです。
 
       initReservation();
     });
+
+    function getMinPeopleText(service) {
+  const minPeople = Number(service.minPeople || 1);
+
+  if (minPeople <= 1) {
+    return "1名様より";
+  }
+
+  return minPeople + "名様より";
+}
+    
   </script>
 </body>
 </html>
