@@ -281,7 +281,12 @@ Lumière Nalu ご予約申込ページです。
   <script>
     const LIFF_ID = "2007730715-wxTZ582n";
     const API_URL = "https://script.google.com/macros/s/AKfycbxOIqa-TOGIogMYIro9Qu0nG85vZ7ObLFT_YWLW3Q9XHbUmfbXVr9Oxk3zuUZxbtmXe/exec";
-
+    const PAYMENT_URLS = {
+    lumiereFrenchNormal: "https://nalu09-official.square.site/product/-/NPY4JU24FWNL3UG5FERZO65S",
+    lumiereFrenchEveil: "https://nalu09-official.square.site/product/-/6AG5V2GUIMZPYTI4SYZIBGTJ",
+    lumiereNalu: "https://nalu09-official.square.site/product/-/IFLBCST2JF4DVJFCBSE656YO"
+     };
+    
     const urlParams = new URLSearchParams(window.location.search);
     const rawState = urlParams.get("liff.state");
     const stateParams = new URLSearchParams((rawState || "").replace(/^\?/, ""));
@@ -621,10 +626,48 @@ if (service.status === "closed") {
           return;
         }
 
-        status.textContent =
-          "予約申込を受け付けました。\n内容を確認のうえ、運営よりご案内いたします。";
+        const selectedService = currentServices.find(function(item) {
+  return String(item.serviceId) === String(serviceId);
+});
 
-        btn.style.display = "none";
+const serviceName = selectedService ? String(selectedService.serviceName || "") : "";
+const rank = String(currentMember && currentMember.rank ? currentMember.rank : "");
+
+let paymentUrl = "";
+
+if (serviceName.includes("Lumière French")) {
+  if (rank === "Éveil" || rank === "Éclat" || rank === "Nalu") {
+    paymentUrl = PAYMENT_URLS.lumiereFrenchEveil;
+  } else {
+    paymentUrl = PAYMENT_URLS.lumiereFrenchNormal;
+  }
+} else if (serviceName.includes("Lumière Nalu")) {
+  paymentUrl = PAYMENT_URLS.lumiereNalu;
+}
+
+if (paymentUrl) {
+
+  status.innerHTML =
+    "予約申込を受け付けました。<br>" +
+    "お支払いページへ移動しています。<br><br>" +
+    "<a class='button' href='" + paymentUrl + "'>移動しない場合はこちら</a>";
+
+  btn.style.display = "none";
+
+  setTimeout(function () {
+    window.location.href = paymentUrl;
+  }, 1500);
+
+} else {
+
+  status.textContent =
+    "予約申込を受け付けました。\n内容を確認のうえ、運営よりご案内いたします。";
+
+  btn.style.display = "none";
+
+}
+
+btn.style.display = "none";
 
       } catch (e) {
         status.textContent =
