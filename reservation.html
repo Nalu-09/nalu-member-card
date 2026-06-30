@@ -626,9 +626,12 @@ if (service.status === "closed") {
           return;
         }
 
-        const serviceSelect = document.getElementById("serviceId");
-const serviceName = serviceSelect.options[serviceSelect.selectedIndex].textContent || "";
-const rank = String(currentMember && currentMember.rank ? currentMember.rank : "");
+        const selectedService = currentServices.find(function(item) {
+         return String(item.serviceId) === String(serviceId);
+        });
+
+        const serviceName = selectedService ? String(selectedService.serviceName || "") : "";
+        const rank = String(currentMember && currentMember.rank ? currentMember.rank : "");
 
 let paymentUrl = "";
 
