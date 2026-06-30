@@ -646,6 +646,17 @@ if (paymentUrl) {
 
   btn.style.display = "none";
 }
+
+              } catch (e) {
+        status.textContent =
+          "予約申込を受け付けできませんでした。\n" +
+          "エラー内容：" + e.message;
+
+        btn.disabled = false;
+        btn.textContent = "予約申込を送信する";
+      }
+    }
+    
         
     async function checkDateCapacity() {
       const statusBox = document.getElementById("dateCapacityStatus");
