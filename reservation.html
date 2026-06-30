@@ -626,24 +626,9 @@ if (service.status === "closed") {
           return;
         }
 
-        const serviceSelect = document.getElementById("serviceId");
-const serviceName = serviceSelect.options[serviceSelect.selectedIndex].textContent || "";
-const rank = String(currentMember && currentMember.rank ? currentMember.rank : "");
-
-let paymentUrl = "";
-
-if (serviceName.includes("Lumière French")) {
-  if (rank === "Éveil" || rank === "Éclat" || rank === "Nalu") {
-    paymentUrl = PAYMENT_URLS.lumiereFrenchEveil;
-  } else {
-    paymentUrl = PAYMENT_URLS.lumiereFrenchNormal;
-  }
-} else if (serviceName.includes("Lumière Nalu")) {
-  paymentUrl = PAYMENT_URLS.lumiereNalu;
-}
+      const paymentUrl = data.paymentUrl || "";
 
 if (paymentUrl) {
-
   status.innerHTML =
     "予約申込を受け付けました。<br>" +
     "お支払いページへ移動しています。<br><br>" +
@@ -656,24 +641,12 @@ if (paymentUrl) {
   }, 1500);
 
 } else {
-
   status.textContent =
     "予約申込を受け付けました。\n内容を確認のうえ、運営よりご案内いたします。";
 
   btn.style.display = "none";
-
 }
-
-      } catch (e) {
-        status.textContent =
-          "予約申込を受け付けできませんでした。\n" +
-          "エラー内容：" + e.message;
-
-        btn.disabled = false;
-        btn.textContent = "予約申込を送信する";
-      }
-    }
-
+        
     async function checkDateCapacity() {
       const statusBox = document.getElementById("dateCapacityStatus");
       const serviceId = document.getElementById("serviceId").value;
