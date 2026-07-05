@@ -220,13 +220,15 @@ Lumière Nalu ご予約申込ページです。
           <div id="serviceDetail" class="service-detail"></div>
         </div>
 
-        <div class="field">
-          <label for="eventDate">参加日</label>
-          <input
-            type="date"
-            id="eventDate"
-          >
-        </div>
+        <div id="eventDateField" class="field">
+  <label for="eventDate">参加日</label>
+  <input
+    type="date"
+    id="eventDate"
+  >
+</div>
+
+<div id="fixedSchedule" class="service-detail"></div>
 
         <div id="dateCapacityStatus" class="service-detail"></div>
 
@@ -332,6 +334,24 @@ Lumière Nalu ご予約申込ページです。
         service.serviceName + "\n\n" +
         "受付状況：" + statusText;
 
+      if (service.eventDate) {
+  text +=
+    "\n開催日：" +
+    formatScheduleDate(service.eventDate);
+
+  if (service.startTime && service.endTime) {
+    text +=
+      "\n開催時間：" +
+      service.startTime +
+      "〜" +
+      service.endTime;
+  } else if (service.startTime) {
+    text +=
+      "\n開始時間：" +
+      service.startTime;
+  }
+}
+      
       if (service.deadlineText) {
         text += "\n申込締切：" + service.deadlineText;
       }
@@ -339,6 +359,134 @@ Lumière Nalu ご予約申込ページです。
       detail.textContent = text;
       detail.style.display = "block";
     }
+
+    function applyServiceSchedule() {
+  const serviceSelect = document.getElementById("serviceId");
+  const eventDateField = document.getElementById("eventDateField");
+  const eventDateInput = document.getElementById("eventDate");
+  const fixedSchedule = document.getElementById("fixedSchedule");
+  const peopleSelect = document.getElementById("people");
+  const capacityStatus = document.getElementById("dateCapacityStatus");
+
+  if (
+    !serviceSelect ||
+    !eventDateField ||
+    !eventDateInput ||
+    !fixedSchedule
+  ) {
+    return;
+  }
+
+  const serviceId = serviceSelect.value;
+
+  const service = currentServices.find(function(item) {
+    return String(item.serviceId) === String(serviceId);
+  });
+
+  capacityStatus.style.display = "none";
+  capacityStatus.textContent = "";
+
+  peopleSelect.innerHTML = "";
+
+  const initialPeopleOption = document.createElement("option");
+  initialPeopleOption.value = "";
+  initialPeopleOption.textContent =
+    serviceId
+      ? "先に日程を選択してください"
+      : "先にイベント名を選択してください";
+
+  peopleSelect.appendChild(initialPeopleOption);
+  peopleSelect.disabled = true;
+
+  if (!service) {
+    eventDateField.style.display = "block";
+    eventDateInput.value = "";
+
+    fixedSchedule.style.display = "none";
+    fixedSchedule.textContent = "";
+
+    return;
+  }
+
+  const fixedEventDate = String(service.eventDate || "").trim();
+  const startTime = String(service.startTime || "").trim();
+  const endTime = String(service.endTime || "").trim();
+
+  if (fixedEventDate) {
+    eventDateInput.value = fixedEventDate.replaceAll("/", "-");
+    eventDateField.style.display = "none";
+
+    let scheduleText =
+      "開催日：" + formatScheduleDate(fixedEventDate);
+
+    if (startTime && endTime) {
+      scheduleText +=
+        "\n開催時間：" +
+        startTime +
+        "〜" +
+        endTime;
+    } else if (startTime) {
+      scheduleText +=
+        "\n開始時間：" +
+        startTime;
+    }
+
+    fixedSchedule.textContent = scheduleText;
+    fixedSchedule.style.display = "block";
+
+    checkDateCapacity();
+    return;
+  }
+
+  eventDateInput.value = "";
+  eventDateField.style.display = "block";
+
+  fixedSchedule.style.display = "none";
+  fixedSchedule.textContent = "";
+}
+
+function formatScheduleDate(value) {
+  const text = String(value || "")
+    .trim()
+    .replaceAll("/", "-");
+
+  const parts = text.split("-");
+
+  if (parts.length !== 3) {
+    return String(value || "");
+  }
+
+  const year = Number(parts[0]);
+  const month = Number(parts[1]);
+  const day = Number(parts[2]);
+
+  if (!year || !month || !day) {
+    return String(value || "");
+  }
+
+  const date = new Date(year, month - 1, day);
+
+  const weekdayNames = [
+    "日",
+    "月",
+    "火",
+    "水",
+    "木",
+    "金",
+    "土"
+  ];
+
+  return (
+    year +
+    "年" +
+    month +
+    "月" +
+    day +
+    "日 " +
+    weekdayNames[date.getDay()] +
+    "曜日"
+  );
+}
 
     function renderRegisteredFoodInfo(member) {
       const box = document.getElementById("registeredFoodInfo");
@@ -779,11 +927,11 @@ if (paymentUrl) {
       }
 
       if (serviceSelect) {
-        serviceSelect.addEventListener("change", function() {
-          updateServiceDetail();
-          checkDateCapacity();
-        });
-      }
+  serviceSelect.addEventListener("change", function() {
+    updateServiceDetail();
+    applyServiceSchedule();
+  });
+}
 
       if (eventDateInput) {
         eventDateInput.addEventListener("change", checkDateCapacity);
