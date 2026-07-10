@@ -1791,11 +1791,9 @@ eventDateInput.value = "";
 
         statusBox.textContent =
   "この日程は受付可能です。\n" +
-  "service_id：" + data.serviceId + "\n" +
-  "定員：" + data.capacity + "名\n" +
-  "予約済み：" + data.reserved + "名\n" +
-  "残り：" + data.remaining + "名\n" +
-  "判定日：" + data.eventDate;
+  "残り：" +
+  data.remaining +
+  "名";
 
       } catch (e) {
         statusBox.textContent =
