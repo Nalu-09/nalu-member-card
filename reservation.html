@@ -747,13 +747,10 @@ Lumière Nalu ご予約申込ページです。
             startTime;
         }
 
-        fixedSchedule.textContent =
-          scheduleText;
+        fixedSchedule.textContent = scheduleText;
+fixedSchedule.style.display = "block";
 
-        fixedSchedule.style.display =
-          "block";
-
-       checkDateCapacity(fixedEventDate);
+checkDateCapacity(fixedEventDate);
 return;
 
       eventDateInput.value = "";
