@@ -753,9 +753,8 @@ Lumière Nalu ご予約申込ページです。
         fixedSchedule.style.display =
           "block";
 
-        checkDateCapacity();
-        return;
-      }
+       checkDateCapacity(fixedEventDate);
+return;
 
       eventDateInput.value = "";
 
@@ -1529,30 +1528,26 @@ Lumière Nalu ご予約申込ページです。
           "予約申込を送信する";
       }
     }
-        async function checkDateCapacity() {
-      const statusBox =
-        document.getElementById(
-          "dateCapacityStatus"
-        );
+      async function checkDateCapacity(forcedEventDate) {
+  const statusBox =
+    document.getElementById("dateCapacityStatus");
 
-      const serviceId =
-        document
-          .getElementById(
-            "serviceId"
-          )
-          .value;
+  const serviceId =
+    document.getElementById("serviceId").value;
 
-      const eventDate =
-        document
-          .getElementById(
-            "eventDate"
-          )
-          .value;
+  const eventDateInput =
+    document.getElementById("eventDate");
 
-      const peopleSelect =
-        document.getElementById(
-          "people"
-        );
+  const peopleSelect =
+    document.getElementById("people");
+
+  const eventDate = String(
+    forcedEventDate ||
+    eventDateInput.value ||
+    ""
+  )
+    .trim()
+    .replaceAll("/", "-");
 
       peopleSelect.innerHTML = "";
       peopleSelect.disabled = true;
