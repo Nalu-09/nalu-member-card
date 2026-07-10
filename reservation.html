@@ -3,7 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <title>Lumière Nalu Reservation</title>
+
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
   <style>
@@ -137,6 +139,70 @@
       display:none;
     }
 
+    .terms-box{
+      margin:24px 0 18px;
+      padding:18px 16px;
+      border:1px solid rgba(255,255,255,.16);
+      border-radius:16px;
+      background:rgba(255,255,255,.035);
+      text-align:left;
+    }
+
+    .terms-title{
+      margin:0 0 10px;
+      font-size:14px;
+      line-height:1.6;
+      letter-spacing:.04em;
+    }
+
+    .terms-text{
+      margin:0 0 12px;
+      color:rgba(255,255,255,.75);
+      font-size:12px;
+      line-height:1.8;
+    }
+
+    .terms-links{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin:0 0 16px;
+    }
+
+    .terms-links a{
+      color:#fff;
+      font-size:13px;
+      line-height:1.7;
+      text-decoration:underline;
+      text-underline-offset:4px;
+    }
+
+    .consent-label{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      cursor:pointer;
+      font-size:12px;
+      line-height:1.8;
+      color:rgba(255,255,255,.88);
+    }
+
+    .consent-label input{
+      width:18px;
+      height:18px;
+      min-width:18px;
+      margin:3px 0 0;
+      accent-color:#fff;
+      cursor:pointer;
+    }
+
+    .privacy-note{
+      margin:12px 0 0;
+      color:rgba(255,255,255,.56);
+      font-size:11px;
+      line-height:1.7;
+    }
+
     .button{
       display:inline-block;
       background:#fff;
@@ -151,7 +217,7 @@
     }
 
     .button:disabled{
-      opacity:.6;
+      opacity:.45;
       cursor:not-allowed;
     }
 
@@ -172,6 +238,7 @@
 <body>
   <div class="wrap">
     <div class="box">
+
       <h1 class="title">Reservation</h1>
 
       <p class="text">
@@ -184,8 +251,10 @@ Lumière Nalu ご予約申込ページです。
       <div id="memberInfo" class="memberInfo"></div>
 
       <div id="formArea" class="hidden">
+
         <div class="field">
           <label for="memberNo">会員番号</label>
+
           <input
             type="text"
             id="memberNo"
@@ -196,6 +265,7 @@ Lumière Nalu ご予約申込ページです。
 
         <div class="field">
           <label for="inputName">お名前</label>
+
           <input
             type="text"
             id="inputName"
@@ -205,6 +275,7 @@ Lumière Nalu ご予約申込ページです。
 
         <div class="field">
           <label for="inputKana">お名前（カナ）</label>
+
           <input
             type="text"
             id="inputKana"
@@ -214,43 +285,68 @@ Lumière Nalu ご予約申込ページです。
 
         <div class="field">
           <label for="serviceId">イベント / 店舗名</label>
+
           <select id="serviceId">
             <option value="">読み込み中...</option>
           </select>
-          <div id="serviceDetail" class="service-detail"></div>
+
+          <div
+            id="serviceDetail"
+            class="service-detail"
+          ></div>
         </div>
 
         <div id="eventDateField" class="field">
-  <label for="eventDate">参加日</label>
-  <input
-    type="date"
-    id="eventDate"
-  >
-</div>
+          <label for="eventDate">参加日</label>
 
-<div id="fixedSchedule" class="service-detail"></div>
+          <input
+            type="date"
+            id="eventDate"
+          >
+        </div>
 
-        <div id="dateCapacityStatus" class="service-detail"></div>
+        <div
+          id="fixedSchedule"
+          class="service-detail"
+        ></div>
+
+        <div
+          id="dateCapacityStatus"
+          class="service-detail"
+        ></div>
 
         <div class="field">
           <label for="people">人数</label>
-          <select id="people" disabled>
-            <option value="">先に日程を選択してください</option>
+
+          <select
+            id="people"
+            disabled
+          >
+            <option value="">
+              先に日程を選択してください
+            </option>
           </select>
         </div>
 
         <div class="field">
-          <label for="companionName">ご同行される方のお名前</label>
+          <label for="companionName">
+            ご同行される方のお名前
+          </label>
+
           <textarea
             id="companionName"
             placeholder="2名以上でお申し込みの場合、ご同行者様のお名前をカナと併せてご入力ください"
           ></textarea>
         </div>
 
-        <div id="registeredFoodInfo" class="registered-food-info"></div>
+        <div
+          id="registeredFoodInfo"
+          class="registered-food-info"
+        ></div>
 
         <div class="field">
           <label for="allergy">アレルギー</label>
+
           <textarea
             id="allergy"
             placeholder="同行者様、または追加のアレルギーがある場合のみご入力ください"
@@ -259,6 +355,7 @@ Lumière Nalu ご予約申込ページです。
 
         <div class="field">
           <label for="dislike">苦手食材</label>
+
           <textarea
             id="dislike"
             placeholder="同行者様、または追加の苦手食材がある場合のみご入力ください"
@@ -267,252 +364,523 @@ Lumière Nalu ご予約申込ページです。
 
         <div class="field">
           <label for="message">連絡事項</label>
+
           <textarea
             id="message"
             placeholder="ご希望や確認事項があればご入力ください"
           ></textarea>
         </div>
 
-        <button id="submitBtn" class="button">予約申込を送信する</button>
+        <div class="terms-box">
+
+          <p class="terms-title">
+            規約・利用条件
+          </p>
+
+          <p class="terms-text">
+            予約申込みにあたり、以下の規約と
+            本開催案内に記載された料金・キャンセル条件を
+            ご確認ください。
+          </p>
+
+          <div class="terms-links">
+
+            <a
+              href="https://app.notion.com/p/Lumi-re-3992665c0f6b80e3a21ac0899c049098?source=copy_link"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Lumière予約・利用規約
+            </a>
+
+            <a
+              href="https://app.notion.com/p/Nalu-09-3992665c0f6b803baddfc14da896d526?source=copy_link"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              合同会社Nalu-09 プライバシーポリシー
+            </a>
+
+          </div>
+
+          <label class="consent-label">
+
+            <input
+              type="checkbox"
+              id="reservationConsent"
+            >
+
+            <span>
+              Lumière予約・利用規約および
+              本開催案内に記載された料金・キャンセル条件を確認し、
+              内容に同意します。
+            </span>
+
+          </label>
+
+          <p class="privacy-note">
+            個人情報の取扱いについては、
+            合同会社Nalu-09プライバシーポリシーをご確認ください。
+          </p>
+
+        </div>
+
+        <button
+          id="submitBtn"
+          class="button"
+          disabled
+        >
+          予約申込を送信する
+        </button>
+
       </div>
 
-      <div id="status" class="status">読み込み中...</div>
+      <div
+        id="status"
+        class="status"
+      >
+        読み込み中...
+      </div>
+
     </div>
   </div>
 
   <script>
-    const LIFF_ID = "2007730715-wxTZ582n";
-    const API_URL = "https://script.google.com/macros/s/AKfycbxOIqa-TOGIogMYIro9Qu0nG85vZ7ObLFT_YWLW3Q9XHbUmfbXVr9Oxk3zuUZxbtmXe/exec";
+    const LIFF_ID =
+      "2007730715-wxTZ582n";
+
+    const API_URL =
+      "https://script.google.com/macros/s/AKfycbxOIqa-TOGIogMYIro9Qu0nG85vZ7ObLFT_YWLW3Q9XHbUmfbXVr9Oxk3zuUZxbtmXe/exec";
+
     const PAYMENT_URLS = {
-    lumiereFrenchNormal: "https://nalu09-official.square.site/product/-/NPY4JU24FWNL3UG5FERZO65S",
-    lumiereFrenchEveil: "https://nalu09-official.square.site/product/-/6AG5V2GUIMZPYTI4SYZIBGTJ",
-    lumiereNalu: "https://nalu09-official.square.site/product/-/IFLBCST2JF4DVJFCBSE656YO"
-     };
-    
-    const urlParams = new URLSearchParams(window.location.search);
-    const rawState = urlParams.get("liff.state");
-    const stateParams = new URLSearchParams((rawState || "").replace(/^\?/, ""));
-    const SOURCE = urlParams.get("source") || stateParams.get("source") || "lumiere";
+      lumiereFrenchNormal:
+        "https://nalu09-official.square.site/product/-/NPY4JU24FWNL3UG5FERZO65S",
+
+      lumiereFrenchEveil:
+        "https://nalu09-official.square.site/product/-/6AG5V2GUIMZPYTI4SYZIBGTJ",
+
+      lumiereNalu:
+        "https://nalu09-official.square.site/product/-/IFLBCST2JF4DVJFCBSE656YO"
+    };
+
+    const urlParams =
+      new URLSearchParams(
+        window.location.search
+      );
+
+    const rawState =
+      urlParams.get("liff.state");
+
+    const stateParams =
+      new URLSearchParams(
+        (rawState || "").replace(/^\?/, "")
+      );
+
+    const SOURCE =
+      urlParams.get("source") ||
+      stateParams.get("source") ||
+      "lumiere";
 
     let currentProfile = null;
     let currentMember = null;
     let currentServices = [];
 
+    function updateSubmitButtonState() {
+      const btn =
+        document.getElementById(
+          "submitBtn"
+        );
+
+      const consent =
+        document.getElementById(
+          "reservationConsent"
+        );
+
+      if (!btn || !consent) {
+        return;
+      }
+
+      btn.disabled =
+        !consent.checked;
+    }
+
     function updateServiceDetail() {
-      const serviceSelect = document.getElementById("serviceId");
-      const detail = document.getElementById("serviceDetail");
+      const serviceSelect =
+        document.getElementById(
+          "serviceId"
+        );
 
-      if (!serviceSelect || !detail) return;
+      const detail =
+        document.getElementById(
+          "serviceDetail"
+        );
 
-      const serviceId = serviceSelect.value;
+      if (!serviceSelect || !detail) {
+        return;
+      }
+
+      const serviceId =
+        serviceSelect.value;
 
       if (!serviceId) {
-        detail.style.display = "none";
+        detail.style.display =
+          "none";
+
         detail.textContent = "";
         return;
       }
 
-      const service = currentServices.find(function(item) {
-        return String(item.serviceId) === String(serviceId);
-      });
+      const service =
+        currentServices.find(
+          function(item) {
+            return (
+              String(item.serviceId) ===
+              String(serviceId)
+            );
+          }
+        );
 
       if (!service) {
-        detail.style.display = "none";
+        detail.style.display =
+          "none";
+
         detail.textContent = "";
         return;
       }
 
-      let statusText = "受付中";
+      let statusText =
+        "受付中";
 
-      if (service.status === "closed") {
-        statusText = "受付終了";
-      } else if (service.status === "full") {
-        statusText = "現在満席です";
+      if (
+        service.status === "closed"
+      ) {
+        statusText =
+          "受付終了";
+
+      } else if (
+        service.status === "full"
+      ) {
+        statusText =
+          "現在満席です";
       }
 
       let text =
-        service.serviceName + "\n\n" +
-        "受付状況：" + statusText;
+        service.serviceName +
+        "\n\n" +
+        "受付状況：" +
+        statusText;
 
       if (service.eventDate) {
-  text +=
-    "\n開催日：" +
-    formatScheduleDate(service.eventDate);
+        text +=
+          "\n開催日：" +
+          formatScheduleDate(
+            service.eventDate
+          );
 
-  if (service.startTime && service.endTime) {
-    text +=
-      "\n開催時間：" +
-      service.startTime +
-      "〜" +
-      service.endTime;
-  } else if (service.startTime) {
-    text +=
-      "\n開始時間：" +
-      service.startTime;
-  }
-}
-      
+        if (
+          service.startTime &&
+          service.endTime
+        ) {
+          text +=
+            "\n開催時間：" +
+            service.startTime +
+            "〜" +
+            service.endTime;
+
+        } else if (
+          service.startTime
+        ) {
+          text +=
+            "\n開始時間：" +
+            service.startTime;
+        }
+      }
+
       if (service.deadlineText) {
-        text += "\n申込締切：" + service.deadlineText;
+        text +=
+          "\n申込締切：" +
+          service.deadlineText;
       }
 
       detail.textContent = text;
-      detail.style.display = "block";
+      detail.style.display =
+        "block";
+    }
+        function applyServiceSchedule() {
+      const serviceSelect =
+        document.getElementById(
+          "serviceId"
+        );
+
+      const eventDateField =
+        document.getElementById(
+          "eventDateField"
+        );
+
+      const eventDateInput =
+        document.getElementById(
+          "eventDate"
+        );
+
+      const fixedSchedule =
+        document.getElementById(
+          "fixedSchedule"
+        );
+
+      const peopleSelect =
+        document.getElementById(
+          "people"
+        );
+
+      const capacityStatus =
+        document.getElementById(
+          "dateCapacityStatus"
+        );
+
+      if (
+        !serviceSelect ||
+        !eventDateField ||
+        !eventDateInput ||
+        !fixedSchedule
+      ) {
+        return;
+      }
+
+      const serviceId =
+        serviceSelect.value;
+
+      const service =
+        currentServices.find(
+          function(item) {
+            return (
+              String(item.serviceId) ===
+              String(serviceId)
+            );
+          }
+        );
+
+      capacityStatus.style.display =
+        "none";
+
+      capacityStatus.textContent = "";
+
+      peopleSelect.innerHTML = "";
+
+      const initialPeopleOption =
+        document.createElement(
+          "option"
+        );
+
+      initialPeopleOption.value = "";
+
+      initialPeopleOption.textContent =
+        serviceId
+          ? "先に日程を選択してください"
+          : "先にイベント名を選択してください";
+
+      peopleSelect.appendChild(
+        initialPeopleOption
+      );
+
+      peopleSelect.disabled = true;
+
+      if (!service) {
+        eventDateField.style.display =
+          "block";
+
+        eventDateInput.value = "";
+
+        fixedSchedule.style.display =
+          "none";
+
+        fixedSchedule.textContent = "";
+
+        return;
+      }
+
+      const fixedEventDate =
+        String(
+          service.eventDate || ""
+        ).trim();
+
+      const startTime =
+        String(
+          service.startTime || ""
+        ).trim();
+
+      const endTime =
+        String(
+          service.endTime || ""
+        ).trim();
+
+      if (fixedEventDate) {
+        eventDateInput.value =
+          fixedEventDate.replaceAll(
+            "/",
+            "-"
+          );
+
+        eventDateField.style.display =
+          "none";
+
+        let scheduleText =
+          "開催日：" +
+          formatScheduleDate(
+            fixedEventDate
+          );
+
+        if (
+          startTime &&
+          endTime
+        ) {
+          scheduleText +=
+            "\n開催時間：" +
+            startTime +
+            "〜" +
+            endTime;
+
+        } else if (
+          startTime
+        ) {
+          scheduleText +=
+            "\n開始時間：" +
+            startTime;
+        }
+
+        fixedSchedule.textContent =
+          scheduleText;
+
+        fixedSchedule.style.display =
+          "block";
+
+        checkDateCapacity();
+        return;
+      }
+
+      eventDateInput.value = "";
+
+      eventDateField.style.display =
+        "block";
+
+      fixedSchedule.style.display =
+        "none";
+
+      fixedSchedule.textContent = "";
     }
 
-    function applyServiceSchedule() {
-  const serviceSelect = document.getElementById("serviceId");
-  const eventDateField = document.getElementById("eventDateField");
-  const eventDateInput = document.getElementById("eventDate");
-  const fixedSchedule = document.getElementById("fixedSchedule");
-  const peopleSelect = document.getElementById("people");
-  const capacityStatus = document.getElementById("dateCapacityStatus");
+    function formatScheduleDate(value) {
+      const text =
+        String(value || "")
+          .trim()
+          .replaceAll("/", "-");
 
-  if (
-    !serviceSelect ||
-    !eventDateField ||
-    !eventDateInput ||
-    !fixedSchedule
-  ) {
-    return;
-  }
+      const parts =
+        text.split("-");
 
-  const serviceId = serviceSelect.value;
+      if (parts.length !== 3) {
+        return String(value || "");
+      }
 
-  const service = currentServices.find(function(item) {
-    return String(item.serviceId) === String(serviceId);
-  });
+      const year =
+        Number(parts[0]);
 
-  capacityStatus.style.display = "none";
-  capacityStatus.textContent = "";
+      const month =
+        Number(parts[1]);
 
-  peopleSelect.innerHTML = "";
+      const day =
+        Number(parts[2]);
 
-  const initialPeopleOption = document.createElement("option");
-  initialPeopleOption.value = "";
-  initialPeopleOption.textContent =
-    serviceId
-      ? "先に日程を選択してください"
-      : "先にイベント名を選択してください";
+      if (!year || !month || !day) {
+        return String(value || "");
+      }
 
-  peopleSelect.appendChild(initialPeopleOption);
-  peopleSelect.disabled = true;
+      const date =
+        new Date(
+          year,
+          month - 1,
+          day
+        );
 
-  if (!service) {
-    eventDateField.style.display = "block";
-    eventDateInput.value = "";
+      const weekdayNames = [
+        "日",
+        "月",
+        "火",
+        "水",
+        "木",
+        "金",
+        "土"
+      ];
 
-    fixedSchedule.style.display = "none";
-    fixedSchedule.textContent = "";
-
-    return;
-  }
-
-  const fixedEventDate = String(service.eventDate || "").trim();
-  const startTime = String(service.startTime || "").trim();
-  const endTime = String(service.endTime || "").trim();
-
-  if (fixedEventDate) {
-    eventDateInput.value = fixedEventDate.replaceAll("/", "-");
-    eventDateField.style.display = "none";
-
-    let scheduleText =
-      "開催日：" + formatScheduleDate(fixedEventDate);
-
-    if (startTime && endTime) {
-      scheduleText +=
-        "\n開催時間：" +
-        startTime +
-        "〜" +
-        endTime;
-    } else if (startTime) {
-      scheduleText +=
-        "\n開始時間：" +
-        startTime;
+      return (
+        year +
+        "年" +
+        month +
+        "月" +
+        day +
+        "日 " +
+        weekdayNames[
+          date.getDay()
+        ] +
+        "曜日"
+      );
     }
-
-    fixedSchedule.textContent = scheduleText;
-    fixedSchedule.style.display = "block";
-
-    checkDateCapacity();
-    return;
-  }
-
-  eventDateInput.value = "";
-  eventDateField.style.display = "block";
-
-  fixedSchedule.style.display = "none";
-  fixedSchedule.textContent = "";
-}
-
-function formatScheduleDate(value) {
-  const text = String(value || "")
-    .trim()
-    .replaceAll("/", "-");
-
-  const parts = text.split("-");
-
-  if (parts.length !== 3) {
-    return String(value || "");
-  }
-
-  const year = Number(parts[0]);
-  const month = Number(parts[1]);
-  const day = Number(parts[2]);
-
-  if (!year || !month || !day) {
-    return String(value || "");
-  }
-
-  const date = new Date(year, month - 1, day);
-
-  const weekdayNames = [
-    "日",
-    "月",
-    "火",
-    "水",
-    "木",
-    "金",
-    "土"
-  ];
-
-  return (
-    year +
-    "年" +
-    month +
-    "月" +
-    day +
-    "日 " +
-    weekdayNames[date.getDay()] +
-    "曜日"
-  );
-}
 
     function renderRegisteredFoodInfo(member) {
-      const box = document.getElementById("registeredFoodInfo");
+      const box =
+        document.getElementById(
+          "registeredFoodInfo"
+        );
 
-      if (!box) return;
+      if (!box) {
+        return;
+      }
 
-      const allergy = member && member.allergy
-        ? String(member.allergy).trim()
-        : "";
+      const allergy =
+        member &&
+        member.allergy
+          ? String(
+              member.allergy
+            ).trim()
+          : "";
 
-      const dislikedFoods = member && member.dislikedFoods
-        ? String(member.dislikedFoods).trim()
-        : "";
+      const dislikedFoods =
+        member &&
+        member.dislikedFoods
+          ? String(
+              member.dislikedFoods
+            ).trim()
+          : "";
 
       const lines = [];
 
-      if (allergy && !isNoneText(allergy)) {
-        lines.push("登録済みアレルギー：" + allergy + "（ご本人）");
+      if (
+        allergy &&
+        !isNoneText(allergy)
+      ) {
+        lines.push(
+          "登録済みアレルギー：" +
+          allergy +
+          "（ご本人）"
+        );
       }
 
-      if (dislikedFoods && !isNoneText(dislikedFoods)) {
-        lines.push("登録済み苦手食材：" + dislikedFoods + "（ご本人）");
+      if (
+        dislikedFoods &&
+        !isNoneText(
+          dislikedFoods
+        )
+      ) {
+        lines.push(
+          "登録済み苦手食材：" +
+          dislikedFoods +
+          "（ご本人）"
+        );
       }
 
       if (lines.length === 0) {
-        box.style.display = "none";
+        box.style.display =
+          "none";
+
         box.textContent = "";
         return;
       }
@@ -521,13 +889,15 @@ function formatScheduleDate(value) {
         lines.join("\n") +
         "\n\n同行者様、または追加事項がある場合のみ下記へご入力ください。";
 
-      box.style.display = "block";
+      box.style.display =
+        "block";
     }
 
     function isNoneText(value) {
-      const text = String(value || "")
-        .replace(/\s/g, "")
-        .trim();
+      const text =
+        String(value || "")
+          .replace(/\s/g, "")
+          .trim();
 
       return (
         text === "" ||
@@ -540,416 +910,995 @@ function formatScheduleDate(value) {
     }
 
     async function initReservation() {
-      const status = document.getElementById("status");
-      const formArea = document.getElementById("formArea");
-      const memberInfo = document.getElementById("memberInfo");
-      const serviceSelect = document.getElementById("serviceId");
+      const status =
+        document.getElementById(
+          "status"
+        );
+
+      const formArea =
+        document.getElementById(
+          "formArea"
+        );
+
+      const memberInfo =
+        document.getElementById(
+          "memberInfo"
+        );
+
+      const serviceSelect =
+        document.getElementById(
+          "serviceId"
+        );
 
       try {
-        status.textContent = "LIFF初期化中...";
+        status.textContent =
+          "LIFF初期化中...";
 
-        await liff.init({ liffId: LIFF_ID });
+        await liff.init({
+          liffId: LIFF_ID
+        });
 
         if (!liff.isLoggedIn()) {
-          status.textContent = "LINEログイン中...";
+          status.textContent =
+            "LINEログイン中...";
+
           liff.login();
           return;
         }
 
-        status.textContent = "プロフィール取得中...";
-        currentProfile = await liff.getProfile();
+        status.textContent =
+          "プロフィール取得中...";
 
-        status.textContent = "会員情報を確認中...";
+        currentProfile =
+          await liff.getProfile();
 
-        const res = await fetch(API_URL, {
-          method: "POST",
-          body: new URLSearchParams({
-            action: "getReservationOptions",
-            lineUserId: currentProfile.userId,
-            source: SOURCE
-          })
-        });
+        status.textContent =
+          "会員情報を確認中...";
 
-        const data = await res.json();
+        const res =
+          await fetch(
+            API_URL,
+            {
+              method: "POST",
+              body:
+                new URLSearchParams({
+                  action:
+                    "getReservationOptions",
+
+                  lineUserId:
+                    currentProfile.userId,
+
+                  source:
+                    SOURCE
+                })
+            }
+          );
+
+        const data =
+          await res.json();
 
         if (!data.ok) {
-          if (data.message === "member_not_found") {
+          if (
+            data.message ===
+            "member_not_found"
+          ) {
             status.textContent =
               "会員情報が確認できませんでした。\n会員証発行後にご利用ください。";
+
             return;
           }
 
           status.textContent =
             "予約フォームを表示できませんでした。\n" +
-            "エラー内容：" + (data.message || "unknown_error");
+            "エラー内容：" +
+            (
+              data.message ||
+              "unknown_error"
+            );
+
           return;
         }
 
-        currentMember = data.member;
-        currentServices = data.services || [];
+        currentMember =
+          data.member;
+
+        currentServices =
+          data.services || [];
 
         memberInfo.textContent =
-          "Member No. " + currentMember.memberNo + "\n" +
-          "Rank： " + currentMember.rank + "\n" +
-          "Name： " + (currentMember.cardName || currentMember.name);
+          "Member No. " +
+          currentMember.memberNo +
+          "\n" +
+          "Rank： " +
+          currentMember.rank +
+          "\n" +
+          "Name： " +
+          (
+            currentMember.cardName ||
+            currentMember.name
+          );
 
-        renderRegisteredFoodInfo(currentMember);
+        renderRegisteredFoodInfo(
+          currentMember
+        );
 
-        serviceSelect.innerHTML = "";
+        serviceSelect.innerHTML =
+          "";
 
-        const defaultOption = document.createElement("option");
+        const defaultOption =
+          document.createElement(
+            "option"
+          );
+
         defaultOption.value = "";
-        defaultOption.textContent = "選択してください";
-        serviceSelect.appendChild(defaultOption);
 
-        if (currentServices.length === 0) {
-          const option = document.createElement("option");
-          option.value = "";
-          option.textContent = "現在選択可能な内容がありません";
-          serviceSelect.appendChild(option);
-        } else {
-          currentServices.forEach(function(service) {
-            const option = document.createElement("option");
-            option.value = service.serviceId;
+        defaultOption.textContent =
+          "選択してください";
 
-            const minPeopleText = getMinPeopleText(service);
-
-if (service.status === "closed") {
-  option.textContent = service.serviceName + "｜" + minPeopleText + "｜受付終了";
-  option.disabled = true;
-} else if (service.status === "full") {
-  option.textContent = service.serviceName + "｜" + minPeopleText + "｜現在満席です";
-  option.disabled = true;
-} else {
-  option.textContent = service.serviceName + "｜" + minPeopleText;
-}
-
-            serviceSelect.appendChild(option);
-          });
-        }
-
-        formArea.classList.remove("hidden");
-        status.textContent = "";
-
-      } catch (e) {
-        const errorMessage = String(e.message || "");
+        serviceSelect.appendChild(
+          defaultOption
+        );
 
         if (
-          errorMessage.includes("access token expired") ||
-          errorMessage.includes("The access token expired")
+          currentServices.length === 0
         ) {
-          status.textContent = "ログイン情報を更新しています。少しお待ちください。";
+          const option =
+            document.createElement(
+              "option"
+            );
+
+          option.value = "";
+
+          option.textContent =
+            "現在選択可能な内容がありません";
+
+          serviceSelect.appendChild(
+            option
+          );
+
+        } else {
+          currentServices.forEach(
+            function(service) {
+              const option =
+                document.createElement(
+                  "option"
+                );
+
+              option.value =
+                service.serviceId;
+
+              const minPeopleText =
+                getMinPeopleText(
+                  service
+                );
+
+              if (
+                service.status ===
+                "closed"
+              ) {
+                option.textContent =
+                  service.serviceName +
+                  "｜" +
+                  minPeopleText +
+                  "｜受付終了";
+
+                option.disabled =
+                  true;
+
+              } else if (
+                service.status ===
+                "full"
+              ) {
+                option.textContent =
+                  service.serviceName +
+                  "｜" +
+                  minPeopleText +
+                  "｜現在満席です";
+
+                option.disabled =
+                  true;
+
+              } else {
+                option.textContent =
+                  service.serviceName +
+                  "｜" +
+                  minPeopleText;
+              }
+
+              serviceSelect.appendChild(
+                option
+              );
+            }
+          );
+        }
+
+        formArea.classList.remove(
+          "hidden"
+        );
+
+        status.textContent = "";
+
+        updateSubmitButtonState();
+
+      } catch (e) {
+        const errorMessage =
+          String(
+            e.message || ""
+          );
+
+        if (
+          errorMessage.includes(
+            "access token expired"
+          ) ||
+          errorMessage.includes(
+            "The access token expired"
+          )
+        ) {
+          status.textContent =
+            "ログイン情報を更新しています。少しお待ちください。";
 
           try {
             liff.logout();
-          } catch (logoutError) {}
+          } catch (
+            logoutError
+          ) {}
 
-          setTimeout(function() {
-            liff.login();
-          }, 500);
+          setTimeout(
+            function() {
+              liff.login();
+            },
+            500
+          );
 
           return;
         }
 
         status.textContent =
           "読み込み中にエラーが発生しました。\n" +
-          "エラー内容：" + errorMessage;
+          "エラー内容：" +
+          errorMessage;
       }
     }
 
     async function submitReservation() {
-      const status = document.getElementById("status");
-      const btn = document.getElementById("submitBtn");
+      const status =
+        document.getElementById(
+          "status"
+        );
 
-      const memberNo = document.getElementById("memberNo").value.trim();
-      const inputName = document.getElementById("inputName").value.trim();
-      const inputKana = document.getElementById("inputKana").value.trim();
-      const serviceId = document.getElementById("serviceId").value;
-      const eventDate = document.getElementById("eventDate").value;
-      const people = document.getElementById("people").value;
-      const companionName = document.getElementById("companionName").value.trim();
-      const allergy = document.getElementById("allergy").value.trim();
-      const dislike = document.getElementById("dislike").value.trim();
-      const message = document.getElementById("message").value.trim();
+      const btn =
+        document.getElementById(
+          "submitBtn"
+        );
+
+      const consent =
+        document.getElementById(
+          "reservationConsent"
+        );
+
+      const memberNo =
+        document
+          .getElementById(
+            "memberNo"
+          )
+          .value
+          .trim();
+
+      const inputName =
+        document
+          .getElementById(
+            "inputName"
+          )
+          .value
+          .trim();
+
+      const inputKana =
+        document
+          .getElementById(
+            "inputKana"
+          )
+          .value
+          .trim();
+
+      const serviceId =
+        document
+          .getElementById(
+            "serviceId"
+          )
+          .value;
+
+      const eventDate =
+        document
+          .getElementById(
+            "eventDate"
+          )
+          .value;
+
+      const people =
+        document
+          .getElementById(
+            "people"
+          )
+          .value;
+
+      const companionName =
+        document
+          .getElementById(
+            "companionName"
+          )
+          .value
+          .trim();
+
+      const allergy =
+        document
+          .getElementById(
+            "allergy"
+          )
+          .value
+          .trim();
+
+      const dislike =
+        document
+          .getElementById(
+            "dislike"
+          )
+          .value
+          .trim();
+
+      const message =
+        document
+          .getElementById(
+            "message"
+          )
+          .value
+          .trim();
 
       if (!currentProfile) {
-        status.textContent = "LINEプロフィールを取得できていません。";
+        status.textContent =
+          "LINEプロフィールを取得できていません。";
+
         return;
       }
 
       if (!memberNo) {
-        status.textContent = "会員番号をご入力ください。";
+        status.textContent =
+          "会員番号をご入力ください。";
+
         return;
       }
 
       if (!inputName) {
-        status.textContent = "お名前をご入力ください。";
+        status.textContent =
+          "お名前をご入力ください。";
+
         return;
       }
 
       if (!inputKana) {
-        status.textContent = "お名前（カナ）をご入力ください。";
+        status.textContent =
+          "お名前（カナ）をご入力ください。";
+
         return;
       }
 
       if (!serviceId) {
-        status.textContent = "イベント / 店舗名を選択してください。";
+        status.textContent =
+          "イベント / 店舗名を選択してください。";
+
         return;
       }
 
       if (!eventDate) {
-        status.textContent = "参加日を選択してください。";
+        status.textContent =
+          "参加日を選択してください。";
+
         return;
       }
 
       if (!people) {
-        status.textContent = "人数を選択してください。";
+        status.textContent =
+          "人数を選択してください。";
+
         return;
       }
 
-      if (Number(people) >= 2 && !companionName) {
-        status.textContent = "2名以上でお申し込みの場合、ご同行される方のお名前をカナと併せてご入力ください。";
+      if (
+        Number(people) >= 2 &&
+        !companionName
+      ) {
+        status.textContent =
+          "2名以上でお申し込みの場合、ご同行される方のお名前をカナと併せてご入力ください。";
+
+        return;
+      }
+
+      if (
+        !consent ||
+        !consent.checked
+      ) {
+        status.textContent =
+          "Lumière予約・利用規約および料金・キャンセル条件を確認し、同意欄にチェックを入れてください。";
+
         return;
       }
 
       try {
         btn.disabled = true;
-        btn.textContent = "送信中...";
 
-        const res = await fetch(API_URL, {
-          method: "POST",
-          body: new URLSearchParams({
-            action: "submitReservation",
-            lineUserId: currentProfile.userId,
-            displayName: currentProfile.displayName || "",
-            source: SOURCE,
-            memberNo: memberNo,
-            inputName: inputName,
-            inputKana: inputKana,
-            serviceId: serviceId,
-            eventDate: eventDate,
-            people: people,
-            companionName: companionName,
-            allergy: allergy,
-            dislike: dislike,
-            message: message
-          })
-        });
+        btn.textContent =
+          "送信中...";
 
-        const data = await res.json();
+        const res =
+          await fetch(
+            API_URL,
+            {
+              method: "POST",
+
+              body:
+                new URLSearchParams({
+                  action:
+                    "submitReservation",
+
+                  lineUserId:
+                    currentProfile.userId,
+
+                  displayName:
+                    currentProfile.displayName ||
+                    "",
+
+                  source:
+                    SOURCE,
+
+                  memberNo:
+                    memberNo,
+
+                  inputName:
+                    inputName,
+
+                  inputKana:
+                    inputKana,
+
+                  serviceId:
+                    serviceId,
+
+                  eventDate:
+                    eventDate,
+
+                  people:
+                    people,
+
+                  companionName:
+                    companionName,
+
+                  allergy:
+                    allergy,
+
+                  dislike:
+                    dislike,
+
+                  message:
+                    message,
+
+                  reservationConsent:
+                    consent.checked
+                      ? "true"
+                      : "false"
+                })
+            }
+          );
+
+        const data =
+          await res.json();
 
         if (!data.ok) {
-          if (data.message === "member_not_found") {
+          if (
+            data.message ===
+            "member_not_found"
+          ) {
             status.textContent =
               "会員情報が確認できませんでした。\n会員証発行後にご利用ください。";
-          } else if (data.message === "member_no_mismatch") {
+
+          } else if (
+            data.message ===
+            "member_no_mismatch"
+          ) {
             status.textContent =
               "会員番号が一致しません。\n会員証をご確認のうえ、再度お試しください。";
-          } else if (data.message === "name_mismatch") {
+
+          } else if (
+            data.message ===
+            "name_mismatch"
+          ) {
             status.textContent =
               "お名前が会員情報と一致しません。\n会員証の表記をご確認ください。";
-          } else if (data.message === "service_not_allowed") {
+
+          } else if (
+            data.message ===
+            "service_not_allowed"
+          ) {
             status.textContent =
               "現在のランクでは、選択された内容にお申し込みいただけません。";
-          } else if (data.message === "kana_required") {
+
+          } else if (
+            data.message ===
+            "kana_required"
+          ) {
             status.textContent =
               "お名前（カナ）をご入力ください。";
-          } else if (data.message === "companion_required") {
+
+          } else if (
+            data.message ===
+            "companion_required"
+          ) {
             status.textContent =
               "2名以上でお申し込みの場合、ご同行される方のお名前をご入力ください。";
-          } else if (data.message === "deadline_closed") {
+
+          } else if (
+            data.message ===
+            "deadline_closed"
+          ) {
             status.textContent =
               "このお申し込みは受付終了しています。";
-          } else if (data.message === "service_full" || data.message === "capacity_full") {
+
+          } else if (
+            data.message ===
+            "service_full" ||
+            data.message ===
+            "capacity_full"
+          ) {
             status.textContent =
               "このお申し込みは現在満席です。";
+
+          } else if (
+            data.message ===
+            "reservation_consent_required"
+          ) {
+            status.textContent =
+              "Lumière予約・利用規約および料金・キャンセル条件への同意が必要です。";
+
+          } else if (
+            data.message ===
+            "min_people_required"
+          ) {
+            status.textContent =
+              "この内容は" +
+              data.minPeople +
+              "名以上でお申し込みください。";
+
           } else {
             status.textContent =
               "予約申込を受け付けできませんでした。\n" +
-              "エラー内容：" + (data.message || "unknown_error");
+              "エラー内容：" +
+              (
+                data.message ||
+                "unknown_error"
+              );
           }
 
-          btn.disabled = false;
-          btn.textContent = "予約申込を送信する";
+          btn.disabled =
+            !consent.checked;
+
+          btn.textContent =
+            "予約申込を送信する";
+
           return;
         }
 
-      const paymentUrl = data.paymentUrl || "";
+        consent.disabled = true;
 
-if (paymentUrl) {
-  status.innerHTML =
-    "予約申込を受け付けました。<br>" +
-    "お支払いページへ移動しています。<br><br>" +
-    "<a class='button' href='" + paymentUrl + "'>移動しない場合はこちら</a>";
+        const paymentUrl =
+          data.paymentUrl || "";
 
-  btn.style.display = "none";
+        if (paymentUrl) {
+          status.innerHTML =
+            "予約申込を受け付けました。<br>" +
+            "お支払いページへ移動しています。<br><br>" +
+            "<a class='button' href='" +
+            paymentUrl +
+            "'>移動しない場合はこちら</a>";
 
-  setTimeout(function () {
-    window.location.href = paymentUrl;
-  }, 1500);
+          btn.style.display =
+            "none";
 
-} else {
-  status.textContent =
-    "予約申込を受け付けました。\n内容を確認のうえ、運営よりご案内いたします。";
+          setTimeout(
+            function() {
+              window.location.href =
+                paymentUrl;
+            },
+            1500
+          );
 
-  btn.style.display = "none";
-}
+        } else {
+          status.textContent =
+            "予約申込を受け付けました。\n内容を確認のうえ、運営よりご案内いたします。";
 
-              } catch (e) {
+          btn.style.display =
+            "none";
+        }
+
+      } catch (e) {
         status.textContent =
           "予約申込を受け付けできませんでした。\n" +
-          "エラー内容：" + e.message;
+          "エラー内容：" +
+          e.message;
 
-        btn.disabled = false;
-        btn.textContent = "予約申込を送信する";
+        btn.disabled =
+          !consent.checked;
+
+        btn.textContent =
+          "予約申込を送信する";
       }
     }
-    
-        
-    async function checkDateCapacity() {
-      const statusBox = document.getElementById("dateCapacityStatus");
-      const serviceId = document.getElementById("serviceId").value;
-      const eventDate = document.getElementById("eventDate").value;
-      const peopleSelect = document.getElementById("people");
+        async function checkDateCapacity() {
+      const statusBox =
+        document.getElementById(
+          "dateCapacityStatus"
+        );
+
+      const serviceId =
+        document
+          .getElementById(
+            "serviceId"
+          )
+          .value;
+
+      const eventDate =
+        document
+          .getElementById(
+            "eventDate"
+          )
+          .value;
+
+      const peopleSelect =
+        document.getElementById(
+          "people"
+        );
 
       peopleSelect.innerHTML = "";
       peopleSelect.disabled = true;
 
-      const defaultOption = document.createElement("option");
-      defaultOption.value = "";
-      defaultOption.textContent = "選択してください";
-      peopleSelect.appendChild(defaultOption);
+      const defaultOption =
+        document.createElement(
+          "option"
+        );
 
-      if (!serviceId || !eventDate) {
-        statusBox.style.display = "none";
+      defaultOption.value = "";
+      defaultOption.textContent =
+        "選択してください";
+
+      peopleSelect.appendChild(
+        defaultOption
+      );
+
+      if (
+        !serviceId ||
+        !eventDate
+      ) {
+        statusBox.style.display =
+          "none";
+
         statusBox.textContent = "";
 
         peopleSelect.innerHTML = "";
 
-        const option = document.createElement("option");
+        const option =
+          document.createElement(
+            "option"
+          );
+
         option.value = "";
-        option.textContent = "先にイベント名と日程を選択してください";
-        peopleSelect.appendChild(option);
+
+        option.textContent =
+          "先にイベント名と日程を選択してください";
+
+        peopleSelect.appendChild(
+          option
+        );
 
         peopleSelect.disabled = true;
+
         return;
       }
 
-      statusBox.style.display = "block";
-      statusBox.textContent = "残席を確認中...";
+      statusBox.style.display =
+        "block";
+
+      statusBox.textContent =
+        "残席を確認中...";
 
       try {
-        const res = await fetch(API_URL, {
-          method: "POST",
-          body: new URLSearchParams({
-            action: "checkDateCapacity",
-            source: SOURCE,
-            serviceId: serviceId,
-            eventDate: eventDate
-          })
-        });
+        const res =
+          await fetch(
+            API_URL,
+            {
+              method: "POST",
 
-        const data = await res.json();
+              body:
+                new URLSearchParams({
+                  action:
+                    "checkDateCapacity",
+
+                  source:
+                    SOURCE,
+
+                  serviceId:
+                    serviceId,
+
+                  eventDate:
+                    eventDate
+                })
+            }
+          );
+
+        const data =
+          await res.json();
 
         if (!data.ok) {
           statusBox.textContent =
             "残席を確認できませんでした。\n" +
-            "エラー内容：" + (data.message || "unknown_error");
+            "エラー内容：" +
+            (
+              data.message ||
+              "unknown_error"
+            );
+
           peopleSelect.disabled = true;
+
           return;
         }
 
         peopleSelect.innerHTML = "";
 
-        const firstOption = document.createElement("option");
-        firstOption.value = "";
-        firstOption.textContent = "選択してください";
-        peopleSelect.appendChild(firstOption);
+        const firstOption =
+          document.createElement(
+            "option"
+          );
 
-        if (data.remaining === null) {
-          for (let i = 1; i <= 4; i++) {
-            const option = document.createElement("option");
-            option.value = String(i);
-            option.textContent = i + "名";
-            peopleSelect.appendChild(option);
+        firstOption.value = "";
+
+        firstOption.textContent =
+          "選択してください";
+
+        peopleSelect.appendChild(
+          firstOption
+        );
+
+        const minPeople =
+          Math.max(
+            Number(
+              data.minPeople || 1
+            ),
+            1
+          );
+
+        if (
+          data.remaining === null
+        ) {
+          for (
+            let i = minPeople;
+            i <= 4;
+            i++
+          ) {
+            const option =
+              document.createElement(
+                "option"
+              );
+
+            option.value =
+              String(i);
+
+            option.textContent =
+              i + "名";
+
+            peopleSelect.appendChild(
+              option
+            );
           }
 
-          peopleSelect.disabled = false;
-          statusBox.textContent = "この日程は受付可能です。";
+          if (
+            minPeople <= 4
+          ) {
+            peopleSelect.disabled =
+              false;
+
+            statusBox.textContent =
+              "この日程は受付可能です。";
+
+          } else {
+            peopleSelect.disabled =
+              true;
+
+            statusBox.textContent =
+              minPeople +
+              "名以上でお申し込みください。";
+          }
+
           return;
         }
 
-        if (!data.available || Number(data.remaining) <= 0) {
+        if (
+          !data.available ||
+          Number(data.remaining) <= 0
+        ) {
           peopleSelect.innerHTML = "";
 
-          const option = document.createElement("option");
-          option.value = "";
-          option.textContent = "満席です";
-          peopleSelect.appendChild(option);
+          const option =
+            document.createElement(
+              "option"
+            );
 
-          peopleSelect.disabled = true;
+          option.value = "";
+
+          option.textContent =
+            "満席です";
+
+          peopleSelect.appendChild(
+            option
+          );
+
+          peopleSelect.disabled =
+            true;
 
           statusBox.textContent =
             "この日程は現在満席です。\n別日をご選択ください。";
+
           return;
         }
 
-        const maxSelectable = Math.min(Number(data.remaining), 4);
+        const maxSelectable =
+          Math.min(
+            Number(data.remaining),
+            4
+          );
 
-        for (let i = 1; i <= maxSelectable; i++) {
-          const option = document.createElement("option");
-          option.value = String(i);
-          option.textContent = i + "名";
-          peopleSelect.appendChild(option);
+        if (
+          maxSelectable < minPeople
+        ) {
+          peopleSelect.innerHTML = "";
+
+          const option =
+            document.createElement(
+              "option"
+            );
+
+          option.value = "";
+
+          option.textContent =
+            "必要人数を選択できません";
+
+          peopleSelect.appendChild(
+            option
+          );
+
+          peopleSelect.disabled =
+            true;
+
+          statusBox.textContent =
+            "この内容は" +
+            minPeople +
+            "名以上でのお申し込みが必要ですが、残席が不足しています。";
+
+          return;
         }
 
-        peopleSelect.disabled = false;
+        for (
+          let i = minPeople;
+          i <= maxSelectable;
+          i++
+        ) {
+          const option =
+            document.createElement(
+              "option"
+            );
+
+          option.value =
+            String(i);
+
+          option.textContent =
+            i + "名";
+
+          peopleSelect.appendChild(
+            option
+          );
+        }
+
+        peopleSelect.disabled =
+          false;
 
         statusBox.textContent =
           "この日程は受付可能です。\n" +
-          "残り：" + data.remaining + "名";
+          "残り：" +
+          data.remaining +
+          "名";
 
       } catch (e) {
         statusBox.textContent =
           "残席確認中にエラーが発生しました。\n" +
-          "エラー内容：" + e.message;
-        peopleSelect.disabled = true;
+          "エラー内容：" +
+          e.message;
+
+        peopleSelect.disabled =
+          true;
       }
     }
 
-    document.addEventListener("DOMContentLoaded", function() {
-      const btn = document.getElementById("submitBtn");
-      const serviceSelect = document.getElementById("serviceId");
-      const eventDateInput = document.getElementById("eventDate");
+    function getMinPeopleText(
+      service
+    ) {
+      const minPeople =
+        Number(
+          service.minPeople || 1
+        );
 
-      if (btn) {
-        btn.addEventListener("click", submitReservation);
+      if (
+        minPeople <= 1
+      ) {
+        return "1名様より";
       }
 
-      if (serviceSelect) {
-  serviceSelect.addEventListener("change", function() {
-    updateServiceDetail();
-    applyServiceSchedule();
-  });
-}
+      return (
+        minPeople +
+        "名様より"
+      );
+    }
 
-      if (eventDateInput) {
-        eventDateInput.addEventListener("change", checkDateCapacity);
+    document.addEventListener(
+      "DOMContentLoaded",
+      function() {
+        const btn =
+          document.getElementById(
+            "submitBtn"
+          );
+
+        const serviceSelect =
+          document.getElementById(
+            "serviceId"
+          );
+
+        const eventDateInput =
+          document.getElementById(
+            "eventDate"
+          );
+
+        const consent =
+          document.getElementById(
+            "reservationConsent"
+          );
+
+        if (btn) {
+          btn.addEventListener(
+            "click",
+            submitReservation
+          );
+        }
+
+        if (consent) {
+          consent.addEventListener(
+            "change",
+            updateSubmitButtonState
+          );
+        }
+
+        if (serviceSelect) {
+          serviceSelect.addEventListener(
+            "change",
+            function() {
+              updateServiceDetail();
+              applyServiceSchedule();
+            }
+          );
+        }
+
+        if (eventDateInput) {
+          eventDateInput.addEventListener(
+            "change",
+            checkDateCapacity
+          );
+        }
+
+        initReservation();
       }
-
-      initReservation();
-    });
-
-    function getMinPeopleText(service) {
-  const minPeople = Number(service.minPeople || 1);
-
-  if (minPeople <= 1) {
-    return "1名様より";
-  }
-
-  return minPeople + "名様より";
-}
-    
+    );
   </script>
 </body>
 </html>
