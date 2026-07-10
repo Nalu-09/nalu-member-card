@@ -626,13 +626,13 @@ async function updateReservationStatus(
 
     reservation.status = nextStatus;
 
-    alert(
-      nextStatus === "attended"
-        ? "来店済みに変更しました。"
-        : "キャンセルに変更しました。"
-    );
+alert(
+  nextStatus === "attended"
+    ? "来店済みに変更しました。"
+    : "キャンセルに変更しました。"
+);
 
-    await loadReservations();
+renderReservationDetail(groupIndex);
 
   } catch (err) {
     if (resultArea) {
