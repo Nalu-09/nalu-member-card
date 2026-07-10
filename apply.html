@@ -141,6 +141,57 @@
   opacity:.75;
 }
     
+
+    .consent-box{
+      margin:24px 0 18px;
+      padding:18px 16px;
+      text-align:left;
+      background:#080808;
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:16px;
+    }
+
+    .consent-title{
+      margin:0 0 10px;
+      font-size:14px;
+      letter-spacing:.04em;
+    }
+
+    .policy-links{
+      margin:0 0 14px;
+      padding:0;
+      list-style:none;
+    }
+
+    .policy-links li{
+      margin:7px 0;
+      font-size:13px;
+      line-height:1.6;
+    }
+
+    .policy-links a{
+      color:#fff;
+      text-decoration:underline;
+      text-underline-offset:3px;
+    }
+
+    .consent-label{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      font-size:12px;
+      line-height:1.75;
+      cursor:pointer;
+    }
+
+    .consent-label input{
+      width:18px;
+      height:18px;
+      margin:2px 0 0;
+      flex:0 0 auto;
+      accent-color:#fff;
+    }
+
   </style>
 </head>
 <body>
@@ -233,6 +284,42 @@
         >
       </div>
 
+
+      <div class="consent-box">
+        <p class="consent-title">規約・個人情報の取扱い</p>
+
+        <ul class="policy-links">
+          <li>
+            <a
+              href="https://app.notion.com/p/Lumi-re-3992665c0f6b80daba45f426a812f1a5?source=copy_link"
+              target="_blank"
+              rel="noopener noreferrer"
+            >Lumière会員利用規約</a>
+          </li>
+          <li>
+            <a
+              href="https://app.notion.com/p/Lumi-re-3992665c0f6b80e3a21ac0899c049098?source=copy_link"
+              target="_blank"
+              rel="noopener noreferrer"
+            >合同会社Nalu-09 プライバシーポリシー</a>
+          </li>
+        </ul>
+
+        <label class="consent-label" for="termsConsent">
+          <input
+            id="termsConsent"
+            name="termsConsent"
+            type="checkbox"
+          >
+          <span>
+            Lumière会員利用規約および合同会社Nalu-09
+            プライバシーポリシーを確認し、会員申請に伴い取得される
+            個人情報および食物アレルギー等の情報が、記載された目的で
+            取り扱われることに同意します。
+          </span>
+        </label>
+      </div>
+
       <button id="applyBtn" class="button">会員申請を送信する</button>
       <div id="status" class="status"></div>
     </div>
@@ -275,6 +362,7 @@
       const nameKana = getValue("nameKana");
       const birthday = getValue("birthday");
       const applicationPassword = getValue("applicationPassword");
+      const termsConsent = document.getElementById("termsConsent").checked;
 
       if (!cardName) {
         return "カード表記名をご入力ください。";
@@ -298,6 +386,10 @@
 
       if (!applicationPassword) {
         return "申請パスワードをご入力ください。";
+      }
+
+      if (!termsConsent) {
+        return "会員利用規約およびプライバシーポリシーをご確認のうえ、同意欄にチェックを入れてください。";
       }
 
       return "";
@@ -343,7 +435,8 @@
           nameKana: nameKana,
           birthday: birthday,
           dislikedFoods: dislikedFoods,
-          allergy: allergy
+          allergy: allergy,
+          termsConsent: document.getElementById("termsConsent").checked
         });
 
         const res = await fetch(API_URL, {
@@ -354,6 +447,14 @@
         const data = await res.json();
 
         if (!data.ok) {
+          if (data.message === "terms_consent_required") {
+            status.textContent =
+              "会員利用規約およびプライバシーポリシーをご確認のうえ、同意欄にチェックを入れてください。";
+            btn.disabled = false;
+            btn.textContent = "会員申請を送信する";
+            return;
+          }
+
           if (data.message === "invalid_password") {
             status.textContent =
               "申請パスワードが正しくありません。\nご確認のうえ、再度お試しください。";
@@ -404,6 +505,7 @@
         document.getElementById("birthday").disabled = true;
         document.getElementById("dislikedFoods").disabled = true;
         document.getElementById("allergy").disabled = true;
+        document.getElementById("termsConsent").disabled = true;
         passwordInput.disabled = true;
 
       } catch (e) {
