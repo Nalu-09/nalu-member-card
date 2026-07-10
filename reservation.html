@@ -1790,10 +1790,11 @@ eventDateInput.value = "";
           false;
 
         statusBox.textContent =
-          "この日程は受付可能です。\n" +
-          "残り：" +
-          data.remaining +
-          "名";
+  "この日程は受付可能です。\n" +
+  "定員：" + data.capacity + "名\n" +
+  "予約済み：" + data.reserved + "名\n" +
+  "残り：" + data.remaining + "名\n" +
+  "判定日：" + data.eventDate;
 
       } catch (e) {
         statusBox.textContent =
