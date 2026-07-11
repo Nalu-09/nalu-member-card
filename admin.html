@@ -397,8 +397,12 @@
       const groups = Object.values(grouped);
 
       groups.sort(function(a, b) {
-        return String(b.date).localeCompare(String(a.date));
-      });
+  if (a.eventDate !== b.eventDate) {
+    return a.eventDate.localeCompare(b.eventDate);
+  }
+
+  return 0;
+});
 
       window.reservationGroups = groups;
 
