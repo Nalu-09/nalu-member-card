@@ -217,47 +217,47 @@
     });
 
     async function loadMemberPreview(memberNo) {
-      const preview = document.getElementById("memberPreview");
+  const preview = document.getElementById("memberPreview");
 
-      preview.style.display = "block";
-      preview.textContent = "会員情報を確認中...";
+  preview.style.display = "block";
+  preview.textContent = "会員情報を確認中...";
 
-      try {
-        const res = await fetch(API_URL, {
-          method: "POST",
-          body: new URLSearchParams({
-            action: "getMemberForCheckin",
-            memberNo: memberNo
-          })
-        });
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: new URLSearchParams({
+        action: "getMemberForCheckin",
+        memberNo: memberNo
+      })
+    });
 
-        const data = await res.json();
+    const data = await res.json();
 
-        if (!data.ok) {
-          currentMember = null;
-          preview.innerHTML = "該当する会員が見つかりません。";
-          return;
-        }
-
-        currentMember = data.member;
-
-        preview.innerHTML =
-          "<div class='name'>" + escapeHtml(data.member.name || "") + " 様</div>"
-          + "<div>会員番号：" + escapeHtml(data.member.memberNo || "") + "</div>"
-          + "<div>カナ：" + escapeHtml(data.member.kana || "") + "</div>"
-          + "<div>ランク：" + escapeHtml(data.member.rank || "") + "</div>"
-          + "<div>来店回数：" + escapeHtml(data.member.visitCount || "0") + "回</div>"
-          + "<div>最終履歴：" + escapeHtml(data.member.lastVisit || "未記録") + "</div>"
-          + "<div>誕生日：" + escapeHtml(data.member.birthday || "未登録") + "</div>"
-          + "<div class='small'>LINE表示名：" + escapeHtml(data.member.displayName || "") + "</div>";
-
-      } catch (err) {
-        currentMember = null;
-        preview.innerHTML =
-          "会員情報の取得中にエラーが発生しました。<br>" +
-          escapeHtml(err.message);
-      }
+    if (!data.ok) {
+      currentMember = null;
+      preview.innerHTML = "該当する会員が見つかりません。";
+      return;
     }
+
+    currentMember = data.member;
+
+    preview.innerHTML =
+      "<div class='name'>" + escapeHtml(data.member.name || "") + " 様</div>"
+      + "<div>会員番号：" + escapeHtml(data.member.memberNo || "") + "</div>"
+      + "<div>カナ：" + escapeHtml(data.member.kana || "") + "</div>"
+      + "<div>ランク：" + escapeHtml(data.member.rank || "") + "</div>"
+      + "<div>来店回数：" + escapeHtml(data.member.visitCount || "0") + "回</div>"
+      + "<div>最終履歴：" + escapeHtml(data.member.lastVisit || "未記録") + "</div>"
+      + "<div>誕生日：" + escapeHtml(data.member.birthday || "未登録") + "</div>"
+      + "<div class='small'>LINE表示名：" + escapeHtml(data.member.displayName || "") + "</div>";
+
+  } catch (err) {
+    currentMember = null;
+    preview.innerHTML =
+      "会員情報の取得中にエラーが発生しました。<br>" +
+      escapeHtml(err.message);
+  }
+}
 
     function hideMemberPreview() {
       const preview = document.getElementById("memberPreview");
