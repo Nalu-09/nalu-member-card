@@ -396,12 +396,15 @@
 
       const groups = Object.values(grouped);
 
-      groups.sort(function(a, b) {
-  if (a.eventDate !== b.eventDate) {
-    return a.eventDate.localeCompare(b.eventDate);
+    groups.sort(function(a, b) {
+  const dateA = String(a.eventDate || a.date || "");
+  const dateB = String(b.eventDate || b.date || "");
+
+  if (dateA !== dateB) {
+    return dateA.localeCompare(dateB);
   }
 
-  return 0;
+  return serviceOrder(a.serviceName || a.program) - serviceOrder(b.serviceName || b.program);
 });
 
       window.reservationGroups = groups;
@@ -1046,6 +1049,18 @@ renderReservationDetail(groupIndex);
 
       return "";
     }
+
+    function serviceOrder(serviceName) {
+  const name = String(serviceName || "");
+
+  if (name.includes("Lumière French")) return 1;
+  if (name.includes("Lumière Nalu")) return 2;
+  if (name.includes("Nalu Table")) return 3;
+  if (name.includes("第1部")) return 4;
+  if (name.includes("第2部")) return 5;
+
+  return 99;
+}
   </script>
 </body>
 </html>
