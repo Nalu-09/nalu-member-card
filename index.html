@@ -316,14 +316,23 @@
       status.textContent =
         "LINE認証情報を確認中...";
 
-      const idToken =
-        liff.getIDToken();
+      const idToken = liff.getIDToken();
+const decodedToken = liff.getDecodedIDToken();
 
-      if (!idToken) {
-        throw new Error(
-          "LINE認証情報を取得できませんでした。"
-        );
-      }
+if (
+  !idToken ||
+  !decodedToken ||
+  !decodedToken.exp ||
+  decodedToken.exp * 1000 <= Date.now()
+) {
+  liff.logout();
+
+  liff.login({
+    redirectUri: window.location.href
+  });
+
+  return;
+}
 
       status.textContent =
         "会員情報取得中...";
