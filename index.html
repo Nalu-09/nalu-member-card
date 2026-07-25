@@ -93,135 +93,358 @@
     <div id="status" class="status"></div>
   </div>
 
-  <script>
-    const LIFF_ID = "2007730715-HKGPvwvU";
-    const API_URL = "https://script.google.com/macros/s/AKfycbxOIqa-TOGIogMYIro9Qu0nG85vZ7ObLFT_YWLW3Q9XHbUmfbXVr9Oxk3zuUZxbtmXe/exec";
+<script>
+  const LIFF_ID =
+    "2007730715-HKGPvwvU";
 
-    const CARD_IMAGES = {
-      WAVE:  "https://nalu-09.github.io/nalu-member-card/wave.png?v=2",
-      EVEIL: "https://nalu-09.github.io/nalu-member-card/eveil.png",
-      ECLAT: "https://nalu-09.github.io/nalu-member-card/eclat.png",
-      NALU:  "https://nalu-09.github.io/nalu-member-card/nalu.png"
-    };
+  /*
+   * GASを新しくデプロイした後、
+   * 新しいWebアプリURLへ差し替える。
+   */
+  const API_URL =
+    "ここに新しいGAS WebアプリURL";
 
-    function setCard(rank, memberNo, name) {
-      const normalizedRank = String(rank || "WAVE").toUpperCase();
-      document.getElementById("cardImage").src = CARD_IMAGES[normalizedRank] || CARD_IMAGES.WAVE;
-      document.getElementById("memberNo").textContent = "No." + String(memberNo || "------");
-      document.getElementById("name").textContent = name || "";
+  const CARD_IMAGES = {
+    WAVE:
+      "https://nalu-09.github.io/nalu-member-card/wave.png?v=2",
+
+    EVEIL:
+      "https://nalu-09.github.io/nalu-member-card/eveil.png",
+
+    ECLAT:
+      "https://nalu-09.github.io/nalu-member-card/eclat.png",
+
+    NALU:
+      "https://nalu-09.github.io/nalu-member-card/nalu.png"
+  };
+
+
+  /**
+   * 会員証を画面へ反映する。
+   *
+   * @param {string} rank
+   * @param {string} memberNo
+   * @param {string} name
+   */
+  function setCard(
+    rank,
+    memberNo,
+    name
+  ) {
+    const normalizedRank =
+      String(rank || "WAVE")
+        .trim()
+        .toUpperCase();
+
+    document
+      .getElementById("cardImage")
+      .src =
+        CARD_IMAGES[normalizedRank] ||
+        CARD_IMAGES.WAVE;
+
+    document
+      .getElementById("memberNo")
+      .textContent =
+        "No." +
+        formatMemberNo(memberNo);
+
+    document
+      .getElementById("name")
+      .textContent =
+        name || "";
+  }
+
+
+  /**
+   * 会員番号を6桁表示に整える。
+   *
+   * @param {string|number} value
+   * @return {string}
+   */
+  function formatMemberNo(value) {
+    if (
+      value === null ||
+      value === undefined ||
+      value === ""
+    ) {
+      return "------";
     }
 
-    function showNotMember() {
-      setCard("WAVE", "------", "未登録");
-      document.getElementById("status").textContent =
-        "会員情報がありません\n現在このLINEアカウントは会員登録されていません。\nご不明点は運営へご確認ください。";
+    const text =
+      String(value).trim();
+
+    if (!/^\d+$/.test(text)) {
+      return text;
     }
 
-    function showGenericError() {
-      setCard("WAVE", "------", "エラー");
-      document.getElementById("status").textContent =
-        "会員情報を取得できませんでした。\n時間をおいて再度お試しください。";
+    return text.padStart(6, "0");
+  }
+
+
+  /**
+   * 未登録の場合の表示。
+   */
+  function showNotMember() {
+    setCard(
+      "WAVE",
+      "------",
+      "未登録"
+    );
+
+    document
+      .getElementById("status")
+      .textContent =
+        "会員情報がありません\n" +
+        "現在このLINEアカウントは会員登録されていません。\n" +
+        "ご不明点は運営へご確認ください。";
+  }
+
+
+  /**
+   * 会員証が無効な場合の表示。
+   *
+   * @param {string} message
+   */
+  function showInactiveCard(message) {
+    setCard(
+      "WAVE",
+      "------",
+      "利用停止中"
+    );
+
+    document
+      .getElementById("status")
+      .textContent =
+        message ||
+        "現在この会員証はご利用いただけません。";
+  }
+
+
+  /**
+   * 通信・システムエラー表示。
+   *
+   * @param {string} message
+   */
+  function showGenericError(message) {
+    setCard(
+      "WAVE",
+      "------",
+      "エラー"
+    );
+
+    document
+      .getElementById("status")
+      .textContent =
+        message ||
+        "会員情報を取得できませんでした。\n" +
+        "時間をおいて再度お試しください。";
+  }
+
+
+  /**
+   * GASから会員証データを取得する。
+   *
+   * @param {string} idToken
+   * @return {Promise<Object>}
+   */
+  async function fetchMemberCardData(
+    idToken
+  ) {
+    const response =
+      await fetch(
+        API_URL,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/x-www-form-urlencoded;charset=UTF-8"
+          },
+
+          body:
+            new URLSearchParams({
+              action:
+                "getMemberCard",
+
+              idToken:
+                idToken
+            })
+        }
+      );
+
+    if (!response.ok) {
+      throw new Error(
+        "通信エラーが発生しました。"
+      );
     }
 
-    async function fetchMemberData(profile) {
-      const callbackName = "jsonpCallback_" + Date.now() + "_" + Math.floor(Math.random() * 10000);
+    return await response.json();
+  }
 
-      return await new Promise((resolve, reject) => {
-        const script = document.createElement("script");
 
-        window[callbackName] = function(response) {
-          resolve(response);
-          try { delete window[callbackName]; } catch (_) {}
-          script.remove();
-        };
+  /**
+   * LIFF初期化と会員証表示。
+   */
+  async function main() {
+    const status =
+      document.getElementById(
+        "status"
+      );
 
-        script.src =
-          API_URL +
-          "?callback=" + callbackName +
-          "&lineUserId=" + encodeURIComponent(profile.userId) +
-          "&name=" + encodeURIComponent(profile.displayName);
+    try {
+      setCard(
+        "WAVE",
+        "------",
+        "読み込み中..."
+      );
 
-        script.onerror = function() {
-          reject(new Error("会員情報の取得に失敗しました"));
-          try { delete window[callbackName]; } catch (_) {}
-          script.remove();
-        };
+      status.textContent =
+        "LIFF初期化中...";
 
-        document.body.appendChild(script);
+      await liff.init({
+        liffId: LIFF_ID
       });
-    }
 
-    async function main() {
-      const status = document.getElementById("status");
+      if (!liff.isLoggedIn()) {
+        status.textContent =
+          "LINEログイン中...";
 
-      try {
-        setCard("WAVE", "------", "読み込み中...");
-        status.textContent = "LIFF初期化中...";
-        await liff.init({ liffId: LIFF_ID });
+        liff.login();
+        return;
+      }
 
-        if (!liff.isLoggedIn()) {
-          status.textContent = "LINEログイン中...";
-          liff.login();
+      status.textContent =
+        "LINE認証情報を確認中...";
+
+      const idToken =
+        liff.getIDToken();
+
+      if (!idToken) {
+        throw new Error(
+          "LINE認証情報を取得できませんでした。"
+        );
+      }
+
+      status.textContent =
+        "会員情報取得中...";
+
+      const data =
+        await fetchMemberCardData(
+          idToken
+        );
+
+      if (
+        !data ||
+        !data.success
+      ) {
+        const code =
+          String(
+            data && data.code
+              ? data.code
+              : ""
+          );
+
+        if (
+          code ===
+          "MEMBER_NOT_FOUND"
+        ) {
+          showNotMember();
           return;
         }
 
-        status.textContent = "プロフィール取得中...";
-        const profile = await liff.getProfile();
+        if (
+          code ===
+          "CARD_INACTIVE"
+        ) {
+          showInactiveCard(
+            data.message
+          );
+          return;
+        }
 
-        status.textContent = "会員情報取得中...";
-        const data = await fetchMemberData(profile);
-
-     if (!data.ok) {
-
-  if (data.message === "system_stopped") {
-    document.getElementById("name").textContent = "利用停止中";
-    status.textContent = "現在この会員システムはご利用いただけません。";
-    return;
-  }
-
-  if (data.message === "member_not_found") {
-    showNoMember();
-    return;
-  }
-
-  showGenericError();
-  return;
-}
-
-        const rank = String(data.rank || "WAVE").toUpperCase();
-        setCard(
-          rank,
-          String(data.memberNo || "------"),
-          data.name || profile.displayName || ""
+        showGenericError(
+          data && data.message
+            ? data.message
+            : ""
         );
 
-        status.textContent = "";
-      } catch (e) {
-        showGenericError();
+        return;
       }
+
+      const member =
+        data.member || {};
+
+      setCard(
+        member.rankId,
+        member.memberId,
+        member.cardName
+      );
+
+      status.textContent = "";
+
+    } catch (error) {
+      console.error(error);
+
+      showGenericError(
+        error &&
+        error.message
+          ? error.message
+          : ""
+      );
     }
+  }
 
-    main();
-    
-    function updateTime() {
-  const now = new Date();
 
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
+  /**
+   * 会員証上の現在日時を更新する。
+   */
+  function updateTime() {
+    const now =
+      new Date();
 
-  const hours = String(now.getHours()).padStart(2, "0");
-  const minutes = String(now.getMinutes()).padStart(2, "0");
-  const seconds = String(now.getSeconds()).padStart(2, "0");
+    const year =
+      now.getFullYear();
 
-  const text = `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
+    const month =
+      String(
+        now.getMonth() + 1
+      ).padStart(2, "0");
 
-  document.getElementById("time").textContent = text;
-}
+    const day =
+      String(
+        now.getDate()
+      ).padStart(2, "0");
 
-setInterval(updateTime, 1000);
-updateTime();
-    
-  </script>
+    const hours =
+      String(
+        now.getHours()
+      ).padStart(2, "0");
+
+    const minutes =
+      String(
+        now.getMinutes()
+      ).padStart(2, "0");
+
+    const seconds =
+      String(
+        now.getSeconds()
+      ).padStart(2, "0");
+
+    document
+      .getElementById("time")
+      .textContent =
+        `${year}/${month}/${day} ` +
+        `${hours}:${minutes}:${seconds}`;
+  }
+
+
+  setInterval(
+    updateTime,
+    1000
+  );
+
+  updateTime();
+  main();
+</script>
 </body>
 </html>
