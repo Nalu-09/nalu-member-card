@@ -297,13 +297,14 @@ Lumière Nalu ご予約申込ページです。
         </div>
 
         <div id="eventDateField" class="field">
-          <label for="eventDate">参加日</label>
+  <label for="eventDate">参加日</label>
 
-          <input
-            type="date"
-            id="eventDate"
-          >
-        </div>
+  <select id="eventDate" disabled>
+    <option value="">
+      先にイベント名を選択してください
+    </option>
+  </select>
+</div>
 
         <div
           id="fixedSchedule"
@@ -504,266 +505,478 @@ Lumière Nalu ご予約申込ページです。
         !consent.checked;
     }
 
-    function updateServiceDetail() {
-      const serviceSelect =
-        document.getElementById(
-          "serviceId"
+function updateServiceDetail() {
+  const serviceSelect =
+    document.getElementById(
+      "serviceId"
+    );
+
+  const detail =
+    document.getElementById(
+      "serviceDetail"
+    );
+
+  if (
+    !serviceSelect ||
+    !detail
+  ) {
+    return;
+  }
+
+  const serviceId =
+    serviceSelect.value;
+
+  if (!serviceId) {
+    detail.style.display =
+      "none";
+
+    detail.textContent = "";
+    return;
+  }
+
+  const service =
+    currentServices.find(
+      function(item) {
+        return (
+          String(item.serviceId) ===
+          String(serviceId)
         );
+      }
+    );
 
-      const detail =
-        document.getElementById(
-          "serviceDetail"
+  if (!service) {
+    detail.style.display =
+      "none";
+
+    detail.textContent = "";
+    return;
+  }
+
+  let statusText =
+    "受付中";
+
+  if (
+    service.status === "closed"
+  ) {
+    statusText =
+      "現在受付可能な日程はありません";
+
+  } else if (
+    service.status === "full"
+  ) {
+    statusText =
+      "現在満席です";
+
+  } else if (
+    service.status ===
+      "cycle_blocked"
+  ) {
+    statusText =
+      "次回申込対象外";
+  }
+
+  let text =
+    service.serviceName +
+    "\n\n" +
+    "受付状況：" +
+    statusText;
+
+  if (
+    service.participationCycleType ===
+      "SKIP_EVENTS" &&
+    Number(
+      service.participationCycleValue
+    ) > 0
+  ) {
+    text +=
+      "\n参加周期：参加後、次の開催を" +
+      service.participationCycleValue +
+      "回休止";
+
+  } else if (
+    service.participationCycleType ===
+      "MONTHS" &&
+    Number(
+      service.participationCycleValue
+    ) > 0
+  ) {
+    text +=
+      "\n参加周期：前回参加日から" +
+      service.participationCycleValue +
+      "か月後";
+
+    if (
+      service.nextAvailableDate
+    ) {
+      text +=
+        "\n次回申込可能日：" +
+        formatScheduleDate(
+          service.nextAvailableDate
         );
-
-      if (!serviceSelect || !detail) {
-        return;
-      }
-
-      const serviceId =
-        serviceSelect.value;
-
-      if (!serviceId) {
-        detail.style.display =
-          "none";
-
-        detail.textContent = "";
-        return;
-      }
-
-      const service =
-        currentServices.find(
-          function(item) {
-            return (
-              String(item.serviceId) ===
-              String(serviceId)
-            );
-          }
-        );
-
-      if (!service) {
-        detail.style.display =
-          "none";
-
-        detail.textContent = "";
-        return;
-      }
-
-      let statusText =
-        "受付中";
-
-      if (
-        service.status === "closed"
-      ) {
-        statusText =
-          "受付終了";
-
-      } else if (
-        service.status === "full"
-      ) {
-        statusText =
-          "現在満席です";
-      }
-
-      let text =
-        service.serviceName +
-        "\n\n" +
-        "受付状況：" +
-        statusText;
-
-      if (service.eventDate) {
-        text +=
-          "\n開催日：" +
-          formatScheduleDate(
-            service.eventDate
-          );
-
-        if (
-          service.startTime &&
-          service.endTime
-        ) {
-          text +=
-            "\n開催時間：" +
-            service.startTime +
-            "〜" +
-            service.endTime;
-
-        } else if (
-          service.startTime
-        ) {
-          text +=
-            "\n開始時間：" +
-            service.startTime;
-        }
-      }
-
-      if (service.deadlineText) {
-        text +=
-          "\n申込締切：" +
-          service.deadlineText;
-      }
-
-      detail.textContent = text;
-      detail.style.display =
-        "block";
     }
-        function applyServiceSchedule() {
-      const serviceSelect =
-        document.getElementById(
-          "serviceId"
-        );
+  }
 
-      const eventDateField =
-        document.getElementById(
-          "eventDateField"
-        );
+  detail.textContent = text;
 
-      const eventDateInput =
-        document.getElementById(
-          "eventDate"
-        );
+  detail.style.display =
+    "block";
+}
+function applyServiceSchedule() {
+  const serviceSelect =
+    document.getElementById(
+      "serviceId"
+    );
 
-      const fixedSchedule =
-        document.getElementById(
-          "fixedSchedule"
-        );
+  const eventDateField =
+    document.getElementById(
+      "eventDateField"
+    );
 
-      const peopleSelect =
-        document.getElementById(
-          "people"
-        );
+  const eventDateSelect =
+    document.getElementById(
+      "eventDate"
+    );
 
-      const capacityStatus =
-        document.getElementById(
-          "dateCapacityStatus"
-        );
+  const fixedSchedule =
+    document.getElementById(
+      "fixedSchedule"
+    );
 
-      if (
-        !serviceSelect ||
-        !eventDateField ||
-        !eventDateInput ||
-        !fixedSchedule
-      ) {
-        return;
+  const peopleSelect =
+    document.getElementById(
+      "people"
+    );
+
+  const capacityStatus =
+    document.getElementById(
+      "dateCapacityStatus"
+    );
+
+  if (
+    !serviceSelect ||
+    !eventDateField ||
+    !eventDateSelect ||
+    !fixedSchedule ||
+    !peopleSelect ||
+    !capacityStatus
+  ) {
+    return;
+  }
+
+  const serviceId =
+    serviceSelect.value;
+
+  const service =
+    currentServices.find(
+      function(item) {
+        return (
+          String(item.serviceId) ===
+          String(serviceId)
+        );
       }
+    );
 
-      const serviceId =
-        serviceSelect.value;
+  /*
+   * 表示を初期化
+   */
+  eventDateSelect.innerHTML = "";
 
-      const service =
-        currentServices.find(
-          function(item) {
-            return (
-              String(item.serviceId) ===
-              String(serviceId)
-            );
-          }
+  eventDateSelect.disabled = true;
+
+  fixedSchedule.style.display =
+    "none";
+
+  fixedSchedule.textContent = "";
+
+  capacityStatus.style.display =
+    "none";
+
+  capacityStatus.textContent = "";
+
+  peopleSelect.innerHTML = "";
+
+  const peopleOption =
+    document.createElement(
+      "option"
+    );
+
+  peopleOption.value = "";
+
+  peopleOption.textContent =
+    serviceId
+      ? "先に日程を選択してください"
+      : "先にイベント名を選択してください";
+
+  peopleSelect.appendChild(
+    peopleOption
+  );
+
+  peopleSelect.disabled = true;
+
+  /*
+   * サービス未選択
+   */
+  if (!service) {
+    eventDateField.style.display =
+      "block";
+
+    const defaultOption =
+      document.createElement(
+        "option"
+      );
+
+    defaultOption.value = "";
+
+    defaultOption.textContent =
+      "先にイベント名を選択してください";
+
+    eventDateSelect.appendChild(
+      defaultOption
+    );
+
+    return;
+  }
+
+  const events =
+    Array.isArray(service.events)
+      ? service.events
+      : [];
+
+  /*
+   * 開催日未登録
+   */
+  if (events.length === 0) {
+    eventDateField.style.display =
+      "block";
+
+    const noEventOption =
+      document.createElement(
+        "option"
+      );
+
+    noEventOption.value = "";
+
+    noEventOption.textContent =
+      "現在受付可能な日程はありません";
+
+    eventDateSelect.appendChild(
+      noEventOption
+    );
+
+    capacityStatus.textContent =
+      "現在、開催日が登録されていません。";
+
+    capacityStatus.style.display =
+      "block";
+
+    return;
+  }
+
+  /*
+   * 開催日が1件だけの場合
+   */
+  if (events.length === 1) {
+    const event =
+      events[0];
+
+    eventDateField.style.display =
+      "none";
+
+    const option =
+      document.createElement(
+        "option"
+      );
+
+    option.value =
+      event.selectable
+        ? event.eventDate
+        : "";
+
+    option.textContent =
+      formatEventOptionText(
+        event
+      );
+
+    eventDateSelect.appendChild(
+      option
+    );
+
+    let scheduleText =
+      "開催日：" +
+      formatScheduleDate(
+        event.eventDate
+      );
+
+    if (
+      event.startTime &&
+      event.endTime
+    ) {
+      scheduleText +=
+        "\n開催時間：" +
+        event.startTime +
+        "〜" +
+        event.endTime;
+
+    } else if (
+      event.startTime
+    ) {
+      scheduleText +=
+        "\n開始時間：" +
+        event.startTime;
+    }
+
+    scheduleText +=
+      "\n受付状況：" +
+      event.remainingText;
+
+    fixedSchedule.textContent =
+      scheduleText;
+
+    fixedSchedule.style.display =
+      "block";
+
+    if (!event.selectable) {
+      capacityStatus.textContent =
+        getEventBlockedMessage(
+          event
         );
 
       capacityStatus.style.display =
-        "none";
+        "block";
 
-      capacityStatus.textContent = "";
+      return;
+    }
 
-      peopleSelect.innerHTML = "";
+    eventDateSelect.value =
+      event.eventDate;
 
-      const initialPeopleOption =
+    checkDateCapacity();
+    return;
+  }
+
+  /*
+   * 開催日が複数ある場合
+   */
+  eventDateField.style.display =
+    "block";
+
+  const defaultOption =
+    document.createElement(
+      "option"
+    );
+
+  defaultOption.value = "";
+
+  defaultOption.textContent =
+    "参加日を選択してください";
+
+  eventDateSelect.appendChild(
+    defaultOption
+  );
+
+  events.forEach(
+    function(event) {
+      const option =
         document.createElement(
           "option"
         );
 
-      initialPeopleOption.value = "";
+      option.value =
+        event.eventDate;
 
-      initialPeopleOption.textContent =
-        serviceId
-          ? "先に日程を選択してください"
-          : "先にイベント名を選択してください";
+      option.textContent =
+        formatEventOptionText(
+          event
+        );
 
-      peopleSelect.appendChild(
-        initialPeopleOption
-      );
-
-      peopleSelect.disabled = true;
-
-      if (!service) {
-        eventDateField.style.display =
-          "block";
-
-        eventDateInput.value = "";
-
-        fixedSchedule.style.display =
-          "none";
-
-        fixedSchedule.textContent = "";
-
-        return;
+      if (!event.selectable) {
+        option.disabled = true;
       }
 
-      const fixedEventDate =
-        String(
-          service.eventDate || ""
-        ).trim();
+      eventDateSelect.appendChild(
+        option
+      );
+    }
+  );
 
-      const startTime =
-        String(
-          service.startTime || ""
-        ).trim();
-
-      const endTime =
-        String(
-          service.endTime || ""
-        ).trim();
-
-      if (fixedEventDate) {
-        eventDateInput.value =
-          fixedEventDate.replaceAll(
-            "/",
-            "-"
-          );
-
-        eventDateField.style.display =
-          "none";
-
-        let scheduleText =
-          "開催日：" +
-          formatScheduleDate(
-            fixedEventDate
-          );
-
-        if (
-          startTime &&
-          endTime
-        ) {
-          scheduleText +=
-            "\n開催時間：" +
-            startTime +
-            "〜" +
-            endTime;
-
-        } else if (
-          startTime
-        ) {
-          scheduleText +=
-            "\n開始時間：" +
-            startTime;
-        }
-
-        fixedSchedule.textContent = scheduleText;
-fixedSchedule.style.display = "block";
-
-checkDateCapacity();
-return;
+  eventDateSelect.disabled =
+    false;
 }
 
-eventDateInput.value = "";
+    function formatEventOptionText(
+  event
+) {
+  let text =
+    formatScheduleDate(
+      event.eventDate
+    );
 
-      eventDateField.style.display =
-        "block";
+  if (
+    event.startTime &&
+    event.endTime
+  ) {
+    text +=
+      "｜" +
+      event.startTime +
+      "〜" +
+      event.endTime;
 
-      fixedSchedule.style.display =
-        "none";
+  } else if (
+    event.startTime
+  ) {
+    text +=
+      "｜" +
+      event.startTime +
+      "〜";
+  }
 
-      fixedSchedule.textContent = "";
-    }
+  if (event.remainingText) {
+    text +=
+      "｜" +
+      event.remainingText;
+  }
+
+  return text;
+}
+
+
+function getEventBlockedMessage(
+  event
+) {
+  if (!event) {
+    return "";
+  }
+
+  if (
+    event.status === "full"
+  ) {
+    return (
+      "この日程は現在満席です。"
+    );
+  }
+
+  if (
+    event.status === "closed"
+  ) {
+    return (
+      "この日程は受付を終了しています。"
+    );
+  }
+
+  if (
+    event.status ===
+      "cycle_blocked"
+  ) {
+    return (
+      "参加周期のため、この日程にはお申し込みいただけません。"
+    );
+  }
+
+  return (
+    event.statusText ||
+    "この日程は選択できません。"
+  );
+}
 
     function formatScheduleDate(value) {
       const text =
@@ -1095,6 +1308,16 @@ eventDateInput.value = "";
                 option.disabled =
                   true;
 
+                } else if (
+  service.status ===
+    "cycle_blocked"
+) {
+  option.textContent =
+    service.serviceName +
+    "｜" +
+    minPeopleText +
+    "｜次回申込対象外";
+                
               } else {
                 option.textContent =
                   service.serviceName +
