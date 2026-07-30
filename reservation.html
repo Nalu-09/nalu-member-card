@@ -242,46 +242,15 @@
       <h1 class="title">Reservation</h1>
 
       <p class="text">
-Lumière Nalu ご予約申込ページです。
+Lumière Dining ご予約申込ページです。
 
-会員番号とお名前を確認のうえ
+会員情報を確認のうえ
 お申し込みを受け付けます。
       </p>
 
       <div id="memberInfo" class="memberInfo"></div>
 
       <div id="formArea" class="hidden">
-
-        <div class="field">
-          <label for="memberNo">会員番号</label>
-
-          <input
-            type="text"
-            id="memberNo"
-            placeholder="例：000001"
-            inputmode="numeric"
-          >
-        </div>
-
-        <div class="field">
-          <label for="inputName">お名前</label>
-
-          <input
-            type="text"
-            id="inputName"
-            placeholder="お名前"
-          >
-        </div>
-
-        <div class="field">
-          <label for="inputKana">お名前（カナ）</label>
-
-          <input
-            type="text"
-            id="inputKana"
-            placeholder="例：オナマエ"
-          >
-        </div>
 
         <div class="field">
           <label for="serviceId">イベント / 店舗名</label>
@@ -1396,30 +1365,6 @@ function getEventBlockedMessage(
           "reservationConsent"
         );
 
-      const memberNo =
-        document
-          .getElementById(
-            "memberNo"
-          )
-          .value
-          .trim();
-
-      const inputName =
-        document
-          .getElementById(
-            "inputName"
-          )
-          .value
-          .trim();
-
-      const inputKana =
-        document
-          .getElementById(
-            "inputKana"
-          )
-          .value
-          .trim();
-
       const serviceId =
         document
           .getElementById(
@@ -1476,27 +1421,6 @@ function getEventBlockedMessage(
       if (!currentProfile) {
         status.textContent =
           "LINEプロフィールを取得できていません。";
-
-        return;
-      }
-
-      if (!memberNo) {
-        status.textContent =
-          "会員番号をご入力ください。";
-
-        return;
-      }
-
-      if (!inputName) {
-        status.textContent =
-          "お名前をご入力ください。";
-
-        return;
-      }
-
-      if (!inputKana) {
-        status.textContent =
-          "お名前（カナ）をご入力ください。";
 
         return;
       }
@@ -1569,15 +1493,6 @@ function getEventBlockedMessage(
                   source:
                     SOURCE,
 
-                  memberNo:
-                    memberNo,
-
-                  inputName:
-                    inputName,
-
-                  inputKana:
-                    inputKana,
-
                   serviceId:
                     serviceId,
 
@@ -1620,31 +1535,10 @@ function getEventBlockedMessage(
 
           } else if (
             data.message ===
-            "member_no_mismatch"
-          ) {
-            status.textContent =
-              "会員番号が一致しません。\n会員証をご確認のうえ、再度お試しください。";
-
-          } else if (
-            data.message ===
-            "name_mismatch"
-          ) {
-            status.textContent =
-              "お名前が会員情報と一致しません。\n会員証の表記をご確認ください。";
-
-          } else if (
-            data.message ===
             "service_not_allowed"
           ) {
             status.textContent =
               "現在のランクでは、選択された内容にお申し込みいただけません。";
-
-          } else if (
-            data.message ===
-            "kana_required"
-          ) {
-            status.textContent =
-              "お名前（カナ）をご入力ください。";
 
           } else if (
             data.message ===
