@@ -84,20 +84,8 @@
           <textarea id="additionalDislikedFoods" placeholder="会員登録後に追加となった内容のみご入力ください"></textarea>
         </div>
 
-        <div id="participantsSection" class="hidden">
-          <h2 class="section-title">Participants</h2>
-          <div id="participants"></div>
-        </div>
-
-        <h2 class="section-title">Payment</h2>
+        <h2 class="section-title">Representative</h2>
         <div class="field">
-          <span class="group-label">支払い単位</span>
-          <div class="radio-group">
-            <label class="radio-card"><input type="radio" name="paymentMode" value="REPRESENTATIVE"><span>代表者がまとめて支払う<br><span class="notice">代表者のみが人数 × 単価を支払います</span></span></label>
-            <label class="radio-card"><input type="radio" name="paymentMode" value="INDIVIDUAL"><span>個別に支払う<br><span class="notice">代表者・同行者がそれぞれ単価分を支払います</span></span></label>
-          </div>
-        </div>
-        <div id="representativePaymentField" class="field hidden">
           <label for="representativePaymentMethod">代表者の支払い方法</label>
           <select id="representativePaymentMethod">
             <option value="">選択してください</option>
@@ -105,6 +93,11 @@
             <option value="BANK_TRANSFER">銀行振込</option>
             <option value="PAYPAY">PayPay</option>
           </select>
+        </div>
+
+        <div id="participantsSection" class="hidden">
+          <h2 class="section-title">Participants</h2>
+          <div id="participants"></div>
         </div>
 
         <div class="terms-box">
@@ -274,7 +267,9 @@
 
       const select = $('guestCount');
       select.innerHTML = '<option value="">選択してください</option>';
-      const max = data.remaining === null ? Math.max(data.minPeople, 10) : data.remaining;
+      const max = data.remaining === null
+        ? 4
+        : Math.min(Number(data.remaining), 4);
       if (!data.available || max < data.minPeople) {
         select.innerHTML = '<option value="">満席です</option>';
         select.disabled = true;
@@ -293,7 +288,6 @@
       const count = Number($('guestCount').value || 0);
       renderParticipants(Math.max(count - 1, 0));
       updatePrice();
-      updateParticipantPaymentVisibility();
     }
 
     function renderParticipants(count) {
@@ -312,26 +306,16 @@
           <div class="field"><label>氏名</label><input class="participant-name" type="text" value="${escapeAttr(previous.name || '')}" placeholder="氏名をご入力ください"></div>
           <div class="field"><label>アレルギー</label><textarea class="participant-allergy" placeholder="ない場合は空欄">${escapeHtml(previous.allergy || '')}</textarea></div>
           <div class="field"><label>苦手食材</label><textarea class="participant-disliked" placeholder="ない場合は空欄">${escapeHtml(previous.dislikedFoods || '')}</textarea></div>
-          <div class="field participant-payment-field hidden"><label>支払い方法</label>
+          <div class="field participant-payment-field"><label>支払い方法</label>
             <select class="participant-payment">
               <option value="">選択してください</option>
-              <option value="CARD" ${previous.paymentMethod === 'CARD' ? 'selected' : ''}>クレジットカード</option>
+              <option value="REPRESENTATIVE" ${previous.paymentMethod === 'REPRESENTATIVE' ? 'selected' : ''}>代表者がまとめて支払う</option>
               <option value="BANK_TRANSFER" ${previous.paymentMethod === 'BANK_TRANSFER' ? 'selected' : ''}>銀行振込</option>
               <option value="PAYPAY" ${previous.paymentMethod === 'PAYPAY' ? 'selected' : ''}>PayPay</option>
             </select>
           </div>`;
         container.appendChild(card);
       }
-    }
-
-    function onPaymentModeChange() {
-      $('representativePaymentField').classList.remove('hidden');
-      updateParticipantPaymentVisibility();
-    }
-
-    function updateParticipantPaymentVisibility() {
-      const individual = selectedPaymentMode() === 'INDIVIDUAL';
-      document.querySelectorAll('.participant-payment-field').forEach(element => element.classList.toggle('hidden', !individual));
     }
 
     function updatePrice() {
@@ -347,8 +331,7 @@
       if (!state.selectedEvent) throw new Error('開催日を選択してください。');
       const guestCount = Number($('guestCount').value || 0);
       if (!guestCount) throw new Error('人数を選択してください。');
-      const paymentMode = selectedPaymentMode();
-      if (!paymentMode) throw new Error('支払い単位を選択してください。');
+      if (guestCount > 4) throw new Error('予約人数は最大4名までです。');
       const representativePaymentMethod = $('representativePaymentMethod').value;
       if (!representativePaymentMethod) throw new Error('代表者の支払い方法を選択してください。');
       if (!$('reservationConsent').checked) throw new Error('規約・料金・キャンセル条件への同意が必要です。');
@@ -357,7 +340,9 @@
       if (companions.length !== guestCount - 1) throw new Error('同行者情報を確認してください。');
       companions.forEach((person, index) => {
         if (!person.name) throw new Error(`同行者${index + 1}の氏名を入力してください。`);
-        if (paymentMode === 'INDIVIDUAL' && !person.paymentMethod) throw new Error(`同行者${index + 1}の支払い方法を選択してください。`);
+        if (!['REPRESENTATIVE', 'BANK_TRANSFER', 'PAYPAY'].includes(person.paymentMethod)) {
+          throw new Error(`同行者${index + 1}の支払い方法を選択してください。`);
+        }
       });
 
       return {
@@ -372,7 +357,6 @@
         additionalDislikedFoods: $('additionalDislikedFoods').value.trim(),
         combinedAllergy: combineFood(state.member.allergy, $('additionalAllergy').value),
         combinedDislikedFoods: combineFood(state.member.dislikedFoods, $('additionalDislikedFoods').value),
-        paymentMode,
         representativePaymentMethod,
         companions,
         unitPrice: Number(state.selectedEvent.unitPrice || 0),
@@ -384,7 +368,7 @@
       try {
         state.draft = buildDraft();
         const companionsText = state.draft.companions.length
-          ? state.draft.companions.map((person, index) => `同行者${index + 1}：${person.name}\nアレルギー：${displayNone(person.allergy)}\n苦手食材：${displayNone(person.dislikedFoods)}\n支払い：${paymentLabel(state.draft.paymentMode === 'REPRESENTATIVE' ? 'REPRESENTATIVE' : person.paymentMethod)}`).join('\n\n')
+          ? state.draft.companions.map((person, index) => `同行者${index + 1}：${person.name}\nアレルギー：${displayNone(person.allergy)}\n苦手食材：${displayNone(person.dislikedFoods)}\n支払い：${paymentLabel(person.paymentMethod)}`).join('\n\n')
           : 'なし';
         $('confirmation').innerHTML = `<dl>
           <dt>イベント</dt><dd>${escapeHtml(state.draft.serviceName)}</dd>
@@ -394,7 +378,7 @@
           <dt>同行者</dt><dd>${escapeHtml(companionsText)}</dd>
           <dt>アレルギー</dt><dd>${escapeHtml(displayNone(state.draft.combinedAllergy))}</dd>
           <dt>苦手食材</dt><dd>${escapeHtml(displayNone(state.draft.combinedDislikedFoods))}</dd>
-          <dt>支払い方法</dt><dd>${escapeHtml(paymentSummary(state.draft))}</dd>
+          <dt>代表者支払い</dt><dd>${escapeHtml(paymentLabel(state.draft.representativePaymentMethod))}</dd>
           <dt>合計金額</dt><dd>${formatMoney(state.draft.totalAmount)}</dd>
         </dl>`;
         $('formScreen').classList.add('hidden');
@@ -429,7 +413,6 @@
           guestCount: String(state.draft.guestCount),
           additionalAllergy: state.draft.additionalAllergy,
           additionalDislikedFoods: state.draft.additionalDislikedFoods,
-          paymentMode: state.draft.paymentMode,
           representativePaymentMethod: state.draft.representativePaymentMethod,
           companionsJson: JSON.stringify(state.draft.companions),
           reservationConsent: 'true',
@@ -472,11 +455,6 @@
         dislikedFoods: card.querySelector('.participant-disliked').value.trim(),
         paymentMethod: card.querySelector('.participant-payment').value,
       })).filter(person => strict || person.name || person.allergy || person.dislikedFoods || person.paymentMethod);
-    }
-
-    function selectedPaymentMode() {
-      const checked = document.querySelector('input[name="paymentMode"]:checked');
-      return checked ? checked.value : '';
     }
 
     function resetAfterService() {
@@ -535,7 +513,6 @@
     function formatMoney(value) { return new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY', maximumFractionDigits: 0 }).format(Number(value || 0)); }
     function serviceStatusLabel(status) { return ({ open:'受付中', full:'満席', closed:'受付終了', cycle_blocked:'次回申込対象外' })[status] || status; }
     function paymentLabel(method) { return ({ CARD:'クレジットカード', PAYPAY:'PayPay', BANK_TRANSFER:'銀行振込', REPRESENTATIVE:'代表者がまとめて支払う' })[method] || method; }
-    function paymentSummary(draft) { return draft.paymentMode === 'REPRESENTATIVE' ? `代表者がまとめて支払う（${paymentLabel(draft.representativePaymentMethod)}）` : `個別支払い／代表者：${paymentLabel(draft.representativePaymentMethod)}`; }
     function setStatus(message) { $('status').textContent = message || ''; }
 
     function showApiError(data, target) {
@@ -576,7 +553,6 @@
     $('serviceId').addEventListener('change', onServiceChange);
     $('eventDate').addEventListener('change', onEventChange);
     $('guestCount').addEventListener('change', onGuestCountChange);
-    document.querySelectorAll('input[name="paymentMode"]').forEach(input => input.addEventListener('change', onPaymentModeChange));
     $('confirmBtn').addEventListener('click', showConfirmation);
     $('backBtn').addEventListener('click', backToForm);
     $('submitBtn').addEventListener('click', submitReservation);
