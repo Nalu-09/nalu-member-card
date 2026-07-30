@@ -13,7 +13,37 @@
     .box{background:#0f0f0f;border:1px solid rgba(255,255,255,.08);border-radius:22px;padding:28px 22px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
     .title{font-size:28px;margin:0 0 18px;letter-spacing:.08em}
     .text{font-size:14px;line-height:1.9;opacity:.95;white-space:pre-wrap;margin:0 0 22px}
-    .member-card,.detail,.capacity,.participant,.confirmation,.food-card{margin:0 0 20px;padding:16px 18px;border:1px solid rgba(255,255,255,.14);border-radius:16px;background:rgba(255,255,255,.035);text-align:left;font-size:13px;line-height:1.85;white-space:pre-wrap}
+.member-card,
+.detail,
+.capacity,
+.participant,
+.confirmation,
+.food-card{
+  margin:0 0 20px;
+  padding:16px 18px;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:16px;
+  background:rgba(255,255,255,.035);
+  text-align:left;
+  font-size:13px;
+  line-height:1.85;
+}
+
+.member-card{
+  padding:18px 20px;
+  white-space:normal;
+}
+
+.detail,
+.capacity,
+.confirmation,
+.food-card{
+  white-space:pre-wrap;
+}
+
+.member-card .member-grid{
+  margin:0;
+}
     .member-grid{display:grid;grid-template-columns:110px 1fr;gap:7px 12px}
     .member-grid dt{opacity:.58}.member-grid dd{margin:0;word-break:break-word}
     .section-title{font-size:17px;letter-spacing:.04em;margin:28px 0 16px;text-align:left}
@@ -345,23 +375,93 @@
         }
       });
 
+      const representativeCompanionCount =
+  companions.filter(
+    person =>
+      person.paymentMethod ===
+      'REPRESENTATIVE'
+  ).length;
+
+const representativePaymentCount =
+  1 +
+  representativeCompanionCount;
+
+const representativePaymentAmount =
+  Number(
+    state.selectedEvent.unitPrice ||
+    0
+  ) *
+  representativePaymentCount;
+
       return {
-        serviceId: state.selectedService.serviceId,
-        serviceName: state.selectedService.serviceName,
-        eventId: state.selectedEvent.eventId,
-        eventDate: state.selectedEvent.eventDate,
-        startTime: state.selectedEvent.startTime,
-        endTime: state.selectedEvent.endTime,
-        guestCount,
-        additionalAllergy: $('additionalAllergy').value.trim(),
-        additionalDislikedFoods: $('additionalDislikedFoods').value.trim(),
-        combinedAllergy: combineFood(state.member.allergy, $('additionalAllergy').value),
-        combinedDislikedFoods: combineFood(state.member.dislikedFoods, $('additionalDislikedFoods').value),
-        representativePaymentMethod,
-        companions,
-        unitPrice: Number(state.selectedEvent.unitPrice || 0),
-        totalAmount: Number(state.selectedEvent.unitPrice || 0) * guestCount,
-      };
+  serviceId:
+    state.selectedService.serviceId,
+
+  serviceName:
+    state.selectedService.serviceName,
+
+  eventId:
+    state.selectedEvent.eventId,
+
+  eventDate:
+    state.selectedEvent.eventDate,
+
+  startTime:
+    state.selectedEvent.startTime,
+
+  endTime:
+    state.selectedEvent.endTime,
+
+  guestCount:
+    guestCount,
+
+  additionalAllergy:
+    $('additionalAllergy')
+      .value
+      .trim(),
+
+  additionalDislikedFoods:
+    $('additionalDislikedFoods')
+      .value
+      .trim(),
+
+  combinedAllergy:
+    combineFood(
+      state.member.allergy,
+      $('additionalAllergy').value
+    ),
+
+  combinedDislikedFoods:
+    combineFood(
+      state.member.dislikedFoods,
+      $('additionalDislikedFoods').value
+    ),
+
+  representativePaymentMethod:
+    representativePaymentMethod,
+
+  companions:
+    companions,
+
+  unitPrice:
+    Number(
+      state.selectedEvent.unitPrice ||
+      0
+    ),
+
+  totalAmount:
+    Number(
+      state.selectedEvent.unitPrice ||
+      0
+    ) *
+    guestCount,
+
+  representativePaymentCount:
+    representativePaymentCount,
+
+  representativePaymentAmount:
+    representativePaymentAmount,
+};
     }
 
     function showConfirmation() {
@@ -378,7 +478,33 @@
           <dt>同行者</dt><dd>${escapeHtml(companionsText)}</dd>
           <dt>アレルギー</dt><dd>${escapeHtml(displayNone(state.draft.combinedAllergy))}</dd>
           <dt>苦手食材</dt><dd>${escapeHtml(displayNone(state.draft.combinedDislikedFoods))}</dd>
-          <dt>代表者支払い</dt><dd>${escapeHtml(paymentLabel(state.draft.representativePaymentMethod))}</dd>
+          <dt>代表者支払い</dt>
+<dd>
+  ${escapeHtml(
+    paymentLabel(
+      state.draft
+        .representativePaymentMethod
+    )
+  )}
+</dd>
+
+<dt>予約総額</dt>
+<dd>
+  ${formatMoney(
+    state.draft.totalAmount
+  )}
+</dd>
+
+<dt>代表者決済額</dt>
+<dd>
+  ${state.draft
+    .representativePaymentCount}名分
+  ／
+  ${formatMoney(
+    state.draft
+      .representativePaymentAmount
+  )}
+</dd>
           <dt>合計金額</dt><dd>${formatMoney(state.draft.totalAmount)}</dd>
         </dl>`;
         $('formScreen').classList.add('hidden');
