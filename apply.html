@@ -530,10 +530,13 @@ if (!emailPattern.test(email)) {
           }
 
           status.textContent =
-            "申請を受け付けできませんでした。\n時間をおいて再度お試しください。";
-          btn.disabled = false;
-          btn.textContent = "会員申請を送信する";
-          return;
+  "申請を受け付けできませんでした。\n" +
+  "エラー：" +
+  (data.message || "unknown_error");
+
+btn.disabled = false;
+btn.textContent = "会員申請を送信する";
+return;
         }
 
         status.textContent =
@@ -553,12 +556,15 @@ if (!emailPattern.test(email)) {
         document.getElementById("termsConsent").disabled = true;
         passwordInput.disabled = true;
 
-      } catch (e) {
-        status.textContent =
-          "申請を受け付けできませんでした。\n時間をおいて再度お試しください。";
-        btn.disabled = false;
-        btn.textContent = "会員申請を送信する";
-      }
+     } catch (e) {
+  status.textContent =
+    "申請を受け付けできませんでした。\n" +
+    "通信エラー：" +
+    (e && e.message ? e.message : String(e));
+
+  btn.disabled = false;
+  btn.textContent = "会員申請を送信する";
+}
     }
 
     document.getElementById("applyBtn").addEventListener("click", submitApplication);
