@@ -277,11 +277,51 @@
       $('capacityStatus').textContent = '残席を確認中...';
       $('capacityStatus').classList.remove('hidden');
       try {
-        const data = await api('checkDateCapacity', {
-          serviceId: state.selectedService.serviceId,
-          eventId: state.selectedEvent.eventId,
-          eventDate: state.selectedEvent.eventDate,
-        });
+      function onEventChange() {
+  const eventId =
+    $('eventId').value;
+
+  const service =
+    state.selectedService;
+
+  if (!service || !eventId) {
+    state.selectedEvent = null;
+
+    $('capacityStatus')
+      .classList
+      .add('hidden');
+
+    updatePrice();
+    return;
+  }
+
+  const event =
+    service.events.find(
+      function(item) {
+        return (
+          String(item.eventId) ===
+          String(eventId)
+        );
+      }
+    );
+
+  if (!event) {
+    state.selectedEvent = null;
+
+    $('capacityStatus')
+      .classList
+      .add('hidden');
+
+    return;
+  }
+
+  state.selectedEvent = event;
+
+  renderCapacityFromEvent_(event);
+
+  updatePrice();
+}
+        
         if (!data.ok) return showApiError(data, $('capacityStatus'));
         state.capacity = data;
         renderCapacity(data);
@@ -683,6 +723,81 @@ const representativePaymentAmount =
     $('backBtn').addEventListener('click', backToForm);
     $('submitBtn').addEventListener('click', submitReservation);
     init();
+
+    function renderCapacityFromEvent_(event) {
+  const status =
+    $('capacityStatus');
+
+  if (!event) {
+    status.classList.add('hidden');
+    return;
+  }
+
+  let message = '';
+
+  if (event.remaining === null) {
+    message =
+      '予約受付中';
+
+  } else if (
+    Number(event.remaining) <= 0
+  ) {
+    message =
+      '満席';
+
+  } else {
+    message =
+      '残席 ' +
+      Number(event.remaining) +
+      '席';
+  }
+
+  status.textContent = message;
+  status.classList.remove('hidden');
+
+  const guestCount =
+    $('guestCount');
+
+  if (
+    event.remaining !== null &&
+    Number(event.remaining) > 0
+  ) {
+    const max =
+      Math.min(
+        Number(event.remaining),
+        4
+      );
+
+    Array.from(
+      guestCount.options
+    ).forEach(
+      function(option) {
+        if (!option.value) {
+          option.disabled = false;
+          return;
+        }
+
+        option.disabled =
+          Number(option.value) >
+          max;
+      }
+    );
+
+  } else if (
+    Number(event.remaining) <= 0
+  ) {
+    Array.from(
+      guestCount.options
+    ).forEach(
+      function(option) {
+        if (option.value) {
+          option.disabled = true;
+        }
+      }
+    );
+  }
+}
+    
   </script>
 </body>
 </html>
