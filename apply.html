@@ -470,80 +470,87 @@ if (!emailPattern.test(email)) {
           termsConsent: document.getElementById("termsConsent").checked
         });
 
-       await fetch(API_URL, {
+       const res = await fetch(API_URL, {
   method: "POST",
-  mode: "no-cors",
   body: body
 });
 
-const data = {
-  ok: true
-};
+const data = await res.json();
 
-        if (!data.ok) {
-          if (data.message === "terms_consent_required") {
-            status.textContent =
-              "会員利用規約およびプライバシーポリシーをご確認のうえ、同意欄にチェックを入れてください。";
-            btn.disabled = false;
-            btn.textContent = "会員申請を送信する";
-            return;
-          }
+if (!data.ok) {
+  if (data.message === "already_applied") {
+    status.textContent =
+      "このLINEアカウントは\n" +
+      "すでに申請済みまたは承認済みです。\n" +
+      "ご案内をお待ちください。";
 
-          if (data.message === "invalid_password") {
-            status.textContent =
-              "申請パスワードが正しくありません。\nご確認のうえ、再度お試しください。";
-            btn.disabled = false;
-            btn.textContent = "会員申請を送信する";
-            return;
-          }
+    btn.style.display = "none";
+    passwordInput.disabled = true;
+    return;
+  }
 
-          if (data.message === "already_applied") {
-            status.textContent =
-              "このLINEアカウントは\nすでに申請済みまたは承認済みです。\nご案内をお待ちください。";
-            btn.style.display = "none";
-            passwordInput.disabled = true;
-            return;
-          }
+  if (data.message === "invalid_password") {
+    status.textContent =
+      "申請パスワードが正しくありません。\n" +
+      "ご確認のうえ、再度お試しください。";
 
-          if (data.message === "invalid_card_name") {
-            status.textContent =
-              "カード表記名は12文字以内でご入力ください。";
-            btn.disabled = false;
-            btn.textContent = "会員申請を送信する";
-            return;
-          }
+    btn.disabled = false;
+    btn.textContent = "会員申請を送信する";
+    return;
+  }
 
-          if (data.message === "invalid_email") {
+  if (data.message === "missing_required_fields") {
+    status.textContent =
+      "未入力の必須項目があります。\n" +
+      "内容をご確認ください。";
+
+    btn.disabled = false;
+    btn.textContent = "会員申請を送信する";
+    return;
+  }
+
+  if (data.message === "invalid_email") {
+    status.textContent =
+      "メールアドレスの形式をご確認ください。";
+
+    btn.disabled = false;
+    btn.textContent = "会員申請を送信する";
+    return;
+  }
+
+  if (data.message === "invalid_birthday") {
+    status.textContent =
+      "誕生日の入力内容をご確認ください。";
+
+    btn.disabled = false;
+    btn.textContent = "会員申請を送信する";
+    return;
+  }
+
+  if (data.message === "terms_consent_required") {
+    status.textContent =
+      "会員利用規約およびプライバシーポリシーをご確認のうえ、" +
+      "同意欄にチェックを入れてください。";
+
+    btn.disabled = false;
+    btn.textContent = "会員申請を送信する";
+    return;
+  }
+
   status.textContent =
-    "メールアドレスの形式をご確認ください。";
+    "申請を受け付けできませんでした。\n" +
+    "エラー：" +
+    (data.message || "unknown_error");
 
   btn.disabled = false;
-  btn.textContent =
-    "会員申請を送信する";
-
+  btn.textContent = "会員申請を送信する";
   return;
 }
 
-          if (data.message === "missing_required_fields") {
-            status.textContent =
-              "未入力の必須項目があります。\n内容をご確認ください。";
-            btn.disabled = false;
-            btn.textContent = "会員申請を送信する";
-            return;
-          }
-
-          status.textContent =
-  "申請を受け付けできませんでした。\n" +
-  "エラー：" +
-  (data.message || "unknown_error");
-
-btn.disabled = false;
-btn.textContent = "会員申請を送信する";
-return;
-        }
-
-        status.textContent =
-          "会員申請を受け付けました。\n内容を確認のうえ、承認後にご利用いただけます。\nしばらくお待ちください。";
+status.textContent =
+  "会員申請を受け付けました。\n" +
+  "内容を確認のうえ、承認後にご利用いただけます。\n" +
+  "しばらくお待ちください。";
 
         btn.style.display = "none";
 
