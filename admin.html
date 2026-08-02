@@ -576,21 +576,34 @@ function renderReservationDetail(index) {
   }
 
   html += ""
-    + "<button"
-    + " class='status-button status-cancelled'"
-    + " onclick='updateReservationStatus("
-    + index + ","
-    + reservationIndex + ","
-    + "\"cancelled\""
-    + ")'>"
-    + "キャンセルにする"
-    + "</button>"
-    + "</div>"
+  + "<button"
+  + " class='status-button status-cancelled'"
+  + " onclick='updateReservationStatus("
+  + index + ","
+  + reservationIndex + ","
+  + "\"cancelled\""
+  + ")'>"
+  + "キャンセルにする"
+  + "</button>"
+  + "</div>";
 
-    + "<div"
-    + " id='status-result-" + index + "-" + reservationIndex + "'"
-    + " class='status-result'>"
-    + "</div>";
+if (attendanceStatus === "ATTENDED") {
+  html += ""
+    + "<button"
+    + " class='save-button'"
+    + " onclick='openReceiptForm("
+    + index + ","
+    + reservationIndex
+    + ")'>"
+    + "領収書を発行する"
+    + "</button>";
+}
+
+html += ""
+  + "<div"
+  + " id='status-result-" + index + "-" + reservationIndex + "'"
+  + " class='status-result'>"
+  + "</div>";
 }
 
     html += "</div>";
