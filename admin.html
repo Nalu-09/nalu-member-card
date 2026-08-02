@@ -339,11 +339,11 @@
 
       try {
         const res = await fetch(API_URL, {
-          method: "POST",
-          body: new URLSearchParams({
-            action: "getReservations"
-          })
-        });
+  method: "POST",
+  body: new URLSearchParams({
+    action: "getAdminServices"
+  })
+});
 
         const data = await res.json();
 
@@ -863,8 +863,24 @@ async function updateReservationStatus(
         const res = await fetch(API_URL, {
           method: "POST",
           body: new URLSearchParams({
-            action: "getAdminServices"
-          })
+  action:
+    nextStatus === "attended"
+      ? "updateReservationAttendance"
+      : "updateReservationStatus",
+
+  reservationId:
+    reservation.reservationId || "",
+
+  attendanceStatus:
+    nextStatus === "attended"
+      ? "ATTENDED"
+      : "",
+
+  status:
+    nextStatus === "cancelled"
+      ? "cancelled"
+      : ""
+})
         });
 
         const data = await res.json();
