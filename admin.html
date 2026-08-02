@@ -311,7 +311,8 @@
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbxOIqa-TOGIogMYIro9Qu0nG85vZ7ObLFT_YWLW3Q9XHbUmfbXVr9Oxk3zuUZxbtmXe/exec";
+    const API_URL =
+  "https://script.google.com/macros/s/AKfycbzuXAKRg9B5AuPOi2ppj9VuaN8qM01vzLlLnIBFjWiNnjKh7rxzmB_BEG2-U0qAMmM8/exec";
 
     let allReservations = [];
     window.reservationGroups = [];
@@ -467,6 +468,23 @@ function renderReservationDetail(index) {
       + "<div>会員番号：" + escapeHtml(formatMemberNo(r.memberNo)) + "</div>"
       + "<div>ランク：" + escapeHtml(r.rank || "") + "</div>"
       + "<div>カナ：" + escapeHtml(r.kana || "") + "</div>"
+      + "<div>予約番号：" + escapeHtml(r.reservationId || "") + "</div>"
++ "<div>時間：" + escapeHtml(
+    r.startTime && r.endTime
+      ? r.startTime + "〜" + r.endTime
+      : r.startTime || ""
+  ) + "</div>"
++ "<div>メール：" + escapeHtml(r.email || "") + "</div>"
++ "<div>カード表記名：" + escapeHtml(r.cardName || "") + "</div>"
++ "<div>予約総額：" + escapeHtml(
+    Number(r.totalAmount || 0).toLocaleString("ja-JP")
+  ) + "円</div>"
++ "<div>支払い方法：" + escapeHtml(
+    getPaymentMethodLabel(r.paymentMethod)
+  ) + "</div>"
++ "<div>支払い状況：" + escapeHtml(
+    getPaymentStatusLabel(r.paymentStatus)
+  ) + "</div>"
       + "<div>同行者：" + escapeHtml(r.companionName || "なし") + "</div>"
       + "<div>苦手食材：" + escapeHtml(r.dislike || "なし") + "</div>"
       + "<div>アレルギー：" + escapeHtml(r.allergy || "なし") + "</div>"
@@ -474,6 +492,28 @@ function renderReservationDetail(index) {
       + "<div>ステータス：" + escapeHtml(statusLabel) + "</div>"
       + "<div class='small'>申込日時：" + escapeHtml(r.createdAt || "") + "</div>";
 
+    if (
+  Array.isArray(r.participants) &&
+  r.participants.length > 0
+) {
+  html += "<div style='margin-top:14px;'>";
+
+  r.participants.forEach(
+    function(person, personIndex) {
+      html += ""
+        + "<div style='margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.12);'>"
+        + "<div>同行者" + (personIndex + 1) + "：" + escapeHtml(person.name || "") + "</div>"
+        + "<div>アレルギー：" + escapeHtml(person.allergy || "なし") + "</div>"
+        + "<div>苦手食材：" + escapeHtml(person.dislike || "なし") + "</div>"
+        + "<div>支払い方法：" + escapeHtml(getPaymentMethodLabel(person.paymentMethod)) + "</div>"
+        + "<div>支払い状況：" + escapeHtml(getPaymentStatusLabel(person.paymentStatus)) + "</div>"
+        + "</div>";
+    }
+  );
+
+  html += "</div>";
+}
+    
     if (status === "confirmed") {
       html += ""
         + "<div class='status-actions'>"
@@ -599,19 +639,16 @@ async function updateReservationStatus(
   try {
     const res = await fetch(API_URL, {
       method: "POST",
-      body: new URLSearchParams({
-        action: "updateReservationStatus",
-        createdAtKey:
-          reservation.createdAtKey || "",
-        memberNo:
-          reservation.memberNo || "",
-        serviceId:
-          reservation.serviceId || "",
-        eventDate:
-          reservation.eventDate || "",
-        status:
-          nextStatus
-      })
+body: new URLSearchParams({
+  action:
+    "updateReservationStatus",
+
+  reservationId:
+    reservation.reservationId || "",
+
+  status:
+    nextStatus
+})
     });
 
     const data = await res.json();
@@ -1061,6 +1098,39 @@ renderReservationDetail(groupIndex);
 
   return 99;
 }
+
+    function getPaymentMethodLabel(method) {
+  const labels = {
+    CARD: "クレジットカード",
+    PAYPAY: "PayPay",
+    BANK_TRANSFER: "銀行振込",
+    REPRESENTATIVE: "代表者支払い"
+  };
+
+  const normalized =
+    String(method || "")
+      .trim()
+      .toUpperCase();
+
+  return labels[normalized] || normalized;
+}
+
+
+function getPaymentStatusLabel(status) {
+  const labels = {
+    UNPAID: "未払い",
+    PAID: "支払い済み",
+    REFUNDED: "返金済み"
+  };
+
+  const normalized =
+    String(status || "")
+      .trim()
+      .toUpperCase();
+
+  return labels[normalized] || normalized;
+}
+    
   </script>
 </body>
 </html>
