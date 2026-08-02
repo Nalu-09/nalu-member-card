@@ -268,35 +268,28 @@
       eventSelect.disabled = false;
     }
 
-    async function onEventChange() {
-      const eventId = $('eventDate').value;
-      state.selectedEvent = state.selectedService && (state.selectedService.events || []).find(item => item.eventId === eventId) || null;
-      resetAfterEvent();
-      if (!state.selectedEvent) return;
-
-      $('capacityStatus').textContent = '残席を確認中...';
-      $('capacityStatus').classList.remove('hidden');
-      try {
-      function onEventChange() {
+   function onEventChange() {
   const eventId =
     $('eventId').value;
 
   const service =
     state.selectedService;
 
-  if (!service || !eventId) {
-    state.selectedEvent = null;
+  state.selectedEvent = null;
 
-    $('capacityStatus')
-      .classList
-      .add('hidden');
+  resetAfterEvent();
 
+  if (
+    !service ||
+    !eventId
+  ) {
+    hideCapacityStatus_();
     updatePrice();
     return;
   }
 
   const event =
-    service.events.find(
+    (service.events || []).find(
       function(item) {
         return (
           String(item.eventId) ===
@@ -306,29 +299,17 @@
     );
 
   if (!event) {
-    state.selectedEvent = null;
-
-    $('capacityStatus')
-      .classList
-      .add('hidden');
-
+    hideCapacityStatus_();
+    updatePrice();
     return;
   }
 
   state.selectedEvent = event;
 
   renderCapacityFromEvent_(event);
-
+  updateGuestCountOptions_(event);
   updatePrice();
 }
-        
-        if (!data.ok) return showApiError(data, $('capacityStatus'));
-        state.capacity = data;
-        renderCapacity(data);
-      } catch (error) {
-        $('capacityStatus').textContent = '残席確認中にエラーが発生しました。\n' + error.message;
-      }
-    }
 
     function renderCapacity(data) {
       const capacityText = data.capacity === null ? '設定なし' : data.capacity + '名';
