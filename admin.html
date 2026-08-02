@@ -420,6 +420,112 @@
     </div>
   </div>
 
+<div id="receiptModal" class="receipt-modal">
+  <div class="receipt-modal-box">
+    <h2 class="receipt-modal-title">
+      Receipt
+    </h2>
+
+    <input
+      id="receiptReservationId"
+      type="hidden"
+    >
+
+    <div class="receipt-field">
+      <label for="receiptRecipientName">
+        宛名
+      </label>
+
+      <input
+        id="receiptRecipientName"
+        class="admin-input"
+        type="text"
+        placeholder="個人名・会社名など"
+      >
+    </div>
+
+    <div class="receipt-field">
+      <label for="receiptPeople">
+        領収書に含める人数
+      </label>
+
+      <select
+        id="receiptPeople"
+        class="admin-input"
+        onchange="updateReceiptAmount()"
+      ></select>
+    </div>
+
+    <div class="receipt-field">
+      <label>1名分の金額</label>
+
+      <div
+        id="receiptUnitPrice"
+        class="receipt-value"
+      >
+        0円
+      </div>
+    </div>
+
+    <div class="receipt-field">
+      <label>合計金額</label>
+
+      <div
+        id="receiptTotalAmount"
+        class="receipt-value receipt-amount"
+      >
+        0円
+      </div>
+    </div>
+
+    <div class="receipt-field">
+      <label>支払い方法</label>
+
+      <div
+        id="receiptPaymentMethod"
+        class="receipt-value"
+      ></div>
+    </div>
+
+    <div class="receipt-field">
+      <label for="receiptDescription">
+        但し書き
+      </label>
+
+      <input
+        id="receiptDescription"
+        class="admin-input"
+        type="text"
+        placeholder="例：お食事代として"
+      >
+    </div>
+
+    <div class="receipt-actions">
+      <button
+        type="button"
+        class="receipt-cancel-button"
+        onclick="closeReceiptForm()"
+      >
+        閉じる
+      </button>
+
+      <button
+        id="receiptIssueButton"
+        type="button"
+        class="receipt-issue-button"
+        onclick="issueReceiptFromAdmin()"
+      >
+        PDFを発行する
+      </button>
+    </div>
+
+    <div
+      id="receiptStatus"
+      class="receipt-status"
+    ></div>
+  </div>
+</div>
+
   <script>
     const API_URL =
   "https://script.google.com/macros/s/AKfycbzuXAKRg9B5AuPOi2ppj9VuaN8qM01vzLlLnIBFjWiNnjKh7rxzmB_BEG2-U0qAMmM8/exec";
@@ -1531,7 +1637,7 @@ async function updateReservationStatus(
        const res = await fetch(API_URL, {
   method: "POST",
   body: new URLSearchParams({
-    action: "getReservations"
+    action: "getAdminServices"
   })
 });
 
@@ -1961,111 +2067,7 @@ function getPaymentStatusLabel(status) {
   return labels[normalized] || normalized;
 }
 
-    <div id="receiptModal" class="receipt-modal">
-  <div class="receipt-modal-box">
-    <h2 class="receipt-modal-title">
-      Receipt
-    </h2>
-
-    <input
-      id="receiptReservationId"
-      type="hidden"
-    >
-
-    <div class="receipt-field">
-      <label for="receiptRecipientName">
-        宛名
-      </label>
-
-      <input
-        id="receiptRecipientName"
-        class="admin-input"
-        type="text"
-        placeholder="個人名・会社名など"
-      >
-    </div>
-
-    <div class="receipt-field">
-      <label for="receiptPeople">
-        領収書に含める人数
-      </label>
-
-      <select
-        id="receiptPeople"
-        class="admin-input"
-        onchange="updateReceiptAmount()"
-      ></select>
-    </div>
-
-    <div class="receipt-field">
-      <label>1名分の金額</label>
-
-      <div
-        id="receiptUnitPrice"
-        class="receipt-value"
-      >
-        0円
-      </div>
-    </div>
-
-    <div class="receipt-field">
-      <label>合計金額</label>
-
-      <div
-        id="receiptTotalAmount"
-        class="receipt-value receipt-amount"
-      >
-        0円
-      </div>
-    </div>
-
-    <div class="receipt-field">
-      <label>支払い方法</label>
-
-      <div
-        id="receiptPaymentMethod"
-        class="receipt-value"
-      ></div>
-    </div>
-
-    <div class="receipt-field">
-      <label for="receiptDescription">
-        但し書き
-      </label>
-
-      <input
-        id="receiptDescription"
-        class="admin-input"
-        type="text"
-        placeholder="例：お食事代として"
-      >
-    </div>
-
-    <div class="receipt-actions">
-      <button
-        type="button"
-        class="receipt-cancel-button"
-        onclick="closeReceiptForm()"
-      >
-        閉じる
-      </button>
-
-      <button
-        id="receiptIssueButton"
-        type="button"
-        class="receipt-issue-button"
-        onclick="issueReceiptFromAdmin()"
-      >
-        PDFを発行する
-      </button>
-    </div>
-
-    <div
-      id="receiptStatus"
-      class="receipt-status"
-    ></div>
-  </div>
-</div>
+    
     
   </script>
 </body>
