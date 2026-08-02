@@ -106,35 +106,52 @@
     let currentMember = null;
 
     async function initLiff() {
-      const liffStatus = document.getElementById("liffStatus");
-      const plusBtn = document.getElementById("plusBtn");
+  const liffStatus =
+    document.getElementById("liffStatus");
 
-      try {
-        liffStatus.textContent = "LIFF初期化中...";
+  const plusBtn =
+    document.getElementById("plusBtn");
 
-        await liff.init({
-          liffId: LIFF_ID
-        });
+  try {
+    liffStatus.textContent =
+      "LIFF初期化中...";
 
-        if (!liff.isLoggedIn()) {
-          liffStatus.textContent = "LINEログインへ移動します...";
-          liff.login();
-          return;
-        }
+    await liff.init({
+      liffId: LIFF_ID
+    });
 
-        currentProfile = await liff.getProfile();
+    console.log({
+      isInClient: liff.isInClient(),
+      isLoggedIn: liff.isLoggedIn()
+    });
 
-        liffStatus.textContent = "";
-        plusBtn.disabled = false;
+    if (!liff.isLoggedIn()) {
+      liffStatus.textContent =
+        "LINEログインへ移動します...";
 
-      } catch (err) {
-        liffStatus.textContent =
-          "LIFFの初期化に失敗しました。\n" +
-          err.message;
+      liff.login({
+        redirectUri:
+          "https://liff.line.me/" +
+          LIFF_ID
+      });
 
-        plusBtn.disabled = true;
-      }
+      return;
     }
+
+    currentProfile =
+      await liff.getProfile();
+
+    liffStatus.textContent = "";
+    plusBtn.disabled = false;
+
+  } catch (err) {
+    liffStatus.textContent =
+      "LIFFの初期化に失敗しました。\n" +
+      err.message;
+
+    plusBtn.disabled = true;
+  }
+}
 
     document.getElementById("plusBtn").addEventListener("click", async function() {
       const memberNo = document.getElementById("memberNo").value.trim();
