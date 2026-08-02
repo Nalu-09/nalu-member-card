@@ -517,8 +517,13 @@ function renderReservationDetail(index) {
       + "<div>苦手食材：" + escapeHtml(r.dislike || "なし") + "</div>"
       + "<div>アレルギー：" + escapeHtml(r.allergy || "なし") + "</div>"
       + "<div>連絡事項：" + escapeHtml(r.message || "なし") + "</div>"
-      + "<div>ステータス：" + escapeHtml(statusLabel) + "</div>"
-      + "<div class='small'>申込日時：" + escapeHtml(r.createdAt || "") + "</div>";
+   + "<div>予約ステータス：" + escapeHtml(statusLabel) + "</div>"
++ "<div>参加確認：" + escapeHtml(
+    String(r.attendanceStatus || "").toUpperCase() === "ATTENDED"
+      ? "確認済み"
+      : "未確認"
+  ) + "</div>"
++ "<div class='small'>申込日時：" + escapeHtml(r.createdAt || "") + "</div>";
 
     if (
   Array.isArray(r.participants) &&
@@ -543,34 +548,50 @@ function renderReservationDetail(index) {
 }
     
     if (status === "confirmed") {
-      html += ""
-        + "<div class='status-actions'>"
-        + "<button"
-        + " class='status-button status-attended'"
-        + " onclick='updateReservationStatus("
-        + index + ","
-        + reservationIndex + ","
-        + "\"attended\""
-        + ")'>"
-        + escapeHtml(getStatusButtonLabel("attended"))
-        + "</button>"
+  const attendanceStatus =
+    String(r.attendanceStatus || "")
+      .trim()
+      .toUpperCase();
 
-        + "<button"
-        + " class='status-button status-cancelled'"
-        + " onclick='updateReservationStatus("
-        + index + ","
-        + reservationIndex + ","
-        + "\"cancelled\""
-        + ")'>"
-        + escapeHtml(getStatusButtonLabel("cancelled"))
-        + "</button>"
-        + "</div>"
+  html += ""
+    + "<div class='status-actions'>";
 
-        + "<div"
-        + " id='status-result-" + index + "-" + reservationIndex + "'"
-        + " class='status-result'>"
-        + "</div>";
-    }
+  if (attendanceStatus !== "ATTENDED") {
+    html += ""
+      + "<button"
+      + " class='status-button status-attended'"
+      + " onclick='updateReservationAttendance("
+      + index + ","
+      + reservationIndex
+      + ")'>"
+      + "参加確認済みにする"
+      + "</button>";
+  } else {
+    html += ""
+      + "<button"
+      + " class='status-button status-attended'"
+      + " disabled>"
+      + "参加確認済み"
+      + "</button>";
+  }
+
+  html += ""
+    + "<button"
+    + " class='status-button status-cancelled'"
+    + " onclick='updateReservationStatus("
+    + index + ","
+    + reservationIndex + ","
+    + "\"cancelled\""
+    + ")'>"
+    + "キャンセルにする"
+    + "</button>"
+    + "</div>"
+
+    + "<div"
+    + " id='status-result-" + index + "-" + reservationIndex + "'"
+    + " class='status-result'>"
+    + "</div>";
+}
 
     html += "</div>";
   });
@@ -604,7 +625,7 @@ function getReservationStatusLabel(status) {
 function getStatusButtonLabel(nextStatus) {
   if (isMobileAdminView()) {
     return nextStatus === "attended"
-      ? "来店済みにする"
+      ? "参加確認済みにする"
       : "キャンセルにする";
   }
 
@@ -613,12 +634,12 @@ function getStatusButtonLabel(nextStatus) {
     : "Cancel reservation";
 }
 
-async function updateReservationStatus(
+    async function updateReservationAttendance(
   groupIndex,
-  reservationIndex,
-  nextStatus
+  reservationIndex
 ) {
-  const group = window.reservationGroups[groupIndex];
+  const group =
+    window.reservationGroups[groupIndex];
 
   if (!group) {
     alert("予約情報を取得できませんでした。");
@@ -633,80 +654,81 @@ async function updateReservationStatus(
     return;
   }
 
-  const currentStatus = String(
-    reservation.status || ""
-  )
-    .trim()
-    .toLowerCase();
-
-  if (currentStatus !== "confirmed") {
-    alert("予約確定の予約のみ変更できます。");
+  if (
+    !window.confirm(
+      "この方を参加確認済みにしますか？"
+    )
+  ) {
     return;
   }
 
-  const confirmMessage =
-    nextStatus === "attended"
-      ? "この予約を来店済みに変更しますか？"
-      : "この予約をキャンセルに変更しますか？";
-
-  if (!window.confirm(confirmMessage)) {
-    return;
-  }
-
-  const resultArea = document.getElementById(
-    "status-result-" +
-    groupIndex +
-    "-" +
-    reservationIndex
-  );
+  const resultArea =
+    document.getElementById(
+      "status-result-" +
+      groupIndex +
+      "-" +
+      reservationIndex
+    );
 
   if (resultArea) {
     resultArea.textContent = "更新中...";
   }
 
   try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-body: new URLSearchParams({
-  action:
-    "updateReservationStatus",
+    const response =
+      await fetch(
+        API_URL,
+        {
+          method: "POST",
 
-  reservationId:
-    reservation.reservationId || "",
+          body:
+            new URLSearchParams({
+              action:
+                "updateReservationAttendance",
 
-  status:
-    nextStatus
-})
-    });
+              reservationId:
+                reservation.reservationId || "",
 
-    const data = await res.json();
+              attendanceStatus:
+                "ATTENDED"
+            })
+        }
+      );
+
+    const data =
+      await response.json();
 
     if (!data.ok) {
+      const message =
+        data.message ||
+        "参加状況を更新できませんでした。";
+
       if (resultArea) {
         resultArea.textContent =
           "更新できませんでした：" +
-          (data.message || "");
+          message;
       }
 
       alert(
         "更新できませんでした：" +
-        (data.message || "")
+        message
       );
 
       return;
     }
 
-    reservation.status = nextStatus;
+    reservation.attendanceStatus =
+      "ATTENDED";
 
-alert(
-  nextStatus === "attended"
-    ? "来店済みに変更しました。"
-    : "キャンセルに変更しました。"
-);
+    alert(
+      "参加確認済みに変更しました。"
+    );
 
-renderReservationDetail(groupIndex);
+    renderReservationDetail(
+      groupIndex
+    );
 
-  } catch (err) {
+  } catch (error) {
     if (resultArea) {
       resultArea.textContent =
         "更新中にエラーが発生しました。";
@@ -714,11 +736,123 @@ renderReservationDetail(groupIndex);
 
     alert(
       "更新中にエラーが発生しました：" +
-      err.message
+      error.message
     );
   }
 }
+    
+async function updateReservationStatus(
+  groupIndex,
+  reservationIndex,
+  nextStatus
+) {
+  const group =
+    window.reservationGroups[groupIndex];
 
+  if (!group) {
+    alert("予約情報を取得できませんでした。");
+    return;
+  }
+
+  const reservation =
+    group.reservations[reservationIndex];
+
+  if (!reservation) {
+    alert("予約情報を取得できませんでした。");
+    return;
+  }
+
+  if (nextStatus !== "cancelled") {
+    alert("未対応の変更です。");
+    return;
+  }
+
+  if (
+    !window.confirm(
+      "この予約をキャンセルに変更しますか？"
+    )
+  ) {
+    return;
+  }
+
+  const resultArea =
+    document.getElementById(
+      "status-result-" +
+      groupIndex +
+      "-" +
+      reservationIndex
+    );
+
+  if (resultArea) {
+    resultArea.textContent = "更新中...";
+  }
+
+  try {
+    const response =
+      await fetch(
+        API_URL,
+        {
+          method: "POST",
+
+          body:
+            new URLSearchParams({
+              action:
+                "updateReservationStatus",
+
+              reservationId:
+                reservation.reservationId || "",
+
+              status:
+                "cancelled"
+            })
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if (!data.ok) {
+      const message =
+        data.message ||
+        "予約を更新できませんでした。";
+
+      if (resultArea) {
+        resultArea.textContent =
+          "更新できませんでした：" +
+          message;
+      }
+
+      alert(
+        "更新できませんでした：" +
+        message
+      );
+
+      return;
+    }
+
+    reservation.status =
+      "cancelled";
+
+    alert(
+      "キャンセルに変更しました。"
+    );
+
+    renderReservationDetail(
+      groupIndex
+    );
+
+  } catch (error) {
+    if (resultArea) {
+      resultArea.textContent =
+        "更新中にエラーが発生しました。";
+    }
+
+    alert(
+      "更新中にエラーが発生しました：" +
+      error.message
+    );
+  }
+}
     async function loadServiceSettings() {
       showPanel("service");
 
