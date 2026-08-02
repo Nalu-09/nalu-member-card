@@ -432,15 +432,22 @@
     >
 
     <div class="receipt-field">
-      <label for="receiptRecipientName">
+      <label for="receiptRecipientSelect">
         宛名
       </label>
+
+      <select
+        id="receiptRecipientSelect"
+        class="admin-input"
+        onchange="handleReceiptRecipientChange()"
+      ></select>
 
       <input
         id="receiptRecipientName"
         class="admin-input"
         type="text"
-        placeholder="個人名・会社名など"
+        placeholder="会社名・団体名などを入力"
+        style="display:none;"
       >
     </div>
 
@@ -967,6 +974,11 @@ async function openReceiptForm(
     currentReceiptData =
       data.receipt;
 
+    currentReceiptData.recipientOptions =
+      buildReceiptRecipientOptions(
+        reservation
+      );
+
     setReceiptFormValues(
       currentReceiptData
     );
@@ -1000,6 +1012,11 @@ function setReceiptFormValues(
       "receiptReservationId"
     );
 
+  const recipientSelect =
+    document.getElementById(
+      "receiptRecipientSelect"
+    );
+
   const recipientNameInput =
     document.getElementById(
       "receiptRecipientName"
@@ -1025,9 +1042,58 @@ function setReceiptFormValues(
       receipt.reservationId || "";
   }
 
+  if (recipientSelect) {
+    recipientSelect.innerHTML = "";
+
+    const recipientOptions =
+      Array.isArray(
+        receipt.recipientOptions
+      ) &&
+      receipt.recipientOptions.length > 0
+        ? receipt.recipientOptions
+        : [receipt.recipientName || ""];
+
+    recipientOptions.forEach(
+      function(name) {
+        if (!name) return;
+
+        const option =
+          document.createElement(
+            "option"
+          );
+
+        option.value = name;
+        option.textContent = name;
+
+        recipientSelect.appendChild(
+          option
+        );
+      }
+    );
+
+    const otherOption =
+      document.createElement(
+        "option"
+      );
+
+    otherOption.value = "__OTHER__";
+    otherOption.textContent =
+      "その他（自由入力）";
+
+    recipientSelect.appendChild(
+      otherOption
+    );
+
+    recipientSelect.value =
+      receipt.recipientName ||
+      recipientOptions[0] ||
+      "__OTHER__";
+  }
+
   if (recipientNameInput) {
-    recipientNameInput.value =
-      receipt.recipientName || "";
+    recipientNameInput.value = "";
+    recipientNameInput.style.display =
+      "none";
   }
 
   if (descriptionInput) {
@@ -1082,6 +1148,108 @@ function setReceiptFormValues(
   }
 
   updateReceiptAmount();
+}
+
+
+/**
+ * 予約者・同行者から宛名候補を作る。
+ */
+function buildReceiptRecipientOptions(
+  reservation
+) {
+  const names = [];
+
+  function addName(value) {
+    const name =
+      String(value || "").trim();
+
+    if (
+      name &&
+      !names.includes(name)
+    ) {
+      names.push(name);
+    }
+  }
+
+  addName(reservation.name);
+
+  if (
+    Array.isArray(
+      reservation.participants
+    )
+  ) {
+    reservation.participants.forEach(
+      function(person) {
+        addName(person && person.name);
+      }
+    );
+  }
+
+  return names;
+}
+
+
+/**
+ * 「その他」選択時だけ自由入力欄を表示する。
+ */
+function handleReceiptRecipientChange() {
+  const recipientSelect =
+    document.getElementById(
+      "receiptRecipientSelect"
+    );
+
+  const recipientNameInput =
+    document.getElementById(
+      "receiptRecipientName"
+    );
+
+  if (
+    !recipientSelect ||
+    !recipientNameInput
+  ) {
+    return;
+  }
+
+  const useOther =
+    recipientSelect.value ===
+    "__OTHER__";
+
+  recipientNameInput.style.display =
+    useOther ? "block" : "none";
+
+  if (useOther) {
+    recipientNameInput.focus();
+  } else {
+    recipientNameInput.value = "";
+  }
+}
+
+
+/**
+ * 現在選択されている宛名を取得する。
+ */
+function getReceiptRecipientName() {
+  const recipientSelect =
+    document.getElementById(
+      "receiptRecipientSelect"
+    );
+
+  const recipientNameInput =
+    document.getElementById(
+      "receiptRecipientName"
+    );
+
+  if (
+    recipientSelect &&
+    recipientSelect.value !==
+      "__OTHER__"
+  ) {
+    return recipientSelect.value.trim();
+  }
+
+  return recipientNameInput
+    ? recipientNameInput.value.trim()
+    : "";
 }
 
 
@@ -1179,6 +1347,11 @@ async function issueReceiptFromAdmin() {
       "receiptReservationId"
     );
 
+  const recipientSelect =
+    document.getElementById(
+      "receiptRecipientSelect"
+    );
+
   const recipientNameInput =
     document.getElementById(
       "receiptRecipientName"
@@ -1210,9 +1383,7 @@ async function issueReceiptFromAdmin() {
       : "";
 
   const recipientName =
-    recipientNameInput
-      ? recipientNameInput.value.trim()
-      : "";
+    getReceiptRecipientName();
 
   const receiptPeople =
     peopleSelect
@@ -1238,8 +1409,15 @@ async function issueReceiptFromAdmin() {
       "宛名を入力してください。"
     );
 
-    if (recipientNameInput) {
+    if (
+      recipientSelect &&
+      recipientSelect.value ===
+        "__OTHER__" &&
+      recipientNameInput
+    ) {
       recipientNameInput.focus();
+    } else if (recipientSelect) {
+      recipientSelect.focus();
     }
 
     return;
