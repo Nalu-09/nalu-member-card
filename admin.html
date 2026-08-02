@@ -347,7 +347,9 @@
       <p class="subtitle">管理者メニュー</p>
 
       <div class="menu">
-        <button onclick="location.href='checkin.html'">チェックイン</button>
+        <button onclick="openCheckinLiff()">
+  チェックイン
+</button>
         <button onclick="loadReservations()">予約管理</button>
         <button onclick="loadServiceSettings()">受付設定</button>
         <button onclick="showServiceManagement()">サービス管理</button>
@@ -2245,7 +2247,10 @@ function getPaymentStatusLabel(status) {
   return labels[normalized] || normalized;
 }
 
-    
+    function openCheckinLiff() {
+  window.location.href =
+    "https://liff.line.me/2007730715-acunFUE6";
+}
     
   </script>
 </body>
