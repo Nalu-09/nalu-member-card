@@ -227,6 +227,116 @@
     grid-template-columns:1fr;
   }
 }
+
+    .receipt-modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:1000;
+  background:rgba(0,0,0,.82);
+  padding:20px;
+  box-sizing:border-box;
+  overflow-y:auto;
+}
+
+.receipt-modal.active{
+  display:block;
+}
+
+.receipt-modal-box{
+  width:min(92vw, 420px);
+  margin:30px auto;
+  padding:24px 20px;
+  box-sizing:border-box;
+  background:#0f0f0f;
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:22px;
+  text-align:left;
+}
+
+.receipt-modal-title{
+  margin:0 0 20px;
+  font-size:20px;
+  font-weight:normal;
+  text-align:center;
+  letter-spacing:.08em;
+}
+
+.receipt-field{
+  margin-top:14px;
+}
+
+.receipt-field label{
+  display:block;
+  margin-bottom:6px;
+  font-size:13px;
+  opacity:.8;
+}
+
+.receipt-value{
+  min-height:22px;
+  padding:11px 12px;
+  box-sizing:border-box;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:12px;
+  background:#050505;
+  font-size:14px;
+}
+
+.receipt-amount{
+  font-size:21px;
+  letter-spacing:.04em;
+}
+
+.receipt-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:24px;
+}
+
+.receipt-cancel-button,
+.receipt-issue-button{
+  width:100%;
+  padding:12px 10px;
+  border-radius:999px;
+  font-family:"Times New Roman", serif;
+  font-size:14px;
+  cursor:pointer;
+}
+
+.receipt-cancel-button{
+  color:#fff;
+  background:transparent;
+  border:1px solid rgba(255,255,255,.25);
+}
+
+.receipt-issue-button{
+  color:#000;
+  background:#fff;
+  border:none;
+}
+
+.receipt-issue-button:disabled{
+  opacity:.45;
+  cursor:default;
+}
+
+.receipt-status{
+  margin-top:14px;
+  font-size:13px;
+  line-height:1.7;
+  text-align:center;
+  white-space:pre-wrap;
+}
+
+.receipt-pdf-link{
+  display:block;
+  margin-top:12px;
+  color:#fff;
+  text-align:center;
+}
+    
   </style>
 </head>
 
@@ -647,6 +757,551 @@ function getStatusButtonLabel(nextStatus) {
     : "Cancel reservation";
 }
 
+    let currentReceiptData = null;
+
+
+/**
+ * 領収書発行フォームを開く。
+ */
+async function openReceiptForm(
+  groupIndex,
+  reservationIndex
+) {
+  const group =
+    window.reservationGroups[
+      groupIndex
+    ];
+
+  if (!group) {
+    alert(
+      "予約情報を取得できませんでした。"
+    );
+    return;
+  }
+
+  const reservation =
+    group.reservations[
+      reservationIndex
+    ];
+
+  if (!reservation) {
+    alert(
+      "予約情報を取得できませんでした。"
+    );
+    return;
+  }
+
+  const modal =
+    document.getElementById(
+      "receiptModal"
+    );
+
+  const statusArea =
+    document.getElementById(
+      "receiptStatus"
+    );
+
+  const issueButton =
+    document.getElementById(
+      "receiptIssueButton"
+    );
+
+  if (!modal) {
+    alert(
+      "領収書フォームが見つかりません。"
+    );
+    return;
+  }
+
+  modal.classList.add("active");
+
+  currentReceiptData = null;
+
+  if (statusArea) {
+    statusArea.textContent =
+      "領収書情報を読み込み中...";
+  }
+
+  if (issueButton) {
+    issueButton.disabled = true;
+  }
+
+  try {
+    const response =
+      await fetch(
+        API_URL,
+        {
+          method: "POST",
+
+          body:
+            new URLSearchParams({
+              action:
+                "getReceiptFormData",
+
+              reservationId:
+                reservation.reservationId ||
+                ""
+            })
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if (
+      !data.ok ||
+      !data.receipt
+    ) {
+      throw new Error(
+        data.message ||
+        "領収書情報を取得できませんでした。"
+      );
+    }
+
+    currentReceiptData =
+      data.receipt;
+
+    setReceiptFormValues(
+      currentReceiptData
+    );
+
+    if (statusArea) {
+      statusArea.textContent = "";
+    }
+
+    if (issueButton) {
+      issueButton.disabled = false;
+    }
+
+  } catch (error) {
+    if (statusArea) {
+      statusArea.textContent =
+        "取得できませんでした：\n" +
+        error.message;
+    }
+  }
+}
+
+
+/**
+ * 取得したデータをフォームへ設定する。
+ */
+function setReceiptFormValues(
+  receipt
+) {
+  const reservationIdInput =
+    document.getElementById(
+      "receiptReservationId"
+    );
+
+  const recipientNameInput =
+    document.getElementById(
+      "receiptRecipientName"
+    );
+
+  const peopleSelect =
+    document.getElementById(
+      "receiptPeople"
+    );
+
+  const paymentMethodArea =
+    document.getElementById(
+      "receiptPaymentMethod"
+    );
+
+  const descriptionInput =
+    document.getElementById(
+      "receiptDescription"
+    );
+
+  if (reservationIdInput) {
+    reservationIdInput.value =
+      receipt.reservationId || "";
+  }
+
+  if (recipientNameInput) {
+    recipientNameInput.value =
+      receipt.recipientName || "";
+  }
+
+  if (descriptionInput) {
+    descriptionInput.value =
+      receipt.description ||
+      "お食事代として";
+  }
+
+  if (paymentMethodArea) {
+    paymentMethodArea.textContent =
+      receipt.paymentMethodLabel ||
+      receipt.paymentMethod ||
+      "";
+  }
+
+  if (peopleSelect) {
+    peopleSelect.innerHTML = "";
+
+    const maxPeople =
+      Math.max(
+        1,
+        Number(
+          receipt.maxPeople || 1
+        )
+      );
+
+    for (
+      let people = 1;
+      people <= maxPeople;
+      people++
+    ) {
+      const option =
+        document.createElement(
+          "option"
+        );
+
+      option.value =
+        String(people);
+
+      option.textContent =
+        people + "名分";
+
+      peopleSelect.appendChild(
+        option
+      );
+    }
+
+    /*
+     * 原則は申込者本人分のみを初期選択。
+     */
+    peopleSelect.value = "1";
+  }
+
+  updateReceiptAmount();
+}
+
+
+/**
+ * 選択人数に応じて金額を再計算する。
+ */
+function updateReceiptAmount() {
+  if (!currentReceiptData) {
+    return;
+  }
+
+  const peopleSelect =
+    document.getElementById(
+      "receiptPeople"
+    );
+
+  const unitPriceArea =
+    document.getElementById(
+      "receiptUnitPrice"
+    );
+
+  const totalAmountArea =
+    document.getElementById(
+      "receiptTotalAmount"
+    );
+
+  const unitPrice =
+    Number(
+      currentReceiptData.unitPrice ||
+      0
+    );
+
+  const people =
+    peopleSelect
+      ? Number(
+          peopleSelect.value || 1
+        )
+      : 1;
+
+  const totalAmount =
+    unitPrice * people;
+
+  if (unitPriceArea) {
+    unitPriceArea.textContent =
+      unitPrice.toLocaleString(
+        "ja-JP"
+      ) +
+      "円";
+  }
+
+  if (totalAmountArea) {
+    totalAmountArea.textContent =
+      totalAmount.toLocaleString(
+        "ja-JP"
+      ) +
+      "円";
+  }
+}
+
+
+/**
+ * 領収書フォームを閉じる。
+ */
+function closeReceiptForm() {
+  const modal =
+    document.getElementById(
+      "receiptModal"
+    );
+
+  const statusArea =
+    document.getElementById(
+      "receiptStatus"
+    );
+
+  if (modal) {
+    modal.classList.remove(
+      "active"
+    );
+  }
+
+  if (statusArea) {
+    statusArea.textContent = "";
+  }
+
+  currentReceiptData = null;
+}
+
+
+/**
+ * 領収書PDFを発行する。
+ */
+async function issueReceiptFromAdmin() {
+  const reservationIdInput =
+    document.getElementById(
+      "receiptReservationId"
+    );
+
+  const recipientNameInput =
+    document.getElementById(
+      "receiptRecipientName"
+    );
+
+  const peopleSelect =
+    document.getElementById(
+      "receiptPeople"
+    );
+
+  const descriptionInput =
+    document.getElementById(
+      "receiptDescription"
+    );
+
+  const statusArea =
+    document.getElementById(
+      "receiptStatus"
+    );
+
+  const issueButton =
+    document.getElementById(
+      "receiptIssueButton"
+    );
+
+  const reservationId =
+    reservationIdInput
+      ? reservationIdInput.value.trim()
+      : "";
+
+  const recipientName =
+    recipientNameInput
+      ? recipientNameInput.value.trim()
+      : "";
+
+  const receiptPeople =
+    peopleSelect
+      ? Number(
+          peopleSelect.value || 1
+        )
+      : 1;
+
+  const description =
+    descriptionInput
+      ? descriptionInput.value.trim()
+      : "";
+
+  if (!reservationId) {
+    alert(
+      "予約番号を取得できませんでした。"
+    );
+    return;
+  }
+
+  if (!recipientName) {
+    alert(
+      "宛名を入力してください。"
+    );
+
+    if (recipientNameInput) {
+      recipientNameInput.focus();
+    }
+
+    return;
+  }
+
+  if (
+    !Number.isInteger(
+      receiptPeople
+    ) ||
+    receiptPeople < 1
+  ) {
+    alert(
+      "領収書対象人数が不正です。"
+    );
+    return;
+  }
+
+  const totalAmount =
+    currentReceiptData
+      ? (
+          Number(
+            currentReceiptData
+              .unitPrice || 0
+          ) *
+          receiptPeople
+        )
+      : 0;
+
+  const confirmed =
+    window.confirm(
+      "次の内容で領収書を発行しますか？\n\n" +
+      "宛名：" +
+      recipientName +
+      " 様\n" +
+      "人数：" +
+      receiptPeople +
+      "名分\n" +
+      "金額：" +
+      totalAmount.toLocaleString(
+        "ja-JP"
+      ) +
+      "円"
+    );
+
+  if (!confirmed) {
+    return;
+  }
+
+  if (issueButton) {
+    issueButton.disabled = true;
+    issueButton.textContent =
+      "発行中...";
+  }
+
+  if (statusArea) {
+    statusArea.textContent =
+      "PDFを作成しています...";
+  }
+
+  try {
+    const response =
+      await fetch(
+        API_URL,
+        {
+          method: "POST",
+
+          body:
+            new URLSearchParams({
+              action:
+                "issueReceipt",
+
+              reservationId:
+                reservationId,
+
+              recipientName:
+                recipientName,
+
+              receiptPeople:
+                String(
+                  receiptPeople
+                ),
+
+              description:
+                description
+            })
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if (!data.ok) {
+      throw new Error(
+        data.message ||
+        "領収書を発行できませんでした。"
+      );
+    }
+
+    const amountText =
+      Number(
+        data.amount || 0
+      ).toLocaleString(
+        "ja-JP"
+      );
+
+    if (statusArea) {
+      statusArea.innerHTML =
+        "領収書を発行しました。<br>" +
+        "No. " +
+        escapeHtml(
+          data.receiptNo || ""
+        ) +
+        "<br>" +
+        amountText +
+        "円" +
+        (
+          data.pdfUrl
+            ? (
+                "<a" +
+                " class='receipt-pdf-link'" +
+                " href='" +
+                escapeHtml(
+                  data.pdfUrl
+                ) +
+                "'" +
+                " target='_blank'" +
+                " rel='noopener noreferrer'>" +
+                "PDFを開く" +
+                "</a>"
+              )
+            : ""
+        );
+    }
+
+    if (
+      data.pdfUrl &&
+      window.confirm(
+        "領収書を発行しました。\nPDFを開きますか？"
+      )
+    ) {
+      window.open(
+        data.pdfUrl,
+        "_blank",
+        "noopener"
+      );
+    }
+
+  } catch (error) {
+    if (statusArea) {
+      statusArea.textContent =
+        "発行できませんでした：\n" +
+        error.message;
+    }
+
+    alert(
+      "領収書を発行できませんでした：" +
+      error.message
+    );
+
+  } finally {
+    if (issueButton) {
+      issueButton.disabled = false;
+      issueButton.textContent =
+        "PDFを発行する";
+    }
+  }
+}
+    
     async function updateReservationAttendance(
   groupIndex,
   reservationIndex
@@ -1305,6 +1960,112 @@ function getPaymentStatusLabel(status) {
 
   return labels[normalized] || normalized;
 }
+
+    <div id="receiptModal" class="receipt-modal">
+  <div class="receipt-modal-box">
+    <h2 class="receipt-modal-title">
+      Receipt
+    </h2>
+
+    <input
+      id="receiptReservationId"
+      type="hidden"
+    >
+
+    <div class="receipt-field">
+      <label for="receiptRecipientName">
+        宛名
+      </label>
+
+      <input
+        id="receiptRecipientName"
+        class="admin-input"
+        type="text"
+        placeholder="個人名・会社名など"
+      >
+    </div>
+
+    <div class="receipt-field">
+      <label for="receiptPeople">
+        領収書に含める人数
+      </label>
+
+      <select
+        id="receiptPeople"
+        class="admin-input"
+        onchange="updateReceiptAmount()"
+      ></select>
+    </div>
+
+    <div class="receipt-field">
+      <label>1名分の金額</label>
+
+      <div
+        id="receiptUnitPrice"
+        class="receipt-value"
+      >
+        0円
+      </div>
+    </div>
+
+    <div class="receipt-field">
+      <label>合計金額</label>
+
+      <div
+        id="receiptTotalAmount"
+        class="receipt-value receipt-amount"
+      >
+        0円
+      </div>
+    </div>
+
+    <div class="receipt-field">
+      <label>支払い方法</label>
+
+      <div
+        id="receiptPaymentMethod"
+        class="receipt-value"
+      ></div>
+    </div>
+
+    <div class="receipt-field">
+      <label for="receiptDescription">
+        但し書き
+      </label>
+
+      <input
+        id="receiptDescription"
+        class="admin-input"
+        type="text"
+        placeholder="例：お食事代として"
+      >
+    </div>
+
+    <div class="receipt-actions">
+      <button
+        type="button"
+        class="receipt-cancel-button"
+        onclick="closeReceiptForm()"
+      >
+        閉じる
+      </button>
+
+      <button
+        id="receiptIssueButton"
+        type="button"
+        class="receipt-issue-button"
+        onclick="issueReceiptFromAdmin()"
+      >
+        PDFを発行する
+      </button>
+    </div>
+
+    <div
+      id="receiptStatus"
+      class="receipt-status"
+    ></div>
+  </div>
+</div>
     
   </script>
 </body>
