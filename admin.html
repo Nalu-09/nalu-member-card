@@ -352,7 +352,35 @@
           return;
         }
 
-        allReservations = data.reservations || [];
+        allReservations =
+  (data.reservations || [])
+    .filter(function(reservation) {
+      const eventDate =
+        String(
+          reservation.eventDate || ''
+        )
+          .replaceAll('-', '/')
+          .slice(0, 10);
+
+      const now =
+        new Date();
+
+      const today =
+        [
+          now.getFullYear(),
+          String(
+            now.getMonth() + 1
+          ).padStart(2, '0'),
+          String(
+            now.getDate()
+          ).padStart(2, '0')
+        ].join('/');
+
+      return (
+        eventDate &&
+        eventDate >= today
+      );
+    });
 
         if (allReservations.length === 0) {
           list.textContent = "現在、予約申込はありません。";
