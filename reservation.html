@@ -268,43 +268,119 @@
       eventSelect.disabled = false;
     }
 
-   async function onEventChange() {
-  const selectedEventId =
+   function onEventChange() {
+  const eventId =
     String(
       $('eventDate').value || ''
-    ).trim();
+    );
+
+  state.selectedEvent =
+    state.selectedService
+      ? (
+          state.selectedService.events || []
+        ).find(
+          function(item) {
+            return (
+              String(item.eventId) ===
+              eventId
+            );
+          }
+        ) || null
+      : null;
 
   resetAfterEvent();
 
-  if (
-    !state.selectedService ||
-    !selectedEventId
-  ) {
-    state.selectedEvent = null;
-    return;
-  }
-
-  state.selectedEvent =
-    (
-      state.selectedService.events || []
-    ).find(function(item) {
-      return (
-        String(
-          item.eventId || ''
-        ).trim() ===
-        selectedEventId
-      );
-    }) || null;
-
   if (!state.selectedEvent) {
-    $('capacityStatus').textContent =
-      '選択した開催情報を取得できませんでした。';
+    return;
+  }
 
-    $('capacityStatus')
-      .classList.remove('hidden');
+  const event =
+    state.selectedEvent;
+
+  if (
+    event.selectable === false ||
+    event.status === 'cycle_blocked'
+  ) {
+    $('guestCount').innerHTML =
+      '<option value="">この開催日は選択できません</option>';
+
+    $('guestCount').disabled = true;
+
+    setStatus(
+      event.statusText ||
+      '次回申込対象外です。'
+    );
 
     return;
   }
+
+  const minPeople =
+    Number(
+      event.minPeople ||
+      state.selectedService.minPeople ||
+      1
+    );
+
+  const remaining =
+    event.remaining === null ||
+    event.remaining === '' ||
+    event.remaining === undefined
+      ? 4
+      : Number(event.remaining);
+
+  const maxPeople =
+    Math.min(
+      remaining,
+      4
+    );
+
+  const select =
+    $('guestCount');
+
+  select.innerHTML =
+    '<option value="">人数を選択してください</option>';
+
+  if (
+    !Number.isFinite(maxPeople) ||
+    maxPeople < minPeople
+  ) {
+    select.innerHTML =
+      '<option value="">満席です</option>';
+
+    select.disabled = true;
+
+    setStatus(
+      'この開催日は満席です。'
+    );
+
+    return;
+  }
+
+  for (
+    let count = minPeople;
+    count <= maxPeople;
+    count++
+  ) {
+    const option =
+      document.createElement(
+        'option'
+      );
+
+    option.value =
+      String(count);
+
+    option.textContent =
+      count + '名';
+
+    select.appendChild(
+      option
+    );
+  }
+
+  select.disabled = false;
+
+  setStatus('');
+}
 
   /*
    * 参加周期や受付状況により
