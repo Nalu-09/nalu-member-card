@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>Nalu-09 Application</title>
+
+  <style>
+    *{
+      box-sizing:border-box;
+    }
+
+    body{
+      min-height:100vh;
+      margin:0;
+      padding:42px 18px;
+      background:#000;
+      color:#fff;
+      font-family:
+        "Times New Roman",
+        "Yu Mincho",
+        "Hiragino Mincho ProN",
+        serif;
+    }
+
+    .wrap{
+      width:min(92vw, 460px);
+      margin:0 auto;
+    }
+
+    .header{
+      margin-bottom:34px;
+      text-align:center;
+    }
+
+    .title{
+      margin:0;
+      font-size:30px;
+      font-weight:normal;
+      letter-spacing:.12em;
+    }
+
+    .subtitle{
+      margin:12px 0 0;
+      font-size:14px;
+      line-height:1.9;
+      opacity:.72;
+    }
+
+    .application-list{
+      display:grid;
+      gap:16px;
+    }
+
+    .application-card{
+      padding:22px 18px;
+      border:
+        1px solid
+        rgba(255,255,255,.14);
+      border-radius:22px;
+      background:
+        rgba(255,255,255,.035);
+    }
+
+    .brand-name{
+      margin-bottom:8px;
+      font-size:20px;
+      letter-spacing:.06em;
+    }
+
+    .description{
+      min-height:24px;
+      margin-bottom:18px;
+      font-size:13px;
+      line-height:1.8;
+      opacity:.72;
+    }
+
+    .application-button{
+      display:block;
+      width:100%;
+      padding:14px 16px;
+      border:none;
+      border-radius:999px;
+      background:#fff;
+      color:#000;
+      font-family:inherit;
+      font-size:15px;
+      text-align:center;
+      text-decoration:none;
+      cursor:pointer;
+    }
+
+    .status{
+      padding:26px 14px;
+      border:
+        1px solid
+        rgba(255,255,255,.12);
+      border-radius:18px;
+      font-size:14px;
+      line-height:1.8;
+      text-align:center;
+      opacity:.75;
+      white-space:pre-wrap;
+    }
+
+    .footer{
+      margin-top:32px;
+      font-size:11px;
+      text-align:center;
+      letter-spacing:.1em;
+      opacity:.45;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="wrap">
+    <header class="header">
+      <h1 class="title">
+        Application
+      </h1>
+
+      <p class="subtitle">
+        お申し込みになるサービスを<br>
+        選択してください
+      </p>
+    </header>
+
+    <div
+      id="applicationList"
+      class="application-list"
+    >
+      <div class="status">
+        申込先を読み込んでいます...
+      </div>
+    </div>
+
+    <footer class="footer">
+      Nalu-09
+    </footer>
+  </main>
+
+  <script>
+    const API_URL =
+      "https://script.google.com/macros/s/AKfycbzuXAKRg9B5AuPOi2ppj9VuaN8qM01vzLlLnIBFjWiNnjKh7rxzmB_BEG2-U0qAMmM8/exec";
+
+
+    async function loadApplicationLinks() {
+      const list =
+        document.getElementById(
+          "applicationList"
+        );
+
+      try {
+        const response =
+          await fetch(
+            API_URL,
+            {
+              method: "POST",
+
+              body:
+                new URLSearchParams({
+                  action:
+                    "getApplicationLinks"
+                })
+            }
+          );
+
+        const data =
+          await response.json();
+
+        if (!data.ok) {
+          throw new Error(
+            data.message ||
+            "申込先を取得できませんでした。"
+          );
+        }
+
+        const links =
+          Array.isArray(data.links)
+            ? data.links
+            : [];
+
+        if (links.length === 0) {
+          list.innerHTML =
+            "<div class='status'>" +
+            "現在受付中のお申し込みはありません。" +
+            "</div>";
+
+          return;
+        }
+
+        let html = "";
+
+        links.forEach(function(link) {
+          const target =
+            link.openType === "blank"
+              ? "_blank"
+              : "_self";
+
+          const rel =
+            target === "_blank"
+              ? " rel='noopener noreferrer'"
+              : "";
+
+          html += ""
+            + "<section class='application-card'>"
+
+            + "<div class='brand-name'>"
+            + escapeHtml(
+                link.brandName || ""
+              )
+            + "</div>"
+
+            + "<div class='description'>"
+            + escapeHtml(
+                link.description || ""
+              )
+            + "</div>"
+
+            + "<a"
+            + " class='application-button'"
+            + " href='"
+            + escapeAttribute(
+                link.applicationUrl || ""
+              )
+            + "'"
+            + " target='"
+            + target
+            + "'"
+            + rel
+            + ">"
+
+            + escapeHtml(
+                link.buttonLabel ||
+                "申し込む"
+              )
+
+            + "</a>"
+            + "</section>";
+        });
+
+        list.innerHTML = html;
+
+      } catch (error) {
+        list.innerHTML =
+          "<div class='status'>" +
+          "申込先を読み込めませんでした。<br>" +
+          escapeHtml(error.message) +
+          "</div>";
+      }
+    }
+
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+
+    function escapeAttribute(value) {
+      return escapeHtml(value);
+    }
+
+
+    loadApplicationLinks();
+  </script>
+</body>
+</html>
