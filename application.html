@@ -159,18 +159,11 @@
 
       try {
         const response =
-          await fetch(
-            API_URL,
-            {
-              method: "POST",
-
-              body:
-                new URLSearchParams({
-                  action:
-                    "getApplicationLinks"
-                })
-            }
-          );
+  await fetch(
+    API_URL +
+    "?action=getApplicationLinks" +
+    "&t=" + Date.now()
+  );
 
         const data =
           await response.json();
