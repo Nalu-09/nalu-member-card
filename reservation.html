@@ -268,47 +268,116 @@
       eventSelect.disabled = false;
     }
 
-   function onEventChange() {
-  const eventId =
-    $('eventId').value;
-
-  const service =
-    state.selectedService;
-
-  state.selectedEvent = null;
+   async function onEventChange() {
+  const selectedEventId =
+    String(
+      $('eventDate').value || ''
+    ).trim();
 
   resetAfterEvent();
 
   if (
-    !service ||
-    !eventId
+    !state.selectedService ||
+    !selectedEventId
   ) {
-    hideCapacityStatus_();
-    updatePrice();
+    state.selectedEvent = null;
     return;
   }
 
-  const event =
-    (service.events || []).find(
-      function(item) {
-        return (
-          String(item.eventId) ===
-          String(eventId)
-        );
-      }
-    );
+  state.selectedEvent =
+    (
+      state.selectedService.events || []
+    ).find(function(item) {
+      return (
+        String(
+          item.eventId || ''
+        ).trim() ===
+        selectedEventId
+      );
+    }) || null;
 
-  if (!event) {
-    hideCapacityStatus_();
-    updatePrice();
+  if (!state.selectedEvent) {
+    $('capacityStatus').textContent =
+      '選択した開催情報を取得できませんでした。';
+
+    $('capacityStatus')
+      .classList.remove('hidden');
+
     return;
   }
 
-  state.selectedEvent = event;
+  /*
+   * 参加周期や受付状況により
+   * 選択不可の開催日は処理しない。
+   */
+  if (
+    state.selectedEvent.selectable === false
+  ) {
+    $('capacityStatus').textContent =
+      state.selectedEvent.statusText ||
+      (
+        state.selectedEvent
+          .blockedReason ===
+        'participation_cycle'
+          ? '参加周期のため、この開催日にはお申し込みいただけません。'
+          : 'この開催日は現在お申し込みいただけません。'
+      );
 
-  renderCapacityFromEvent_(event);
-  updateGuestCountOptions_(event);
-  updatePrice();
+    $('capacityStatus')
+      .classList.remove('hidden');
+
+    return;
+  }
+
+  $('capacityStatus').textContent =
+    '残席を確認中...';
+
+  $('capacityStatus')
+    .classList.remove('hidden');
+
+  try {
+    const data =
+      await api(
+        'checkDateCapacity',
+        {
+          lineUserId:
+            state.profile &&
+            state.profile.userId
+              ? state.profile.userId
+              : '',
+
+          serviceId:
+            state.selectedService
+              .serviceId,
+
+          eventId:
+            state.selectedEvent
+              .eventId,
+
+          eventDate:
+            state.selectedEvent
+              .eventDate
+        }
+      );
+
+    if (!data.ok) {
+      showApiError(
+        data,
+        $('capacityStatus')
+      );
+
+      return;
+    }
+
+    state.capacity = data;
+
+    renderCapacity(data);
+
+  } catch (error) {
+    $('capacityStatus').textContent =
+      '残席確認中にエラーが発生しました。\n' +
+      error.message;
+  }
 }
 
     function renderCapacity(data) {
