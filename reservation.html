@@ -161,28 +161,80 @@
       return response.json();
     }
 
-    async function init() {
-      try {
-        setStatus('LIFF初期化中...');
-        await liff.init({ liffId: LIFF_ID });
-        if (!liff.isLoggedIn()) { liff.login(); return; }
+   async function init() {
+  try {
+    setStatus('LIFF初期化中...');
 
-        setStatus('予約情報を読み込んでいます...');
-        state.profile = await liff.getProfile();
-        const data = await api('getReservationOptions', { lineUserId: state.profile.userId });
-        if (!data.ok) return showApiError(data);
+    await liff.init({
+      liffId: LIFF_ID
+    });
 
-        state.member = data.member;
-        state.services = Array.isArray(data.services) ? data.services : [];
-        renderMember();
-        renderRegisteredFood();
-        renderServices();
-        $('formScreen').classList.remove('hidden');
-        setStatus('');
-      } catch (error) {
-        handleInitError(error);
-      }
+    if (!liff.isLoggedIn()) {
+      liff.login();
+      return;
     }
+
+    /*
+     * getProfile()を待たず、
+     * LIFFコンテキストからUser IDを取得する。
+     */
+    const context =
+      liff.getContext();
+
+    const lineUserId =
+      context &&
+      context.userId
+        ? String(context.userId).trim()
+        : '';
+
+    if (!lineUserId) {
+      throw new Error(
+        'LINEユーザー情報を取得できませんでした。'
+      );
+    }
+
+    state.profile = {
+      userId: lineUserId
+    };
+
+    setStatus(
+      '予約情報を読み込んでいます...'
+    );
+
+    const data =
+      await api(
+        'getReservationOptions',
+        {
+          lineUserId: lineUserId
+        }
+      );
+
+    if (!data.ok) {
+      showApiError(data);
+      return;
+    }
+
+    state.member =
+      data.member || {};
+
+    state.services =
+      Array.isArray(data.services)
+        ? data.services
+        : [];
+
+    renderMember();
+    renderRegisteredFood();
+    renderServices();
+
+    $('formScreen')
+      .classList.remove('hidden');
+
+    setStatus('');
+
+  } catch (error) {
+    handleInitError(error);
+  }
+}
 
     function renderMember() {
       $('memberInfo').innerHTML = `
