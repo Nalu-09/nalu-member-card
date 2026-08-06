@@ -155,15 +155,96 @@
     }
 
     async function api(action, payload) {
-      const body = new URLSearchParams(Object.assign({ action, source: SOURCE }, payload || {}));
-      const response = await fetch(API_URL, { method: 'POST', body });
-      if (!response.ok) throw new Error('network_error_' + response.status);
-      return response.json();
+    async function api(action, payload) {
+  const controller =
+    new AbortController();
+
+  const timeoutId =
+    setTimeout(
+      function() {
+        controller.abort();
+      },
+      15000
+    );
+
+  try {
+    const body =
+      new URLSearchParams(
+        Object.assign(
+          {
+            action: action,
+            source: SOURCE
+          },
+          payload || {}
+        )
+      );
+
+    const response =
+      await fetch(
+        API_URL,
+        {
+          method: 'POST',
+          body: body,
+          redirect: 'follow',
+          cache: 'no-store',
+          signal: controller.signal
+        }
+      );
+
+    const responseText =
+      await response.text();
+
+    if (!response.ok) {
+      throw new Error(
+        'HTTP ' +
+        response.status +
+        '\n' +
+        responseText.slice(0, 300)
+      );
     }
+
+    if (!responseText) {
+      throw new Error(
+        'APIの返答が空です。'
+      );
+    }
+
+    try {
+      return JSON.parse(
+        responseText
+      );
+
+    } catch (error) {
+      throw new Error(
+        'APIの返答をJSONとして解析できません。\n' +
+        responseText.slice(0, 300)
+      );
+    }
+
+  } catch (error) {
+    if (
+      error &&
+      error.name === 'AbortError'
+    ) {
+      throw new Error(
+        '予約情報の取得が15秒を超えました。'
+      );
+    }
+
+    throw error;
+
+  } finally {
+    clearTimeout(
+      timeoutId
+    );
+  }
+}
 
    async function init() {
   try {
-    setStatus('LIFF初期化中...');
+    setStatus(
+      'LIFF初期化中...'
+    );
 
     await liff.init({
       liffId: LIFF_ID
@@ -174,28 +255,8 @@
       return;
     }
 
-    /*
-     * getProfile()を待たず、
-     * LIFFコンテキストからUser IDを取得する。
-     */
-    const context =
-      liff.getContext();
-
-    const lineUserId =
-      context &&
-      context.userId
-        ? String(context.userId).trim()
-        : '';
-
-    if (!lineUserId) {
-      throw new Error(
-        'LINEユーザー情報を取得できませんでした。'
-      );
-    }
-
-    state.profile = {
-      userId: lineUserId
-    };
+    state.profile =
+      await liff.getProfile();
 
     setStatus(
       '予約情報を読み込んでいます...'
@@ -205,7 +266,8 @@
       await api(
         'getReservationOptions',
         {
-          lineUserId: lineUserId
+          lineUserId:
+            state.profile.userId
         }
       );
 
