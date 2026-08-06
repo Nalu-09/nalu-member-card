@@ -1,10 +1,1203 @@
+ChatGPT Plus
+
+
+
+
+金曜日 1:57
+
+貼り付けられたテキスト（1 点）(25).txt
+ドキュメント
+
+Pasted code (2)(2).js
+JavaScript
+Reservation.html / Reservation.gs 全面改修依頼
+前提
+
+添付した Reservation.html（現行版）をベースに全面改修してください。
+
+デザインは現在の世界観を維持してください。
+
+既存の動作を壊さず、Reservation.html と Reservation.gs を全面的に修正してください。
+
+既存コードを継ぎ足すのではなく、必要に応じて設計を整理してください。
+
+システム構成
+Google Apps Script
+Google Spreadsheet
+LIFF
+GitHub Pages
+Reservationシート
+
+以下の構成へ変更してください。
+
+保持する項目
+
+Reservation_ID
+Event_ID
+Service_ID
+Member_ID
+User_ID
+Applicant_Name
+Applicant_Card_Name
+Applicant_Email
+Rank_ID_At_Reservation
+Reservation_At
+Guest_Count
+Price_ID
+Unit_Price
+Total_Amount
+Allergy
+Disliked_Foods
+Payment_Method
+Payment_Link_ID
+Payment_URL
+Payment_Status
+Reservation_Status
+
+削除
+
+Checked_In_At
+Confirmed_At
+Reservation_Status
+
+使用する値
+
+ACTIVE
+
+CANCELLED
+
+NOSHOW（将来利用）
+
+Payment_Status
+
+UNPAID
+
+PAID
+
+予約者情報
+
+Reservationにはスナップショットとして保存
+
+Applicant_Name
+
+Applicant_Card_Name
+
+Applicant_Email
+
+同行者
+
+同行者はReservationへ保存しない。
+
+新規シート
+
+Dining_Reservation_Participants
+
+を作成する前提。
+
+フォーム改修
+会員情報
+
+自動表示
+
+Member No
+Name
+Card Name
+Rank
+
+入力不可
+
+イベント選択
+
+イベント
+
+↓
+
+開催日
+
+↓
+
+人数
+
+残席表示
+
+開催日選択後
+
+表示内容
+
+定員
+
+現在予約人数
+
+残席
+
+例
+
+定員10名
+
+予約6名
+
+残席4名
+
+人数
+
+残席以上は選択不可
+
+例
+
+残席3名なら
+
+1
+
+2
+
+3
+
+のみ
+
+アレルギー
+
+会員登録済み内容を表示
+
+追加分のみ入力
+
+保存時は
+
+登録済み
+
+＋
+
+追加分
+
+を結合してReservationへ保存
+
+Reservation単体で確認できるようにする
+
+苦手食材
+
+同じ仕様
+
+同行者UI
+
+人数が2名以上なら自動生成
+
+同行者1
+
+同行者2
+
+...
+
+各同行者
+
+氏名
+
+アレルギー
+
+苦手食材
+
+支払い方法
+
+支払い方法
+
+各同行者ごと
+
+代表者がまとめて支払う
+
+クレジットカード
+
+銀行振込
+
+PayPay
+
+代表者がまとめて支払う
+
+代表者のみ
+
+人数×単価
+
+個別支払い
+
+代表者
+
+単価
+
+同行者
+
+単価
+
+同行者
+
+単価
+
+クレジットカード
+
+Square決済URLへ遷移
+
+PayPay
+
+予約後
+
+表示
+
+「ご案内はコチラより決済方法をご確認ください」
+
+銀行振込
+
+同じ
+
+確認画面追加
+
+送信前
+
+確認画面を表示
+
+表示項目
+
+イベント
+
+開催日
+
+人数
+
+代表者
+
+同行者一覧
+
+アレルギー
+
+苦手食材
+
+支払い方法
+
+合計金額
+
+問題なければ
+
+予約確定
+
+管理画面
+
+Payment_Method
+
+CARD
+
+PAYPAY
+
+BANK_TRANSFER
+
+REPRESENTATIVE
+
+で保存
+
+GAS
+
+submitReservation_
+
+全面修正
+
+checkDateCapacity_
+
+人数ではなく
+
+Guest_Count合計
+
+で残席判定
+
+getReservationOptions_
+
+会員情報
+
+イベント
+
+ランク
+
+参加周期
+
+価格
+
+すべて返却
+
+参加周期
+
+現行ロジック維持
+
+壊さない
+
+デザイン
+
+現在の黒ベースデザイン維持
+
+Times New Roman維持
+
+ボタンデザイン維持
+
+コード品質
+
+関数分割
+
+重複削除
+
+可読性向上
+
+コメント追加
+
+納品方法
+
+Reservation.html 完成版
+
+Reservation.gs 完成版
+
+をそれぞれ完成したファイルとして出力してください。
+
+途中コードではなく、貼り替えるだけで動作する完成版をお願いします。
+？
+
+
+貼り付けられたテキスト（1 点）(26).txt
+ドキュメント
+書き換えて
+
+IMG_3338.PNG
+IMG_3339.PNG
+IMG_3340.PNG
+
+最初の会員表示の枠の余白が気になる
+代表者がまとめて決済は１つなのに、4人の合計金額になっている
+
+IMG_3341.PNG
+スクリーンショット 2026-07-31 8.19.02.png
+Dining_Reservationsのシートだけ作成していて、Dining_Reservation_Participantsのシートを作成していないのだが、この２つのシートの意味は？Dining_Reservations一つではダメなのか？
+
+スクリーンショット 2026-07-31 8.36.46.png
+スクリーンショット 2026-07-31 8.36.51.png
+そしたら次は会員申請を更新したい
+
+この形状はそのままに、会員申請でメールアドレスの登録も追加したい
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nalu Member Application</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    body{
+      margin:0;
+      background:#000;
+      color:#fff;
+      font-family:"Times New Roman", "Yu Mincho", "Hiragino Mincho ProN", serif;
+      text-align:center;
+      padding:32px 16px 40px;
+    }
+
+    .wrap{
+      width:min(92vw, 420px);
+      margin:0 auto;
+    }
+
+    .box{
+      background:#0f0f0f;
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:22px;
+      padding:28px 22px;
+      box-shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+
+    .title{
+      font-size:28px;
+      margin:0 0 18px;
+      letter-spacing:.04em;
+      line-height:1.35;
+    }
+
+    .text{
+      font-size:14px;
+      line-height:1.9;
+      opacity:.95;
+      white-space:pre-wrap;
+      margin:0 0 28px;
+    }
+
+    .field{
+      margin:0 0 18px;
+      text-align:left;
+    }
+
+    .field label{
+      display:block;
+      font-size:13px;
+      margin:0 0 8px;
+      opacity:.9;
+      letter-spacing:.04em;
+    }
+
+    .field input,
+    .field textarea{
+      width:100%;
+      box-sizing:border-box;
+      background:#050505;
+      color:#fff;
+      border:1px solid rgba(255,255,255,.16);
+      border-radius:14px;
+      padding:12px 14px;
+      font-size:14px;
+      font-family:"Times New Roman", "Yu Mincho", "Hiragino Mincho ProN", serif;
+      outline:none;
+    }
+
+    .field textarea{
+      min-height:82px;
+      resize:vertical;
+      line-height:1.7;
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder{
+      color:rgba(255,255,255,.45);
+    }
+
+    .note{
+      margin:7px 0 0;
+      font-size:11px;
+      line-height:1.7;
+      color:rgba(255,255,255,.62);
+    }
+
+    .optional{
+      font-size:11px;
+      color:rgba(255,255,255,.55);
+      margin-left:4px;
+    }
+
+    .button{
+      display:inline-block;
+      background:#fff;
+      color:#000;
+      border:none;
+      border-radius:999px;
+      padding:12px 24px;
+      font-size:14px;
+      font-family:"Times New Roman", "Yu Mincho", "Hiragino Mincho ProN", serif;
+      cursor:pointer;
+      margin-top:6px;
+    }
+
+    .button:disabled{
+      opacity:.6;
+      cursor:not-allowed;
+    }
+
+    .status{
+      margin-top:18px;
+      font-size:14px;
+      line-height:1.8;
+      white-space:pre-wrap;
+      opacity:.95;
+    }
+
+    .field input[type="date"]{
+  width:100%;
+  box-sizing:border-box;
+  min-height:48px;
+  appearance:none;
+  -webkit-appearance:none;
+  border-radius:14px;
+  padding:12px 14px;
+  background:#050505;
+  color:#fff;
+}
+
+.field input[type="date"]::-webkit-date-and-time-value{
+  text-align:left;
+}
+
+.field input[type="date"]::-webkit-calendar-picker-indicator{
+  filter:invert(1);
+  opacity:.75;
+}
+    
+
+    .consent-box{
+      margin:24px 0 18px;
+      padding:18px 16px;
+      text-align:left;
+      background:#080808;
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:16px;
+    }
+
+    .consent-title{
+      margin:0 0 10px;
+      font-size:14px;
+      letter-spacing:.04em;
+    }
+
+    .policy-links{
+      margin:0 0 14px;
+      padding:0;
+      list-style:none;
+    }
+
+    .policy-links li{
+      margin:7px 0;
+      font-size:13px;
+      line-height:1.6;
+    }
+
+    .policy-links a{
+      color:#fff;
+      text-decoration:underline;
+      text-underline-offset:3px;
+    }
+
+    .consent-label{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      font-size:12px;
+      line-height:1.75;
+      cursor:pointer;
+    }
+
+    .consent-label input{
+      width:18px;
+      height:18px;
+      margin:2px 0 0;
+      flex:0 0 auto;
+      accent-color:#fff;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="box">
+      <h1 class="title">Membership<br>Application</h1>
+
+      <p class="text" id="introText">
+ご案内ありがとうございます。
+こちらは、会員申請のための専用ページです。
+
+会員証の申請には、専用パスワードが必要です。
+
+申請内容を確認し
+審査通過後に会員証をご利用いただけます。
+      </p>
+
+      <div class="field">
+        <label for="cardName">カード表記名</label>
+        <input
+          id="cardName"
+          name="cardName"
+          type="text"
+          maxlength="12"
+          placeholder="12文字以内・絵文字可"
+          required
+        >
+        <p class="note">会員証に表示されるお名前です。12文字以内でご入力ください。</p>
+      </div>
+
+      <div class="field">
+        <label for="realName">名前</label>
+        <input
+          id="realName"
+          name="realName"
+          type="text"
+          placeholder="お名前"
+          required
+        >
+      </div>
+
+      <div class="field">
+        <label for="nameKana">名前（カナ）</label>
+        <input
+          id="nameKana"
+          name="nameKana"
+          type="text"
+          placeholder="オナマエ"
+          required
+        >
+      </div>
+
+      <div class="field">
+        <label for="birthday">誕生日</label>
+        <input
+          id="birthday"
+          name="birthday"
+          type="date"
+          required
+        >
+      </div>
+
+      <div class="field">
+        <label for="dislikedFoods">苦手食材 <span class="optional">任意</span></label>
+        <textarea
+          id="dislikedFoods"
+          name="dislikedFoods"
+          placeholder="例：パクチー、牡蠣"
+        ></textarea>
+        <p class="note">苦手食材がございましたらご記入ください。</p>
+      </div>
+
+      <div class="field">
+        <label for="allergy">アレルギー <span class="optional">任意</span></label>
+        <textarea
+          id="allergy"
+          name="allergy"
+          placeholder="例：甲殻類、そば、卵"
+        ></textarea>
+        <p class="note">アレルギー食材がございましたらご記入ください。</p>
+      </div>
+
+      <div class="field">
+        <label for="applicationPassword">申請パスワード</label>
+        <input
+          type="password"
+          id="applicationPassword"
+          placeholder="申請パスワードを入力"
+          autocomplete="off"
+        >
+      </div>
+
+
+      <div class="consent-box">
+        <p class="consent-title">規約・個人情報の取扱い</p>
+
+        <ul class="policy-links">
+          <li>
+            <a
+              href="https://sudden-squid-b26.notion.site/Lumi-re-3992665c0f6b80daba45f426a812f1a5?source=copy_link"
+              target="_blank"
+              rel="noopener noreferrer"
+            >Lumière会員利用規約</a>
+          </li>
+          <li>
+            <a
+              href="https://sudden-squid-b26.notion.site/Nalu-09-3992665c0f6b803baddfc14da896d526?source=copy_link"
+              target="_blank"
+              rel="noopener noreferrer"
+            >合同会社Nalu-09 プライバシーポリシー</a>
+          </li>
+        </ul>
+
+        <label class="consent-label" for="termsConsent">
+          <input
+            id="termsConsent"
+            name="termsConsent"
+            type="checkbox"
+          >
+          <span>
+            Lumière会員利用規約および合同会社Nalu-09
+            プライバシーポリシーを確認し、会員申請に伴い取得される
+            個人情報および食物アレルギー等の情報が、記載された目的で
+            取り扱われることに同意します。
+          </span>
+        </label>
+      </div>
+
+      <button id="applyBtn" class="button">会員申請を送信する</button>
+      <div id="status" class="status"></div>
+    </div>
+  </div>
+
+  <script>
+    const LIFF_ID = "2007730715-0wmIs1fy";
+    const API_URL = "https://script.google.com/macros/s/AKfycbxOIqa-TOGIogMYIro9Qu0nG85vZ7ObLFT_YWLW3Q9XHbUmfbXVr9Oxk3zuUZxbtmXe/exec";
+
+    let currentProfile = null;
+
+    async function initLiff() {
+      const status = document.getElementById("status");
+
+      try {
+        status.textContent = "LIFF初期化中...";
+        await liff.init({ liffId: LIFF_ID });
+
+        if (!liff.isLoggedIn()) {
+          status.textContent = "LINEログイン中...";
+          liff.login();
+          return;
+        }
+
+        currentProfile = await liff.getProfile();
+        status.textContent = "";
+      } catch (e) {
+        status.textContent = "ページを開けませんでした。\n時間をおいて再度お試しください。";
+        document.getElementById("applyBtn").disabled = true;
+      }
+    }
+
+    function getValue(id) {
+      return document.getElementById(id).value.trim();
+    }
+
+    function validateForm() {
+      const cardName = getValue("cardName");
+      const realName = getValue("realName");
+      const nameKana = getValue("nameKana");
+      const birthday = getValue("birthday");
+      const applicationPassword = getValue("applicationPassword");
+      const termsConsent = document.getElementById("termsConsent").checked;
+
+      if (!cardName) {
+        return "カード表記名をご入力ください。";
+      }
+
+      if ([...cardName].length > 12) {
+        return "カード表記名は12文字以内でご入力ください。";
+      }
+
+      if (!realName) {
+        return "名前をご入力ください。";
+      }
+
+      if (!nameKana) {
+        return "名前（カナ）をご入力ください。";
+      }
+
+      if (!birthday) {
+        return "誕生日をご入力ください。";
+      }
+
+      if (!applicationPassword) {
+        return "申請パスワードをご入力ください。";
+      }
+
+      if (!termsConsent) {
+        return "会員利用規約およびプライバシーポリシーをご確認のうえ、同意欄にチェックを入れてください。";
+      }
+
+      return "";
+    }
+
+    async function submitApplication() {
+      const btn = document.getElementById("applyBtn");
+      const status = document.getElementById("status");
+      const passwordInput = document.getElementById("applicationPassword");
+
+      if (!currentProfile) {
+        status.textContent = "プロフィールを取得できていません。";
+        return;
+      }
+
+      const errorMessage = validateForm();
+
+      if (errorMessage) {
+        status.textContent = errorMessage;
+        return;
+      }
+
+      const cardName = getValue("cardName");
+      const realName = getValue("realName");
+      const nameKana = getValue("nameKana");
+      const birthday = getValue("birthday");
+      const dislikedFoods = getValue("dislikedFoods");
+      const allergy = getValue("allergy");
+      const applicationPassword = getValue("applicationPassword");
+
+      try {
+        btn.disabled = true;
+        btn.textContent = "送信中...";
+        status.textContent = "";
+
+        const body = new URLSearchParams({
+          action: "submitApplication",
+          lineUserId: currentProfile.userId,
+          displayName: currentProfile.displayName || "",
+          applicationPassword: applicationPassword,
+          cardName: cardName,
+          realName: realName,
+          nameKana: nameKana,
+          birthday: birthday,
+          dislikedFoods: dislikedFoods,
+          allergy: allergy,
+          termsConsent: document.getElementById("termsConsent").checked
+        });
+
+        const res = await fetch(API_URL, {
+          method: "POST",
+          body: body
+        });
+
+        const data = await res.json();
+
+        if (!data.ok) {
+          if (data.message === "terms_consent_required") {
+            status.textContent =
+              "会員利用規約およびプライバシーポリシーをご確認のうえ、同意欄にチェックを入れてください。";
+            btn.disabled = false;
+            btn.textContent = "会員申請を送信する";
+            return;
+          }
+
+          if (data.message === "invalid_password") {
+            status.textContent =
+              "申請パスワードが正しくありません。\nご確認のうえ、再度お試しください。";
+            btn.disabled = false;
+            btn.textContent = "会員申請を送信する";
+            return;
+          }
+
+          if (data.message === "already_applied") {
+            status.textContent =
+              "このLINEアカウントは\nすでに申請済みまたは承認済みです。\nご案内をお待ちください。";
+            btn.style.display = "none";
+            passwordInput.disabled = true;
+            return;
+          }
+
+          if (data.message === "invalid_card_name") {
+            status.textContent =
+              "カード表記名は12文字以内でご入力ください。";
+            btn.disabled = false;
+            btn.textContent = "会員申請を送信する";
+            return;
+          }
+
+          if (data.message === "missing_required_fields") {
+            status.textContent =
+              "未入力の必須項目があります。\n内容をご確認ください。";
+            btn.disabled = false;
+            btn.textContent = "会員申請を送信する";
+            return;
+          }
+
+          status.textContent =
+            "申請を受け付けできませんでした。\n時間をおいて再度お試しください。";
+          btn.disabled = false;
+          btn.textContent = "会員申請を送信する";
+          return;
+        }
+
+        status.textContent =
+          "会員申請を受け付けました。\n内容を確認のうえ、承認後にご利用いただけます。\nしばらくお待ちください。";
+
+        btn.style.display = "none";
+
+        document.getElementById("cardName").disabled = true;
+        document.getElementById("realName").disabled = true;
+        document.getElementById("nameKana").disabled = true;
+        document.getElementById("birthday").disabled = true;
+        document.getElementById("dislikedFoods").disabled = true;
+        document.getElementById("allergy").disabled = true;
+        document.getElementById("termsConsent").disabled = true;
+        passwordInput.disabled = true;
+
+      } catch (e) {
+        status.textContent =
+          "申請を受け付けできませんでした。\n時間をおいて再度お試しください。";
+        btn.disabled = false;
+        btn.textContent = "会員申請を送信する";
+      }
+    }
+
+    document.getElementById("applyBtn").addEventListener("click", submitApplication);
+
+    initLiff();
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+なんでこうなる？
+
+
+Pasted code(20).js
+JavaScript
+会員申請のgsは作成してない
+だから新規で作成する話となっていたはず
+
+スクリーンショット 2026-07-31 9.50.53.png
+スクリーンショット 2026-07-31 9.50.57.png
+なんでこうなるんだよ
+
+
+Pasted code(21).js
+JavaScript
+全修正しろ
+
+
+スクリーンショット 2026-07-31 10.07.06.png
+スクリーンショット 2026-07-31 10.07.12.png
+スクリーンショット 2026-07-31 10.07.15.png
+
+土曜日 1:16
+スクリーンショット 2026-08-01 1.16.14.png
+スクリーンショット 2026-08-01 1.16.18.png
+申請申し込みの回答はできているが、スプレッドシートへの反映はされていない
+
+最初からバージョン２になっているが？
+
+やっぱりこうなる
+
+スクリーンショット 2026-08-01 1.31.35(1).png
+スクリーンショット 2026-08-01 1.35.14.png
+
+スクリーンショット 2026-08-01 8.45.25.png
+スクリーンショット 2026-08-01 8.45.31.png
+
+
+
+
+
+
+
+
+スクリーンショット 2026-08-01 9.53.09.png
+スクリーンショット 2026-08-01 9.53.13.png
+スクリーンショット 2026-08-01 9.53.22.png
+
+
+
+
+貼り付けられたテキスト（1 点）(27).txt
+ドキュメント
+
+
+function testReservationMailPermission_() { console.log( MailApp.getRemainingDailyQuota() ); }
+
+押せないんだよね、
+
+
+
+Pasted code(22).js
+JavaScript
+
+
+貼り付けられたテキスト（1 点）(28).txt
+ドキュメント
+旧シート反映の際の管理画面コード
+これを現行のシートから反映されるようにしたい
+
+
+
+
+貼り付けられたテキスト（1 点）(29).txt
+ドキュメント
+どこ
+
+
+貼り付けられたテキスト（1 点）(30).txt
+ドキュメント
+ないよ？
+
+
+
+貼り付けられたテキスト（1 点）(31).txt
+ドキュメント
+
+参加確認済みの後に領収書の発行のボタンが表示されるようにしてほしい
+
+スクリーンショット 2026-08-02 18.11.02.png
+スクリーンショット 2026-08-02 18.11.13.png
+スクリーンショット 2026-08-02 18.11.16.png
+No.は、事業コード（Service_ID）＋日付＋連番
+シート20が領収書のテンプレートなのでシート名の設定
+シート21は領収書発行のデータ保管用？
+領収書を保管するグーグルドライブフォルダはそれぞれ作成済みなのでDining_Price_Masterの右にPDF保管IDを登録すればそれぞれの名称で保管ができるのではないだろうか？
+
+
+貼り付けられたテキスト（1 点）(32).txt
+ドキュメント
+
+
+
+Pasted code(23).js
+JavaScript
+
+
+
+
+デプロイはしてんだよ
+
+
+
+
+
+さっきのやつ、
+function getReservationOptions_(parameters) {が見当たらないが？
+
+
+Pasted code(24).js
+JavaScript
+
+スクリーンショット 2026-08-07 1.17.02.png
+
+スクリーンショット 2026-08-07 1.18.22.png
+
+スクリーンショット 2026-08-07 1.21.35.png
+
+
+貼り付けられたテキスト（1 点）(20260806-162335).txt
+ドキュメント
+
+スクリーンショット 2026-08-07 1.34.16.png
+ずっとこれのまま
+
+36s考えました
+画面を見る限り、いま開かれているHTMLは修正前のままです。
+
+理由は、修正後のinit()なら最初の1行で、
+
+setStatus('1/6 LIFF初期化中...');
+に変わるためです。API通信以前に即時反映されます。ところが画面は初期HTMLの、
+
+<div id="status" class="status">読み込み中...</div>
+のままです。つまり、JavaScriptの処理速度ではなく、更新したHTMLがブラウザへ届いていません。
+
+また、今のURLにはすでに?liff.state=...があります。先ほど私が案内した?v=...の追加方法は誤りです。すでに?があるので、追加するなら&です。
+
+ブラウザのURL末尾にそのまま、
+
+&v=202608070135
+を追加して開いてください。
+
+現在のURLが、
+
+https://nalu-09.github.io/nalu-member-card/reservation.html?liff.state=...
+なので、最終形は、
+
+https://nalu-09.github.io/nalu-member-card/reservation.html?liff.state=...&v=202608070135
+です。
+
+それでも「読み込み中…」なら、GitHubで編集したファイルが実際に公開されているreservation.htmlとは別です。GitHub上のreservation.htmlを直接開いて、ページ内検索で、
+
+1/6 LIFF初期化中
+が存在するか確認してください。
+
+なお、送ってもらったHTML自体はJavaScriptの構文検査を通っています。構文エラーで実行されていないわけではありません。問題は、そのHTMLが現在の公開ページへ反映されていないことです。
+
+
+存在するが変わらない
+
+存在するのに表示が変わらないなら、キャッシュではなく、メインのJavaScriptが構文エラーで1行も実行されていません。
+
+init()の最初に表示変更を書いても、ブラウザは<script>全体を先に解析するため、後半に1か所でも構文エラーがあるとinit()自体が始まりません。
+
+次の1行を、現在のメイン<script>とは別にしてください。
+
+127行目付近を変更
+現在の、
+
+<div id="status" class="status">読み込み中...</div>
+の直後、</section>より前に追加します。
+
+<script>
+  document.getElementById('status').textContent =
+    'HTML・JavaScript起動確認';
+</script>
+配置はこうです。
+
+<div id="completeScreen" class="hidden"></div>
+<div id="status" class="status">読み込み中...</div>
+
+<script>
+  document.getElementById('status').textContent =
+    'HTML・JavaScript起動確認';
+</script>
+その下にある既存の長い、
+
+<script>
+  'use strict';
+  // 予約画面の全処理
+</script>
+はそのまま残します。
+
+結果の見方
+「HTML・JavaScript起動確認」に変わる場合
+
+公開HTMLは正しく更新されています。長いメインスクリプト内に構文エラーがあります。
+Chromeで次を開いてください。
+
+画面上で右クリック
+→ 検証
+→ Console
+赤字の最初のエラーをそのまま送ってください。通常は、
+
+Uncaught SyntaxError: ...
+reservation.html:○○
+と行番号が表示されます。
+
+それでも「読み込み中…」のままの場合
+
+ブラウザが表示しているHTMLと、GitHubで確認したreservation.htmlが一致していません。
+
+現状では、GSの処理速度やLIFF取得をさらに変更しても直りません。init()以前にスクリプトが動いていないためです。
+
+
+全修正して
+
+1m 35s考えました
+全修正版を作りました。
+今回は、アップロードされた現在のHTMLを基準に、読み込み中で永久停止しない構成へ全文修正しています。
+
+reservation_full_fixed.html
+
+修正内容は以下です。
+
+LIFF SDKをheadで同期読込する方式を廃止
+
+LIFF SDKを動的に読み込み
+
+SDK読込に15秒タイムアウト
+
+LIFF初期化に15秒タイムアウト
+
+LINEユーザーID取得を複数経路で実行
+
+liff.getContext()
+
+liff.getDecodedIDToken()
+
+liff.getProfile()
+
+API通信に20秒タイムアウト
+
+API返答を一度テキストで受信してからJSON解析
+
+HTTPエラー、空レスポンス、JSON解析失敗を画面表示
+
+JavaScript実行エラーを画面表示
+
+Promiseエラーを画面表示
+
+初期表示を「読み込み中...」から「起動しています...」へ変更
+
+読み込み段階を1/6〜6/6で表示
+
+開催日選択時の残席API再通信は行わない
+
+取得済みの残席情報から人数を即時表示
+
+参加周期対象日は選択不可を維持
+
+このHTMLはJavaScript構文検査済みです。
+
+GitHubの現在のreservation.htmlを、このファイルの内容で全文置換してください。今回は部分追加ではなく、先頭の<!doctype html>から末尾の</html>まで全置換です。
+
+
+
+reservation_full_fixed.html
+HTML
+
+
+ライブラリ
+/
+reservation_full_fixed.html
+
+
+
+
 <!doctype html>
 <html lang="ja">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Lumière Nalu Reservation</title>
-  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
     :root{color-scheme:dark}
     *{box-sizing:border-box}
@@ -124,7 +1317,7 @@
       </div>
 
       <div id="completeScreen" class="hidden"></div>
-   <div id="status" class="status">HTML更新確認 0132</div>
+      <div id="status" class="status">起動しています...</div>
     </section>
   </main>
 
@@ -154,196 +1347,138 @@
       return direct.get('source') || nested.get('source') || 'lumiere';
     }
 
-    async function api(action, payload) {
-    async function api(action, payload) {
-  const controller =
-    new AbortController();
+    function withTimeout(promise, milliseconds, message) {
+      let timer;
+      const timeout = new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error(message)), milliseconds);
+      });
+      return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+    }
 
-  const timeoutId =
-    setTimeout(
-      function() {
-        controller.abort();
-      },
-      15000
-    );
+    function loadLiffSdk() {
+      if (window.liff) return Promise.resolve();
 
-  try {
-    const body =
-      new URLSearchParams(
-        Object.assign(
-          {
-            action: action,
-            source: SOURCE
-          },
-          payload || {}
-        )
+      return withTimeout(
+        new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = 'https://static.line-scdn.net/liff/edge/2/sdk.js';
+          script.async = true;
+          script.onload = () => resolve();
+          script.onerror = () => reject(new Error('LIFF SDKを読み込めませんでした。'));
+          document.head.appendChild(script);
+        }),
+        15000,
+        'LIFF SDKの読み込みが15秒を超えました。'
       );
+    }
 
-    const response =
-      await fetch(
-        API_URL,
-        {
+    async function api(action, payload) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 20000);
+
+      try {
+        const body = new URLSearchParams(
+          Object.assign({ action, source: SOURCE }, payload || {})
+        );
+
+        const response = await fetch(API_URL, {
           method: 'POST',
-          body: body,
+          body,
           redirect: 'follow',
           cache: 'no-store',
-          signal: controller.signal
+          signal: controller.signal,
+        });
+
+        const text = await response.text();
+
+        if (!response.ok) {
+          throw new Error('HTTP ' + response.status + '\n' + text.slice(0, 300));
         }
-      );
 
-    const responseText =
-      await response.text();
-
-    if (!response.ok) {
-      throw new Error(
-        'HTTP ' +
-        response.status +
-        '\n' +
-        responseText.slice(0, 300)
-      );
-    }
-
-    if (!responseText) {
-      throw new Error(
-        'APIの返答が空です。'
-      );
-    }
-
-    try {
-      return JSON.parse(
-        responseText
-      );
-
-    } catch (error) {
-      throw new Error(
-        'APIの返答をJSONとして解析できません。\n' +
-        responseText.slice(0, 300)
-      );
-    }
-
-  } catch (error) {
-    if (
-      error &&
-      error.name === 'AbortError'
-    ) {
-      throw new Error(
-        '予約情報の取得が15秒を超えました。'
-      );
-    }
-
-    throw error;
-
-  } finally {
-    clearTimeout(
-      timeoutId
-    );
-  }
-}
-
-   async function init() {
-  try {
-    setStatus('1/6 LIFF初期化中...');
-
-    await liff.init({
-      liffId: LIFF_ID
-    });
-
-    setStatus('2/6 ログイン確認中...');
-
-    if (!liff.isLoggedIn()) {
-      liff.login();
-      return;
-    }
-
-    setStatus('3/6 LINE情報を取得中...');
-
-    const context =
-      liff.getContext();
-
-    const lineUserId =
-      context &&
-      context.userId
-        ? String(context.userId).trim()
-        : '';
-
-    if (!lineUserId) {
-      throw new Error(
-        'LINEユーザーIDを取得できませんでした。'
-      );
-    }
-
-    state.profile = {
-      userId: lineUserId
-    };
-
-    setStatus('4/6 予約情報を取得中...');
-
-    const data =
-      await api(
-        'getReservationOptions',
-        {
-          lineUserId: lineUserId
+        if (!text) {
+          throw new Error('APIの返答が空です。');
         }
-      );
 
-    setStatus('5/6 予約画面を作成中...');
-
-    if (!data) {
-      throw new Error(
-        'APIから返答がありません。'
-      );
+        try {
+          return JSON.parse(text);
+        } catch (_) {
+          throw new Error('APIの返答を解析できません。\n' + text.slice(0, 300));
+        }
+      } catch (error) {
+        if (error && error.name === 'AbortError') {
+          throw new Error('予約情報の取得が20秒を超えました。');
+        }
+        throw error;
+      } finally {
+        clearTimeout(timeoutId);
+      }
     }
 
-    if (!data.ok) {
-      showApiError(data);
-      return;
+    async function resolveLineUserId() {
+      const context = liff.getContext && liff.getContext();
+      if (context && context.userId) return String(context.userId).trim();
+
+      const decoded = liff.getDecodedIDToken && liff.getDecodedIDToken();
+      if (decoded && decoded.sub) return String(decoded.sub).trim();
+
+      const profile = await withTimeout(
+        liff.getProfile(),
+        10000,
+        'LINEプロフィールの取得が10秒を超えました。'
+      );
+
+      return profile && profile.userId ? String(profile.userId).trim() : '';
     }
 
-    state.member =
-      data.member || {};
+    async function init() {
+      try {
+        setStatus('1/6 LIFF SDKを読み込んでいます...');
+        await loadLiffSdk();
 
-    state.services =
-      Array.isArray(data.services)
-        ? data.services
-        : [];
+        setStatus('2/6 LIFFを初期化しています...');
+        await withTimeout(
+          liff.init({ liffId: LIFF_ID }),
+          15000,
+          'LIFF初期化が15秒を超えました。'
+        );
 
-    renderMember();
+        setStatus('3/6 ログイン状態を確認しています...');
+        if (!liff.isLoggedIn()) {
+          liff.login();
+          return;
+        }
 
-    setStatus('5/6 食材情報を表示中...');
-    renderRegisteredFood();
+        const lineUserId = await resolveLineUserId();
+        if (!lineUserId) {
+          throw new Error('LINEユーザーIDを取得できませんでした。');
+        }
 
-    setStatus('5/6 イベント一覧を表示中...');
-    renderServices();
+        state.profile = { userId: lineUserId };
 
-    $('formScreen')
-      .classList.remove('hidden');
+        setStatus('4/6 予約情報を取得しています...');
+        const data = await api('getReservationOptions', { lineUserId });
 
-    setStatus('6/6 完了');
+        if (!data || !data.ok) {
+          showApiError(data || { message: 'empty_response' });
+          return;
+        }
 
-    setTimeout(
-      function() {
-        setStatus('');
-      },
-      500
-    );
+        setStatus('5/6 予約画面を作成しています...');
+        state.member = data.member || {};
+        state.services = Array.isArray(data.services) ? data.services : [];
 
-  } catch (error) {
-    console.error(
-      'init error',
-      error
-    );
+        renderMember();
+        renderRegisteredFood();
+        renderServices();
+        $('formScreen').classList.remove('hidden');
 
-    setStatus(
-      '読み込みエラー\n' +
-      (
-        error &&
-        error.message
-          ? error.message
-          : String(error)
-      )
-    );
-  }
-}
+        setStatus('6/6 完了');
+        setTimeout(() => setStatus(''), 400);
+      } catch (error) {
+        handleInitError(error);
+      }
+    }
+
     function renderMember() {
       $('memberInfo').innerHTML = `
         <dl class="member-grid">
@@ -761,13 +1896,30 @@
     }
     function escapeAttr(value) { return escapeHtml(value); }
 
-    $('serviceId').addEventListener('change', onServiceChange);
-    $('eventDate').addEventListener('change', onEventChange);
-    $('guestCount').addEventListener('change', onGuestCountChange);
-    $('confirmBtn').addEventListener('click', showConfirmation);
-    $('backBtn').addEventListener('click', backToForm);
-    $('submitBtn').addEventListener('click', submitReservation);
+    function bindEvents() {
+      $('serviceId').addEventListener('change', onServiceChange);
+      $('eventDate').addEventListener('change', onEventChange);
+      $('guestCount').addEventListener('change', onGuestCountChange);
+      $('confirmBtn').addEventListener('click', showConfirmation);
+      $('backBtn').addEventListener('click', backToForm);
+      $('submitBtn').addEventListener('click', submitReservation);
+    }
+
+    window.addEventListener('error', event => {
+      setStatus('JavaScriptエラー\n' + (event.message || 'unknown_error'));
+    });
+
+    window.addEventListener('unhandledrejection', event => {
+      const reason = event.reason && event.reason.message
+        ? event.reason.message
+        : String(event.reason || 'unknown_error');
+      setStatus('処理エラー\n' + reason);
+    });
+
+    bindEvents();
     init();
   </script>
 </body>
 </html>
+
+説明
