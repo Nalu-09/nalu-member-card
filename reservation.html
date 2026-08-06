@@ -13,37 +13,7 @@
     .box{background:#0f0f0f;border:1px solid rgba(255,255,255,.08);border-radius:22px;padding:28px 22px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
     .title{font-size:28px;margin:0 0 18px;letter-spacing:.08em}
     .text{font-size:14px;line-height:1.9;opacity:.95;white-space:pre-wrap;margin:0 0 22px}
-.member-card,
-.detail,
-.capacity,
-.participant,
-.confirmation,
-.food-card{
-  margin:0 0 20px;
-  padding:16px 18px;
-  border:1px solid rgba(255,255,255,.14);
-  border-radius:16px;
-  background:rgba(255,255,255,.035);
-  text-align:left;
-  font-size:13px;
-  line-height:1.85;
-}
-
-.member-card{
-  padding:18px 20px;
-  white-space:normal;
-}
-
-.detail,
-.capacity,
-.confirmation,
-.food-card{
-  white-space:pre-wrap;
-}
-
-.member-card .member-grid{
-  margin:0;
-}
+    .member-card,.detail,.capacity,.participant,.confirmation,.food-card{margin:0 0 20px;padding:16px 18px;border:1px solid rgba(255,255,255,.14);border-radius:16px;background:rgba(255,255,255,.035);text-align:left;font-size:13px;line-height:1.85;white-space:pre-wrap}
     .member-grid{display:grid;grid-template-columns:110px 1fr;gap:7px 12px}
     .member-grid dt{opacity:.58}.member-grid dd{margin:0;word-break:break-word}
     .section-title{font-size:17px;letter-spacing:.04em;margin:28px 0 16px;text-align:left}
@@ -197,7 +167,7 @@
         await liff.init({ liffId: LIFF_ID });
         if (!liff.isLoggedIn()) { liff.login(); return; }
 
-        setStatus('会員情報を確認中...');
+        setStatus('予約情報を読み込んでいます...');
         state.profile = await liff.getProfile();
         const data = await api('getReservationOptions', { lineUserId: state.profile.userId });
         if (!data.ok) return showApiError(data);
@@ -268,193 +238,78 @@
       eventSelect.disabled = false;
     }
 
-   function onEventChange() {
-  const eventId =
-    String(
-      $('eventDate').value || ''
-    );
+    async function onEventChange() {
+      const eventId =
+        String(
+          $('eventDate').value || ''
+        );
 
-  state.selectedEvent =
-    state.selectedService
-      ? (
-          state.selectedService.events || []
-        ).find(
-          function(item) {
-            return (
-              String(item.eventId) ===
-              eventId
-            );
-          }
-        ) || null
-      : null;
+      state.selectedEvent =
+        state.selectedService
+          ? (
+              state.selectedService.events || []
+            ).find(
+              function(item) {
+                return (
+                  String(item.eventId) ===
+                  eventId
+                );
+              }
+            ) || null
+          : null;
 
-  resetAfterEvent();
+      resetAfterEvent();
 
-  if (!state.selectedEvent) {
-    return;
-  }
+      if (!state.selectedEvent) {
+        return;
+      }
 
-  const event =
-    state.selectedEvent;
+      const event =
+        state.selectedEvent;
 
-  if (
-    event.selectable === false ||
-    event.status === 'cycle_blocked'
-  ) {
-    $('guestCount').innerHTML =
-      '<option value="">この開催日は選択できません</option>';
+      state.capacity = {
+        ok: true,
+        capacity:
+          event.capacity,
+        reservedPeople:
+          Number(
+            event.reservedPeople || 0
+          ),
+        remaining:
+          event.remaining,
+        minPeople:
+          Number(
+            event.minPeople ||
+            state.selectedService.minPeople ||
+            1
+          ),
+        available:
+          event.selectable !== false &&
+          event.status !==
+            'participation_cycle' &&
+          event.status !==
+            'capacity_full',
+      };
 
-    $('guestCount').disabled = true;
-
-    setStatus(
-      event.statusText ||
-      '次回申込対象外です。'
-    );
-
-    return;
-  }
-
-  const minPeople =
-    Number(
-      event.minPeople ||
-      state.selectedService.minPeople ||
-      1
-    );
-
-  const remaining =
-    event.remaining === null ||
-    event.remaining === '' ||
-    event.remaining === undefined
-      ? 4
-      : Number(event.remaining);
-
-  const maxPeople =
-    Math.min(
-      remaining,
-      4
-    );
-
-  const select =
-    $('guestCount');
-
-  select.innerHTML =
-    '<option value="">人数を選択してください</option>';
-
-  if (
-    !Number.isFinite(maxPeople) ||
-    maxPeople < minPeople
-  ) {
-    select.innerHTML =
-      '<option value="">満席です</option>';
-
-    select.disabled = true;
-
-    setStatus(
-      'この開催日は満席です。'
-    );
-
-    return;
-  }
-
-  for (
-    let count = minPeople;
-    count <= maxPeople;
-    count++
-  ) {
-    const option =
-      document.createElement(
-        'option'
-      );
-
-    option.value =
-      String(count);
-
-    option.textContent =
-      count + '名';
-
-    select.appendChild(
-      option
-    );
-  }
-
-  select.disabled = false;
-
-  setStatus('');
-}
-
-  /*
-   * 参加周期や受付状況により
-   * 選択不可の開催日は処理しない。
-   */
-  if (
-    state.selectedEvent.selectable === false
-  ) {
-    $('capacityStatus').textContent =
-      state.selectedEvent.statusText ||
-      (
-        state.selectedEvent
-          .blockedReason ===
-        'participation_cycle'
-          ? '参加周期のため、この開催日にはお申し込みいただけません。'
-          : 'この開催日は現在お申し込みいただけません。'
-      );
-
-    $('capacityStatus')
-      .classList.remove('hidden');
-
-    return;
-  }
-
-  $('capacityStatus').textContent =
-    '残席を確認中...';
-
-  $('capacityStatus')
-    .classList.remove('hidden');
-
-  try {
-    const data =
-      await api(
-        'checkDateCapacity',
-        {
-          lineUserId:
-            state.profile &&
-            state.profile.userId
-              ? state.profile.userId
-              : '',
-
-          serviceId:
-            state.selectedService
-              .serviceId,
-
-          eventId:
-            state.selectedEvent
-              .eventId,
-
-          eventDate:
-            state.selectedEvent
-              .eventDate
-        }
-      );
-
-    if (!data.ok) {
-      showApiError(
-        data,
+      if (
+        event.selectable === false ||
+        event.status ===
+          'participation_cycle'
+      ) {
+        $('capacityStatus').textContent =
+          'この開催日は参加周期の対象外です。';
         $('capacityStatus')
+          .classList.remove('hidden');
+        $('guestCount').innerHTML =
+          '<option value="">選択できません</option>';
+        $('guestCount').disabled = true;
+        return;
+      }
+
+      renderCapacity(
+        state.capacity
       );
-
-      return;
     }
-
-    state.capacity = data;
-
-    renderCapacity(data);
-
-  } catch (error) {
-    $('capacityStatus').textContent =
-      '残席確認中にエラーが発生しました。\n' +
-      error.message;
-  }
-}
 
     function renderCapacity(data) {
       const capacityText = data.capacity === null ? '設定なし' : data.capacity + '名';
@@ -541,93 +396,23 @@
         }
       });
 
-      const representativeCompanionCount =
-  companions.filter(
-    person =>
-      person.paymentMethod ===
-      'REPRESENTATIVE'
-  ).length;
-
-const representativePaymentCount =
-  1 +
-  representativeCompanionCount;
-
-const representativePaymentAmount =
-  Number(
-    state.selectedEvent.unitPrice ||
-    0
-  ) *
-  representativePaymentCount;
-
       return {
-  serviceId:
-    state.selectedService.serviceId,
-
-  serviceName:
-    state.selectedService.serviceName,
-
-  eventId:
-    state.selectedEvent.eventId,
-
-  eventDate:
-    state.selectedEvent.eventDate,
-
-  startTime:
-    state.selectedEvent.startTime,
-
-  endTime:
-    state.selectedEvent.endTime,
-
-  guestCount:
-    guestCount,
-
-  additionalAllergy:
-    $('additionalAllergy')
-      .value
-      .trim(),
-
-  additionalDislikedFoods:
-    $('additionalDislikedFoods')
-      .value
-      .trim(),
-
-  combinedAllergy:
-    combineFood(
-      state.member.allergy,
-      $('additionalAllergy').value
-    ),
-
-  combinedDislikedFoods:
-    combineFood(
-      state.member.dislikedFoods,
-      $('additionalDislikedFoods').value
-    ),
-
-  representativePaymentMethod:
-    representativePaymentMethod,
-
-  companions:
-    companions,
-
-  unitPrice:
-    Number(
-      state.selectedEvent.unitPrice ||
-      0
-    ),
-
-  totalAmount:
-    Number(
-      state.selectedEvent.unitPrice ||
-      0
-    ) *
-    guestCount,
-
-  representativePaymentCount:
-    representativePaymentCount,
-
-  representativePaymentAmount:
-    representativePaymentAmount,
-};
+        serviceId: state.selectedService.serviceId,
+        serviceName: state.selectedService.serviceName,
+        eventId: state.selectedEvent.eventId,
+        eventDate: state.selectedEvent.eventDate,
+        startTime: state.selectedEvent.startTime,
+        endTime: state.selectedEvent.endTime,
+        guestCount,
+        additionalAllergy: $('additionalAllergy').value.trim(),
+        additionalDislikedFoods: $('additionalDislikedFoods').value.trim(),
+        combinedAllergy: combineFood(state.member.allergy, $('additionalAllergy').value),
+        combinedDislikedFoods: combineFood(state.member.dislikedFoods, $('additionalDislikedFoods').value),
+        representativePaymentMethod,
+        companions,
+        unitPrice: Number(state.selectedEvent.unitPrice || 0),
+        totalAmount: Number(state.selectedEvent.unitPrice || 0) * guestCount,
+      };
     }
 
     function showConfirmation() {
@@ -644,33 +429,7 @@ const representativePaymentAmount =
           <dt>同行者</dt><dd>${escapeHtml(companionsText)}</dd>
           <dt>アレルギー</dt><dd>${escapeHtml(displayNone(state.draft.combinedAllergy))}</dd>
           <dt>苦手食材</dt><dd>${escapeHtml(displayNone(state.draft.combinedDislikedFoods))}</dd>
-          <dt>代表者支払い</dt>
-<dd>
-  ${escapeHtml(
-    paymentLabel(
-      state.draft
-        .representativePaymentMethod
-    )
-  )}
-</dd>
-
-<dt>予約総額</dt>
-<dd>
-  ${formatMoney(
-    state.draft.totalAmount
-  )}
-</dd>
-
-<dt>代表者決済額</dt>
-<dd>
-  ${state.draft
-    .representativePaymentCount}名分
-  ／
-  ${formatMoney(
-    state.draft
-      .representativePaymentAmount
-  )}
-</dd>
+          <dt>代表者支払い</dt><dd>${escapeHtml(paymentLabel(state.draft.representativePaymentMethod))}</dd>
           <dt>合計金額</dt><dd>${formatMoney(state.draft.totalAmount)}</dd>
         </dl>`;
         $('formScreen').classList.add('hidden');
@@ -849,81 +608,6 @@ const representativePaymentAmount =
     $('backBtn').addEventListener('click', backToForm);
     $('submitBtn').addEventListener('click', submitReservation);
     init();
-
-    function renderCapacityFromEvent_(event) {
-  const status =
-    $('capacityStatus');
-
-  if (!event) {
-    status.classList.add('hidden');
-    return;
-  }
-
-  let message = '';
-
-  if (event.remaining === null) {
-    message =
-      '予約受付中';
-
-  } else if (
-    Number(event.remaining) <= 0
-  ) {
-    message =
-      '満席';
-
-  } else {
-    message =
-      '残席 ' +
-      Number(event.remaining) +
-      '席';
-  }
-
-  status.textContent = message;
-  status.classList.remove('hidden');
-
-  const guestCount =
-    $('guestCount');
-
-  if (
-    event.remaining !== null &&
-    Number(event.remaining) > 0
-  ) {
-    const max =
-      Math.min(
-        Number(event.remaining),
-        4
-      );
-
-    Array.from(
-      guestCount.options
-    ).forEach(
-      function(option) {
-        if (!option.value) {
-          option.disabled = false;
-          return;
-        }
-
-        option.disabled =
-          Number(option.value) >
-          max;
-      }
-    );
-
-  } else if (
-    Number(event.remaining) <= 0
-  ) {
-    Array.from(
-      guestCount.options
-    ).forEach(
-      function(option) {
-        if (option.value) {
-          option.disabled = true;
-        }
-      }
-    );
-  }
-}
-    
   </script>
 </body>
 </html>
