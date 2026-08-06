@@ -242,34 +242,57 @@
 
    async function init() {
   try {
-    setStatus(
-      'LIFF初期化中...'
-    );
+    setStatus('1/6 LIFF初期化中...');
 
     await liff.init({
       liffId: LIFF_ID
     });
+
+    setStatus('2/6 ログイン確認中...');
 
     if (!liff.isLoggedIn()) {
       liff.login();
       return;
     }
 
-    state.profile =
-      await liff.getProfile();
+    setStatus('3/6 LINE情報を取得中...');
 
-    setStatus(
-      '予約情報を読み込んでいます...'
-    );
+    const context =
+      liff.getContext();
+
+    const lineUserId =
+      context &&
+      context.userId
+        ? String(context.userId).trim()
+        : '';
+
+    if (!lineUserId) {
+      throw new Error(
+        'LINEユーザーIDを取得できませんでした。'
+      );
+    }
+
+    state.profile = {
+      userId: lineUserId
+    };
+
+    setStatus('4/6 予約情報を取得中...');
 
     const data =
       await api(
         'getReservationOptions',
         {
-          lineUserId:
-            state.profile.userId
+          lineUserId: lineUserId
         }
       );
+
+    setStatus('5/6 予約画面を作成中...');
+
+    if (!data) {
+      throw new Error(
+        'APIから返答がありません。'
+      );
+    }
 
     if (!data.ok) {
       showApiError(data);
@@ -285,19 +308,42 @@
         : [];
 
     renderMember();
+
+    setStatus('5/6 食材情報を表示中...');
     renderRegisteredFood();
+
+    setStatus('5/6 イベント一覧を表示中...');
     renderServices();
 
     $('formScreen')
       .classList.remove('hidden');
 
-    setStatus('');
+    setStatus('6/6 完了');
+
+    setTimeout(
+      function() {
+        setStatus('');
+      },
+      500
+    );
 
   } catch (error) {
-    handleInitError(error);
+    console.error(
+      'init error',
+      error
+    );
+
+    setStatus(
+      '読み込みエラー\n' +
+      (
+        error &&
+        error.message
+          ? error.message
+          : String(error)
+      )
+    );
   }
 }
-
     function renderMember() {
       $('memberInfo').innerHTML = `
         <dl class="member-grid">
