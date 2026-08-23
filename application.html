@@ -8,7 +8,7 @@
     content="width=device-width, initial-scale=1"
   >
 
-  <title>Nalu-09 Application</title>
+  <title>Nalu-09 Reservation</title>
 
   <style>
     *{
@@ -190,15 +190,8 @@
         let html = "";
 
         links.forEach(function(link) {
-          const target =
-            link.openType === "blank"
-              ? "_blank"
-              : "_self";
-
-          const rel =
-            target === "_blank"
-              ? " rel='noopener noreferrer'"
-              : "";
+          const target = "_blank";
+const rel = " rel='noopener noreferrer'";
 
           html += ""
             + "<section class='application-card'>"
@@ -258,7 +251,7 @@
         .replaceAll("'", "&#039;");
     }
 
-
+　
     function escapeAttribute(value) {
       return escapeHtml(value);
     }
