@@ -745,20 +745,50 @@ border:1px solid rgba(244,240,232,.14);
 
     function showApiError(data, target) {
       const messages = {
-        member_not_found:'会員情報が確認できませんでした。\n会員証発行後にご利用ください。',
-        member_rank_not_found:'会員ランクを確認できませんでした。',
-        service_not_allowed:'現在のランクでは、このイベントにお申し込みいただけません。',
-        event_not_found:'開催情報を確認できませんでした。',
-        deadline_closed:'この開催日の受付は終了しています。',
-        capacity_full:'この開催日は満席です。',
-        participation_cycle:'参加周期のため、この開催日にはお申し込みいただけません。',
-        min_people_required:`このイベントは${data.minPeople || ''}名以上でお申し込みください。`,
-        active_price_not_found:'適用価格を確認できませんでした。',
-        participant_count_mismatch:'人数と同行者情報が一致していません。',
-        participant_name_required:`同行者${data.participantNo || ''}の氏名を入力してください。`,
-        participant_payment_method_required:`同行者${data.participantNo || ''}の支払い方法を選択してください。`,
-        reservation_consent_required:'規約・料金・キャンセル条件への同意が必要です。',
-      };
+  member_not_found:
+    '会員情報が確認できませんでした。\n会員証発行後にご利用ください。',
+
+  member_rank_not_found:
+    '会員ランクを確認できませんでした。',
+
+  service_not_allowed:
+    '現在のランクでは、このイベントにお申し込みいただけません。',
+
+  event_not_found:
+    '開催情報を確認できませんでした。',
+
+  reservation_not_started:
+    data.reservationStart
+      ? `${formatDate(data.reservationStart)}よりお申し込みいただけます。`
+      : '現在はまだ予約受付開始前です。',
+
+  deadline_closed:
+    'この開催日の受付は終了しています。',
+
+  capacity_full:
+    'この開催日は満席です。',
+
+  participation_cycle:
+    '参加周期のため、この開催日にはお申し込みいただけません。',
+
+  min_people_required:
+    `このイベントは${data.minPeople || ''}名以上でお申し込みください。`,
+
+  active_price_not_found:
+    '適用価格を確認できませんでした。',
+
+  participant_count_mismatch:
+    '人数と同行者情報が一致していません。',
+
+  participant_name_required:
+    `同行者${data.participantNo || ''}の氏名を入力してください。`,
+
+  participant_payment_method_required:
+    `同行者${data.participantNo || ''}の支払い方法を選択してください。`,
+
+  reservation_consent_required:
+    '規約・料金・キャンセル条件への同意が必要です。',
+};
       const message = messages[data.message] || `処理できませんでした。\nエラー内容：${data.message || 'unknown_error'}`;
       if (target) target.textContent = message; else setStatus(message);
     }
