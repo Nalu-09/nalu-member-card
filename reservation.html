@@ -388,7 +388,31 @@ border:1px solid rgba(244,240,232,.14);
         const option = document.createElement('option');
         option.value = service.serviceId;
         option.disabled = service.status !== 'open';
-        option.textContent = service.serviceName + (service.status === 'open' ? '' : '｜' + serviceStatusLabel(service.status));
+        if (
+  service.status ===
+  'reservation_not_started' &&
+  service.reservationStart
+) {
+  option.textContent =
+    service.serviceName +
+    '｜' +
+    formatDate(
+      service.reservationStart
+    ) +
+    'より受付開始';
+
+} else {
+  option.textContent =
+    service.serviceName +
+    (
+      service.status === 'open'
+        ? ''
+        : '｜' +
+          serviceStatusLabel(
+            service.status
+          )
+    );
+}
         select.appendChild(option);
       });
       if (!state.services.length) select.innerHTML = '<option value="">現在選択可能なイベントはありません</option>';
