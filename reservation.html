@@ -763,7 +763,15 @@ border:1px solid rgba(244,240,232,.14);
 
     function displayNone(value) { return isNone(value) ? 'なし' : String(value || '').trim(); }
     function formatMoney(value) { return new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY', maximumFractionDigits: 0 }).format(Number(value || 0)); }
-    function serviceStatusLabel(status) { return ({ open:'受付中', full:'満席', closed:'受付終了', cycle_blocked:'次回申込対象外' })[status] || status; }
+    function serviceStatusLabel(status) {
+  return ({
+    open:'受付中',
+    full:'満席',
+    closed:'受付終了',
+    cycle_blocked:'次回申込対象外',
+    reservation_not_started:'受付開始前'
+  })[status] || status;
+}
     function paymentLabel(method) { return ({ CARD:'クレジットカード', PAYPAY:'PayPay', BANK_TRANSFER:'銀行振込', REPRESENTATIVE:'代表者がまとめて支払う' })[method] || method; }
     function setStatus(message) { $('status').textContent = message || ''; }
 
