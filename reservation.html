@@ -216,15 +216,16 @@ border:1px solid rgba(244,240,232,.14);
     const SOURCE = getSource();
 
     const state = {
-      profile: null,
-      member: null,
-      services: [],
-      selectedService: null,
-      selectedEvent: null,
-      capacity: null,
-      draft: null,
-      submitting: false,
-    };
+  profile: null,
+  member: null,
+  services: [],
+  paymentSettings: {},
+  selectedService: null,
+  selectedEvent: null,
+  capacity: null,
+  draft: null,
+  submitting: false,
+};
 
     const $ = id => document.getElementById(id);
 
@@ -353,6 +354,9 @@ border:1px solid rgba(244,240,232,.14);
         setStatus('5/6 予約画面を作成しています...');
         state.member = data.member || {};
         state.services = Array.isArray(data.services) ? data.services : [];
+
+        state.paymentSettings =
+  data.paymentSettings || {};
 
         renderMember();
         renderRegisteredFood();
@@ -777,6 +781,69 @@ border:1px solid rgba(244,240,232,.14);
     reservation_not_started:'受付開始前'
   })[status] || status;
 }
+    function renderPaymentGuide() {
+  const method =
+    $('representativePaymentMethod').value;
+
+  const box =
+    $('paymentGuide');
+
+  const settings =
+    state.paymentSettings || {};
+
+  if (!method) {
+    box.innerHTML = '';
+    box.classList.add('hidden');
+    return;
+  }
+
+  if (method === 'CARD') {
+    box.innerHTML = `
+      <strong>クレジットカード決済</strong>
+      <p>
+        お申し込み完了後、自動で決済ページへ移動します。<br>
+        移動先のページにて決済手続きをお願いいたします。
+      </p>
+    `;
+    box.classList.remove('hidden');
+    return;
+  }
+
+  if (method === 'BANK_TRANSFER') {
+    box.innerHTML = `
+      <strong>銀行振込</strong>
+      <p>
+        ${escapeHtml(settings.bankName || '')}<br>
+        ${escapeHtml(settings.branchName || '')}<br>
+        ${escapeHtml(settings.accountType || '')}
+        ${escapeHtml(settings.accountNumber || '')}<br>
+        口座名義：${escapeHtml(settings.accountName || '')}
+        <br><br>
+        お申し込み完了後、上記口座へお振り込みをお願いいたします。
+      </p>
+    `;
+    box.classList.remove('hidden');
+    return;
+  }
+
+  if (method === 'PAYPAY') {
+    box.innerHTML = `
+      <strong>PayPay</strong>
+      <p>
+        PayPay ID：${escapeHtml(settings.paypayId || '')}<br>
+        受け取り名義：${escapeHtml(settings.paypayName || '')}
+        <br><br>
+        お申し込み完了後、上記宛先へお支払いをお願いいたします。
+      </p>
+    `;
+    box.classList.remove('hidden');
+    return;
+  }
+
+  box.innerHTML = '';
+  box.classList.add('hidden');
+}
+    
     function paymentLabel(method) { return ({ CARD:'クレジットカード', PAYPAY:'PayPay', BANK_TRANSFER:'銀行振込', REPRESENTATIVE:'代表者がまとめて支払う' })[method] || method; }
     function setStatus(message) { $('status').textContent = message || ''; }
 
@@ -846,13 +913,20 @@ border:1px solid rgba(244,240,232,.14);
     function escapeAttr(value) { return escapeHtml(value); }
 
     function bindEvents() {
-      $('serviceId').addEventListener('change', onServiceChange);
-      $('eventDate').addEventListener('change', onEventChange);
-      $('guestCount').addEventListener('change', onGuestCountChange);
-      $('confirmBtn').addEventListener('click', showConfirmation);
-      $('backBtn').addEventListener('click', backToForm);
-      $('submitBtn').addEventListener('click', submitReservation);
-    }
+  $('serviceId').addEventListener('change', onServiceChange);
+  $('eventDate').addEventListener('change', onEventChange);
+  $('guestCount').addEventListener('change', onGuestCountChange);
+
+  $('representativePaymentMethod')
+    .addEventListener(
+      'change',
+      renderPaymentGuide
+    );
+
+  $('confirmBtn').addEventListener('click', showConfirmation);
+  $('backBtn').addEventListener('click', backToForm);
+  $('submitBtn').addEventListener('click', submitReservation);
+}
 
     window.addEventListener('error', event => {
       setStatus('JavaScriptエラー\n' + (event.message || 'unknown_error'));
