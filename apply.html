@@ -6,191 +6,194 @@
   <title>Nalu Member Application</title>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
-    body{
-      margin:0;
-      background:#000;
-      color:#fff;
-      font-family:"Times New Roman", "Yu Mincho", "Hiragino Mincho ProN", serif;
-      text-align:center;
-      padding:32px 16px 40px;
-    }
-
-    .wrap{
-      width:min(92vw, 420px);
-      margin:0 auto;
-    }
-
-    .box{
-      background:#0f0f0f;
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:22px;
-      padding:28px 22px;
-      box-shadow:0 10px 30px rgba(0,0,0,.35);
-    }
-
-    .title{
-      font-size:28px;
-      margin:0 0 18px;
-      letter-spacing:.04em;
-      line-height:1.35;
-    }
-
-    .text{
-      font-size:14px;
-      line-height:1.9;
-      opacity:.95;
-      white-space:pre-wrap;
-      margin:0 0 28px;
-    }
-
-    .field{
-      margin:0 0 18px;
-      text-align:left;
-    }
-
-    .field label{
-      display:block;
-      font-size:13px;
-      margin:0 0 8px;
-      opacity:.9;
-      letter-spacing:.04em;
-    }
-
-    .field input,
-    .field textarea{
-      width:100%;
-      box-sizing:border-box;
-      background:#050505;
-      color:#fff;
-      border:1px solid rgba(255,255,255,.16);
-      border-radius:14px;
-      padding:12px 14px;
-      font-size:14px;
-      font-family:"Times New Roman", "Yu Mincho", "Hiragino Mincho ProN", serif;
-      outline:none;
-    }
-
-    .field textarea{
-      min-height:82px;
-      resize:vertical;
-      line-height:1.7;
-    }
-
-    .field input::placeholder,
-    .field textarea::placeholder{
-      color:rgba(255,255,255,.45);
-    }
-
-    .note{
-      margin:7px 0 0;
-      font-size:11px;
-      line-height:1.7;
-      color:rgba(255,255,255,.62);
-    }
-
-    .optional{
-      font-size:11px;
-      color:rgba(255,255,255,.55);
-      margin-left:4px;
-    }
-
-    .button{
-      display:inline-block;
-      background:#fff;
-      color:#000;
-      border:none;
-      border-radius:999px;
-      padding:12px 24px;
-      font-size:14px;
-      font-family:"Times New Roman", "Yu Mincho", "Hiragino Mincho ProN", serif;
-      cursor:pointer;
-      margin-top:6px;
-    }
-
-    .button:disabled{
-      opacity:.6;
-      cursor:not-allowed;
-    }
-
-    .status{
-      margin-top:18px;
-      font-size:14px;
-      line-height:1.8;
-      white-space:pre-wrap;
-      opacity:.95;
-    }
-
-    .field input[type="date"]{
-  width:100%;
-  box-sizing:border-box;
-  min-height:48px;
-  appearance:none;
-  -webkit-appearance:none;
-  border-radius:14px;
-  padding:12px 14px;
-  background:#050505;
-  color:#fff;
+  body {
+  margin: 0;
+  background: #17201E;
+  color: #F4F0E8;
+  font-family: "Times New Roman", serif;
+  text-align: center;
+  padding: 32px 16px 48px;
 }
 
-.field input[type="date"]::-webkit-date-and-time-value{
-  text-align:left;
+.wrap {
+  width: min(92vw, 420px);
+  margin: 0 auto;
 }
 
-.field input[type="date"]::-webkit-calendar-picker-indicator{
-  filter:invert(1);
-  opacity:.75;
+.box,
+.card,
+.form-card,
+.member-card {
+  background: #202A27;
+  border: 1px solid rgba(244, 240, 232, .14);
+  color: #F4F0E8;
+  border-radius: 22px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .22);
 }
-    
 
-    .consent-box{
-      margin:24px 0 18px;
-      padding:18px 16px;
-      text-align:left;
-      background:#080808;
-      border:1px solid rgba(255,255,255,.14);
-      border-radius:16px;
-    }
+.title {
+  font-size: 28px;
+  margin: 0 0 18px;
+  letter-spacing: .04em;
+  line-height: 1.35;
+}
 
-    .consent-title{
-      margin:0 0 10px;
-      font-size:14px;
-      letter-spacing:.04em;
-    }
+.text {
+  font-size: 14px;
+  line-height: 1.9;
+  opacity: .95;
+  white-space: pre-wrap;
+  margin: 0 0 28px;
+}
 
-    .policy-links{
-      margin:0 0 14px;
-      padding:0;
-      list-style:none;
-    }
+.field {
+  margin: 0 0 18px;
+  text-align: left;
+}
 
-    .policy-links li{
-      margin:7px 0;
-      font-size:13px;
-      line-height:1.6;
-    }
+.field label {
+  display: block;
+  font-size: 13px;
+  margin: 0 0 8px;
+  opacity: .9;
+  letter-spacing: .04em;
+}
 
-    .policy-links a{
-      color:#fff;
-      text-decoration:underline;
-      text-underline-offset:3px;
-    }
+.field input,
+.field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: #151C1A;
+  color: #F4F0E8;
+  border: 1px solid rgba(244, 240, 232, .18);
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-family: "Times New Roman", "Yu Mincho", "Hiragino Mincho ProN", serif;
+  outline: none;
+}
 
-    .consent-label{
-      display:flex;
-      align-items:flex-start;
-      gap:10px;
-      font-size:12px;
-      line-height:1.75;
-      cursor:pointer;
-    }
+.field textarea {
+  min-height: 82px;
+  resize: vertical;
+  line-height: 1.7;
+}
 
-    .consent-label input{
-      width:18px;
-      height:18px;
-      margin:2px 0 0;
-      flex:0 0 auto;
-      accent-color:#fff;
-    }
+.field input::placeholder,
+.field textarea::placeholder {
+  color: rgba(244, 240, 232, .42);
+}
+
+.note {
+  margin: 7px 0 0;
+  font-size: 11px;
+  line-height: 1.7;
+  color: rgba(244, 240, 232, .62);
+}
+
+.optional {
+  font-size: 11px;
+  color: rgba(244, 240, 232, .55);
+  margin-left: 4px;
+}
+
+.button {
+  display: inline-block;
+  background: #E8E0D2;
+  color: #1A211F;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-family: "Times New Roman", "Yu Mincho", "Hiragino Mincho ProN", serif;
+  cursor: pointer;
+  margin-top: 6px;
+}
+
+.button:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+.status {
+  margin-top: 18px;
+  font-size: 14px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  opacity: .95;
+}
+
+.field input[type="date"] {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 48px;
+  appearance: none;
+  -webkit-appearance: none;
+  border-radius: 14px;
+  padding: 12px 14px;
+  background: #151C1A;
+  color: #F4F0E8;
+  border: 1px solid rgba(244, 240, 232, .18);
+}
+
+.field input[type="date"]::-webkit-date-and-time-value {
+  text-align: left;
+}
+
+.field input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: .75;
+}
+
+.consent-box {
+  margin: 24px 0 18px;
+  padding: 18px 16px;
+  text-align: left;
+  background: rgba(244, 240, 232, .035);
+  border: 1px solid rgba(244, 240, 232, .14);
+  border-radius: 16px;
+}
+
+.consent-title {
+  margin: 0 0 10px;
+  font-size: 14px;
+  letter-spacing: .04em;
+}
+
+.policy-links {
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+}
+
+.policy-links li {
+  margin: 7px 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.policy-links a {
+  color: #F4F0E8;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.consent-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 12px;
+  line-height: 1.75;
+  cursor: pointer;
+}
+
+.consent-label input {
+  width: 18px;
+  height: 18px;
+  margin: 2px 0 0;
+  flex: 0 0 auto;
+  accent-color: #E8E0D2;
+}
 
   </style>
 </head>
