@@ -565,9 +565,13 @@
   try {
     const res = await fetch(API_URL, {
       method: "POST",
-      body: new URLSearchParams({
-        action: "getReservations"
-      })
+      new URLSearchParams({
+  action:
+    "getReservations",
+
+  idToken:
+    liff.getIDToken() || ""
+})
     });
 
         const data = await res.json();
