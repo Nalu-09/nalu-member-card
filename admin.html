@@ -569,16 +569,21 @@ let currentAdminAuth = null;
   list.textContent = "予約履歴を読み込み中...";
 
   try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      new URLSearchParams({
-  action:
-    "getReservations",
+    const res = await fetch(
+  API_URL,
+  {
+    method: "POST",
 
-  idToken:
-    liff.getIDToken() || ""
-})
-    });
+    body:
+      new URLSearchParams({
+        action:
+          "getReservations",
+
+        idToken:
+          liff.getIDToken() || ""
+      })
+  }
+);
 
         const data = await res.json();
 
