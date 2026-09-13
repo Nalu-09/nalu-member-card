@@ -347,14 +347,35 @@
       <h1 class="title">Lumière Dining Admin</h1>
       <p class="subtitle">管理者メニュー</p>
 
-      <div class="menu">
-        <button onclick="openCheckinLiff()">
-  チェックイン
-</button>
-        <button onclick="loadReservations()">予約管理</button>
-        <button onclick="loadServiceSettings()">受付設定</button>
-        <button onclick="showServiceManagement()">サービス管理</button>
-      </div>
+        <div class="menu">
+  <button
+    id="menuCheckin"
+    onclick="openCheckinLiff()"
+  >
+    チェックイン
+  </button>
+
+  <button
+    id="menuReservations"
+    onclick="loadReservations()"
+  >
+    予約管理
+  </button>
+
+  <button
+    id="menuReservationSettings"
+    onclick="showReservationSettings()"
+  >
+    受付設定
+  </button>
+
+  <button
+    id="menuStatusManagement"
+    onclick="loadStatusManagement()"
+  >
+    ステータスアップ
+  </button>
+</div>
 
       <div id="reservation" class="panel">
         <h2>Reservation</h2>
@@ -362,63 +383,48 @@
       </div>
 
       <div id="service" class="panel">
-        <h2>Service Setting</h2>
-        <div id="serviceList">読み込み前です。</div>
-      </div>
+  <h2>Reservation Setting</h2>
 
-      <div id="rank" class="panel">
-        <h2>Service Management</h2>
+  <div
+    id="reservationSettingMenu"
+    class="menu"
+  >
+    <button
+      id="newReservationButton"
+      onclick="showAdminNewReservation()"
+    >
+      新規予約
+    </button>
 
-        <div id="serviceManagementMenu" class="menu">
-          <button onclick="showNewServiceForm()">新規サービス登録</button>
-          <button onclick="loadServiceBasicEdit()">既存サービス修正</button>
-        </div>
+    <button
+      id="editReservationButton"
+      onclick="showAdminReservationEdit()"
+    >
+      既存予約修正
+    </button>
+  </div>
 
-        <div id="newServiceArea" style="display:none;">
-          <div class="service-card">
-            <div class="service-name">新規サービス登録</div>
+  <div
+    id="newReservationArea"
+    style="display:none;"
+  ></div>
 
-            <label>サービス名</label>
-            <input id="newServiceName" class="admin-input" type="text" placeholder="例：Nalu Table">
+  <div
+    id="editReservationArea"
+    style="display:none;"
+  ></div>
+</div>
 
-            <label>表示先</label>
-            <select id="newSource" class="admin-input">
-              <option value="lumiere" selected>Lumière Nalu</option>
-              <option value="event">Event</option>
-            </select>
 
-            <label>対象ランク</label>
-            <select id="newRequiredRank" class="admin-input">
-              <option value="WAVE">WAVE</option>
-              <option value="EVEIL">EVEIL</option>
-              <option value="ECLAT">ECLAT</option>
-              <option value="NALU">NALU</option>
-            </select>
+<div id="rank" class="panel">
+  <h2>Member Status</h2>
 
-            <label>受付状態</label>
-            <select id="newStatus" class="admin-input">
-              <option value="active" selected>受付中</option>
-              <option value="paused">停止中</option>
-            </select>
-
-            <label>申込期限</label>
-            <input id="newDeadline" class="admin-input" type="datetime-local">
-
-            <label>上限人数</label>
-            <input id="newCapacity" class="admin-input" type="number" placeholder="無制限の場合は空欄">
-
-            <label>memo</label>
-            <input id="newMemo" class="admin-input" type="text" placeholder="例：会員制フレンチ">
-
-            <button class="save-button" onclick="addNewService()">登録する</button>
-          </div>
-
-          <div id="addServiceStatus" class="small"></div>
-        </div>
-
-        <div id="editServiceArea" style="display:none;">
-          <div id="editServiceList">読み込み前です。</div>
-        </div>
+  <div
+    id="statusManagementList"
+  >
+    読み込み前です。
+  </div>
+</div>
       </div>
     </div>
   </div>
@@ -562,6 +568,119 @@ let currentAdminIdToken = "";
         target.classList.add("active");
       }
     }
+
+    function showReservationSettings() {
+  showPanel("service");
+
+  const menu =
+    document.getElementById(
+      "reservationSettingMenu"
+    );
+
+  const newArea =
+    document.getElementById(
+      "newReservationArea"
+    );
+
+  const editArea =
+    document.getElementById(
+      "editReservationArea"
+    );
+
+  if (menu) {
+    menu.style.display = "grid";
+  }
+
+  if (newArea) {
+    newArea.style.display = "none";
+  }
+
+  if (editArea) {
+    editArea.style.display = "none";
+  }
+}
+
+
+function showAdminNewReservation() {
+  showPanel("service");
+
+  const newArea =
+    document.getElementById(
+      "newReservationArea"
+    );
+
+  const editArea =
+    document.getElementById(
+      "editReservationArea"
+    );
+
+  if (newArea) {
+    newArea.style.display = "block";
+
+    if (!newArea.innerHTML.trim()) {
+      newArea.innerHTML =
+        "<div class='service-card'>" +
+        "<div class='service-name'>新規予約</div>" +
+        "<div class='small'>新規予約フォームを読み込む準備中です。</div>" +
+        "</div>";
+    }
+  }
+
+  if (editArea) {
+    editArea.style.display = "none";
+  }
+}
+
+
+function showAdminReservationEdit() {
+  showPanel("service");
+
+  const newArea =
+    document.getElementById(
+      "newReservationArea"
+    );
+
+  const editArea =
+    document.getElementById(
+      "editReservationArea"
+    );
+
+  if (newArea) {
+    newArea.style.display = "none";
+  }
+
+  if (editArea) {
+    editArea.style.display = "block";
+
+    if (!editArea.innerHTML.trim()) {
+      editArea.innerHTML =
+        "<div class='service-card'>" +
+        "<div class='service-name'>既存予約修正</div>" +
+        "<div class='small'>既存予約一覧を読み込む準備中です。</div>" +
+        "</div>";
+    }
+  }
+}
+
+
+function loadStatusManagement() {
+  showPanel("rank");
+
+  const list =
+    document.getElementById(
+      "statusManagementList"
+    );
+
+  if (!list) {
+    return;
+  }
+
+  list.innerHTML =
+    "<div class='service-card'>" +
+    "<div class='service-name'>会員ステータス</div>" +
+    "<div class='small'>会員情報を読み込む準備中です。</div>" +
+    "</div>";
+}
 
     async function loadReservations() {
   showPanel("reservation");
@@ -2358,53 +2477,78 @@ currentAdminIdToken =
   const permissions =
     auth.permissions || {};
 
-  const buttons =
-    document.querySelectorAll(
-      ".menu button"
+
+  const checkin =
+    document.getElementById(
+      "menuCheckin"
     );
 
-  buttons.forEach(
-    function(button) {
-      button.style.display =
-        "none";
-    }
-  );
-
-  const menu =
-    document.querySelector(
-      ".menu"
+  const reservations =
+    document.getElementById(
+      "menuReservations"
     );
 
-  if (!menu) {
-    return;
+  const reservationSettings =
+    document.getElementById(
+      "menuReservationSettings"
+    );
+
+  const statusManagement =
+    document.getElementById(
+      "menuStatusManagement"
+    );
+
+  const newReservation =
+    document.getElementById(
+      "newReservationButton"
+    );
+
+  const editReservation =
+    document.getElementById(
+      "editReservationButton"
+    );
+
+
+  if (checkin) {
+    checkin.style.display =
+      permissions.updateAttendance
+        ? ""
+        : "none";
   }
 
-  if (
-    permissions.viewReservations
-  ) {
-    showMenuButtonByText(
-      "予約管理"
-    );
+  if (reservations) {
+    reservations.style.display =
+      permissions.viewReservations
+        ? ""
+        : "none";
   }
 
-  if (
-    permissions.updateAttendance
-  ) {
-    showMenuButtonByText(
-      "チェックイン"
-    );
+  if (reservationSettings) {
+    reservationSettings.style.display =
+      permissions.viewReservationSettings
+        ? ""
+        : "none";
   }
 
-  if (
-    permissions.editService
-  ) {
-    showMenuButtonByText(
-      "受付設定"
-    );
+  if (newReservation) {
+    newReservation.style.display =
+      permissions.createReservation
+        ? ""
+        : "none";
+  }
 
-    showMenuButtonByText(
-      "サービス管理"
-    );
+  if (editReservation) {
+    editReservation.style.display =
+      permissions.editReservation
+        ? ""
+        : "none";
+  }
+
+  if (statusManagement) {
+    statusManagement.style.display =
+      permissions.viewStatusManagement
+        ? ""
+        : "none";
   }
 }
 
