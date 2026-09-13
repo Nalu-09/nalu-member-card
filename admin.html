@@ -1,9 +1,10 @@
 <!doctype html>
 <html lang="ja">
 <head>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Nalu-09 Admin</title>
+  <title>Lumière Dining Admin</title>
 
   <style>
     body{
@@ -538,6 +539,11 @@
   <script>
     const API_URL =
   "https://script.google.com/macros/s/AKfycbzuXAKRg9B5AuPOi2ppj9VuaN8qM01vzLlLnIBFjWiNnjKh7rxzmB_BEG2-U0qAMmM8/exec";
+    
+    const ADMIN_LIFF_ID =
+  "2007730715-acunFUE6";
+
+let currentAdminAuth = null;
 
     let allReservations = [];
     window.reservationGroups = [];
@@ -2255,6 +2261,161 @@ function getPaymentStatusLabel(status) {
   window.location.href =
     "https://liff.line.me/2007730715-acunFUE6";
 }
+
+    async function initAdminAuth() {
+  try {
+    await liff.init({
+      liffId: ADMIN_LIFF_ID
+    });
+
+    if (!liff.isLoggedIn()) {
+      liff.login();
+      return;
+    }
+
+    const idToken =
+      liff.getIDToken();
+
+    if (!idToken) {
+      throw new Error(
+        "LINE認証情報を取得できませんでした。"
+      );
+    }
+
+    const response =
+      await fetch(
+        API_URL,
+        {
+          method: "POST",
+          body:
+            new URLSearchParams({
+              action:
+                "getAdminAuth",
+              idToken:
+                idToken
+            })
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if (!data.ok) {
+      document.body.innerHTML =
+        "<div style='padding:40px;text-align:center;'>"
+        + "<h2>アクセスできません</h2>"
+        + "<p>"
+        + escapeHtml(
+            data.message ||
+            "管理権限がありません。"
+          )
+        + "</p>"
+        + "</div>";
+
+      return;
+    }
+
+    currentAdminAuth = data;
+
+    applyAdminPermissions(
+      data
+    );
+
+  } catch (error) {
+    document.body.innerHTML =
+      "<div style='padding:40px;text-align:center;'>"
+      + "<h2>認証エラー</h2>"
+      + "<p>"
+      + escapeHtml(
+          error.message ||
+          "認証に失敗しました。"
+        )
+      + "</p>"
+      + "</div>";
+  }
+}
+
+    function applyAdminPermissions(
+  auth
+) {
+  const permissions =
+    auth.permissions || {};
+
+  const buttons =
+    document.querySelectorAll(
+      ".menu button"
+    );
+
+  buttons.forEach(
+    function(button) {
+      button.style.display =
+        "none";
+    }
+  );
+
+  const menu =
+    document.querySelector(
+      ".menu"
+    );
+
+  if (!menu) {
+    return;
+  }
+
+  if (
+    permissions.viewReservations
+  ) {
+    showMenuButtonByText(
+      "予約管理"
+    );
+  }
+
+  if (
+    permissions.updateAttendance
+  ) {
+    showMenuButtonByText(
+      "チェックイン"
+    );
+  }
+
+  if (
+    permissions.editService
+  ) {
+    showMenuButtonByText(
+      "受付設定"
+    );
+
+    showMenuButtonByText(
+      "サービス管理"
+    );
+  }
+}
+
+    function showMenuButtonByText(
+  text
+) {
+  const buttons =
+    document.querySelectorAll(
+      ".menu button"
+    );
+
+  buttons.forEach(
+    function(button) {
+      if (
+        button.textContent
+          .trim() === text
+      ) {
+        button.style.display =
+          "";
+      }
+    }
+  );
+}
+
+    document.addEventListener(
+  "DOMContentLoaded",
+  initAdminAuth
+);
     
   </script>
 </body>
