@@ -601,7 +601,13 @@ let currentAdminIdToken = "";
 }
 
 
-let adminNewReservationOptions = null;
+let adminNewReservationState = {
+  members: [],
+  services: [],
+  selectedMember: null,
+  selectedService: null,
+  selectedEvent: null
+};
 
 
 async function showAdminNewReservation() {
@@ -663,9 +669,20 @@ async function showAdminNewReservation() {
       );
     }
 
-    renderAdminNewReservationForm(
-      data.members || []
-    );
+    adminNewReservationState = {
+  members:
+    Array.isArray(data.members)
+      ? data.members
+      : [],
+  services: [],
+  selectedMember: null,
+  selectedService: null,
+  selectedEvent: null
+};
+
+renderAdminNewReservationForm(
+  adminNewReservationState.members
+);
 
   } catch (error) {
     newArea.innerHTML =
@@ -752,7 +769,7 @@ async function showAdminNewReservation() {
     "<select" +
     " id='adminReservationMember'" +
     " class='admin-input'" +
-    " onchange='loadAdminReservationMember()'>" +
+    " onchange='loadAdminMemberReservationOptions()'>" +
 
     memberOptions +
 
@@ -771,7 +788,7 @@ async function showAdminNewReservation() {
     " id='adminReservationService'" +
     " class='admin-input'" +
     " disabled" +
-    " onchange='updateAdminReservationEvents()'>" +
+    " onchange='handleAdminReservationServiceChange()'>" +
 
     "<option value=''>" +
     "先に会員を選択してください" +
@@ -786,7 +803,7 @@ async function showAdminNewReservation() {
     " id='adminReservationEvent'" +
     " class='admin-input'" +
     " disabled" +
-    " onchange='updateAdminReservationPeople()'>" +
+    " onchange='handleAdminReservationEventChange()'>" +
 
     "<option value=''>" +
     "先にサービスを選択してください" +
@@ -3409,22 +3426,39 @@ currentAdminIdToken =
       );
 
     const data =
-      await response.json();
+  await response.json();
 
-    if (!data.ok) {
-      document.body.innerHTML =
-        "<div style='padding:40px;text-align:center;'>"
-        + "<h2>アクセスできません</h2>"
-        + "<p>"
-        + escapeHtml(
-            data.message ||
-            "管理権限がありません。"
-          )
-        + "</p>"
-        + "</div>";
+if (!data.ok) {
+  const message =
+    String(
+      data.message || ""
+    );
 
-      return;
-    }
+  if (
+    message.includes(
+      "IdToken expired"
+    )
+  ) {
+    liff.logout();
+
+    liff.login();
+
+    return;
+  }
+
+  document.body.innerHTML =
+    "<div style='padding:40px;text-align:center;'>"
+    + "<h2>アクセスできません</h2>"
+    + "<p>"
+    + escapeHtml(
+        message ||
+        "管理権限がありません。"
+      )
+    + "</p>"
+    + "</div>";
+
+  return;
+}
 
     currentAdminAuth = data;
 
