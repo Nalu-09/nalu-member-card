@@ -1812,7 +1812,14 @@ async function submitAdminEventEdit(
   }
 }
 
-function loadStatusManagement() {
+/* =========================================================
+   ステータスアップ
+========================================================= */
+
+let adminStatusMembers = [];
+
+
+async function loadStatusManagement() {
   showPanel("rank");
 
   const list =
@@ -1824,11 +1831,505 @@ function loadStatusManagement() {
     return;
   }
 
+
   list.innerHTML =
     "<div class='service-card'>" +
-    "<div class='service-name'>会員ステータス</div>" +
-    "<div class='small'>会員情報を読み込む準備中です。</div>" +
+    "<div class='service-name'>" +
+    "会員ステータス" +
+    "</div>" +
+    "<div class='small'>" +
+    "会員情報を読み込み中..." +
+    "</div>" +
     "</div>";
+
+
+  try {
+    const response =
+      await fetch(
+        API_URL,
+        {
+          method: "POST",
+
+          body:
+            new URLSearchParams({
+              action:
+                "getAdminStatusMembers",
+
+              idToken:
+                currentAdminIdToken
+            })
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!data.ok) {
+      throw new Error(
+        data.message ||
+        "会員情報を取得できませんでした。"
+      );
+    }
+
+
+    adminStatusMembers =
+      Array.isArray(
+        data.members
+      )
+        ? data.members
+        : [];
+
+
+    renderAdminStatusMembers();
+
+
+  } catch (error) {
+    list.innerHTML =
+      "<div class='service-card'>" +
+      "<div class='service-name'>" +
+      "会員ステータス" +
+      "</div>" +
+      "<div class='small'>" +
+      escapeHtml(
+        "取得できませんでした：" +
+        error.message
+      ) +
+      "</div>" +
+      "</div>";
+  }
+}
+
+
+/* =========================================================
+   会員ステータス一覧表示
+========================================================= */
+
+function renderAdminStatusMembers() {
+  const list =
+    document.getElementById(
+      "statusManagementList"
+    );
+
+  if (!list) {
+    return;
+  }
+
+
+  if (
+    !Array.isArray(
+      adminStatusMembers
+    ) ||
+    adminStatusMembers.length === 0
+  ) {
+    list.innerHTML =
+      "<div class='service-card'>" +
+      "<div class='small'>" +
+      "対象会員がいません。" +
+      "</div>" +
+      "</div>";
+
+    return;
+  }
+
+
+  const permissions =
+    currentAdminAuth &&
+    currentAdminAuth.permissions
+      ? currentAdminAuth.permissions
+      : {};
+
+
+  const canApprove =
+    Boolean(
+      permissions.approveStatusUp
+    );
+
+
+  let html =
+    "<div class='summary-list'>";
+
+
+  adminStatusMembers.forEach(
+    function(member, index) {
+
+      const rankId =
+        String(
+          member.rankId ||
+          member.rank ||
+          ""
+        )
+          .trim()
+          .toUpperCase();
+
+
+      const nextRankId =
+        getNextAdminRank(
+          rankId
+        );
+
+
+      const memberName =
+        member.name ||
+        member.cardName ||
+        member.memberId ||
+        "";
+
+
+      const visitCount =
+        Number(
+          member.visitCount || 0
+        );
+
+
+      const lastVisit =
+        member.lastVisit ||
+        member.lastVisitDate ||
+        "-";
+
+
+      const lastService =
+        member.lastServiceName ||
+        member.lastService ||
+        member.lastServiceId ||
+        "-";
+
+
+      html +=
+        "<div class='service-card'>" +
+
+        "<div class='service-name'>" +
+        escapeHtml(
+          memberName
+        ) +
+        "</div>" +
+
+        "<div>" +
+        "会員番号：" +
+        escapeHtml(
+          formatMemberNo(
+            member.memberId || ""
+          )
+        ) +
+        "</div>" +
+
+        "<div>" +
+        "現在ランク：" +
+        escapeHtml(
+          rankId || "-"
+        ) +
+        "</div>" +
+
+        "<div>" +
+        "来店カウント：" +
+        escapeHtml(
+          String(
+            visitCount
+          )
+        ) +
+        "回" +
+        "</div>" +
+
+        "<div>" +
+        "最終来店：" +
+        escapeHtml(
+          lastVisit
+        ) +
+        "</div>" +
+
+        "<div>" +
+        "最終利用：" +
+        escapeHtml(
+          lastService
+        ) +
+        "</div>";
+
+
+      /*
+       * OWNER / ADMINのみ
+       * ステータスアップ実行可能
+       */
+      if (
+        canApprove &&
+        nextRankId
+      ) {
+        html +=
+          "<button" +
+          " class='save-button'" +
+          " type='button'" +
+          " onclick='confirmAdminStatusUp(" +
+          index +
+          ")'>" +
+
+          escapeHtml(
+            nextRankId
+          ) +
+          "へステータスアップ" +
+
+          "</button>";
+      }
+
+
+      if (
+        rankId === "NALU"
+      ) {
+        html +=
+          "<div" +
+          " class='small'" +
+          " style='margin-top:12px;'>" +
+          "最高ランクです。" +
+          "</div>";
+      }
+
+
+      html +=
+        "<div" +
+        " id='statusManagementResult-" +
+        index +
+        "'" +
+        " class='status-result'>" +
+        "</div>" +
+
+        "</div>";
+    }
+  );
+
+
+  html += "</div>";
+
+  list.innerHTML =
+    html;
+}
+
+
+/* =========================================================
+   次のランク
+========================================================= */
+
+function getNextAdminRank(
+  rankId
+) {
+  const rankOrder = {
+    WAVE:
+      "EVEIL",
+
+    EVEIL:
+      "ECLAT",
+
+    ECLAT:
+      "NALU",
+
+    NALU:
+      ""
+  };
+
+
+  return (
+    rankOrder[
+      String(
+        rankId || ""
+      )
+        .trim()
+        .toUpperCase()
+    ] || ""
+  );
+}
+
+
+/* =========================================================
+   ステータスアップ確認
+========================================================= */
+
+function confirmAdminStatusUp(
+  index
+) {
+  const member =
+    adminStatusMembers[
+      index
+    ];
+
+  if (!member) {
+    alert(
+      "会員情報を取得できませんでした。"
+    );
+
+    return;
+  }
+
+
+  const currentRank =
+    String(
+      member.rankId ||
+      member.rank ||
+      ""
+    )
+      .trim()
+      .toUpperCase();
+
+
+  const nextRank =
+    getNextAdminRank(
+      currentRank
+    );
+
+
+  if (!nextRank) {
+    alert(
+      "これ以上ステータスアップできません。"
+    );
+
+    return;
+  }
+
+
+  const memberName =
+    member.name ||
+    member.cardName ||
+    member.memberId ||
+    "";
+
+
+  const visitCount =
+    Number(
+      member.visitCount || 0
+    );
+
+
+  const lastVisit =
+    member.lastVisit ||
+    member.lastVisitDate ||
+    "-";
+
+
+  const confirmed =
+    window.confirm(
+      "ステータスアップを実行しますか？\n\n" +
+
+      memberName +
+      "\n\n" +
+
+      "現在ランク：" +
+      currentRank +
+      "\n" +
+
+      "変更後：" +
+      nextRank +
+      "\n" +
+
+      "来店カウント：" +
+      visitCount +
+      "回\n" +
+
+      "最終来店：" +
+      lastVisit
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  updateAdminMemberRank(
+    index,
+    nextRank
+  );
+}
+
+
+/* =========================================================
+   ステータスアップ実行
+========================================================= */
+
+async function updateAdminMemberRank(
+  index,
+  nextRankId
+) {
+  const member =
+    adminStatusMembers[
+      index
+    ];
+
+  if (!member) {
+    return;
+  }
+
+
+  const resultArea =
+    document.getElementById(
+      "statusManagementResult-" +
+      index
+    );
+
+
+  if (resultArea) {
+    resultArea.textContent =
+      "更新しています...";
+  }
+
+
+  try {
+    const response =
+      await fetch(
+        API_URL,
+        {
+          method: "POST",
+
+          body:
+            new URLSearchParams({
+              action:
+                "updateAdminMemberRank",
+
+              idToken:
+                currentAdminIdToken,
+
+              memberId:
+                member.memberId || "",
+
+              nextRankId:
+                nextRankId
+            })
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!data.ok) {
+      throw new Error(
+        data.message ||
+        "ステータスアップできませんでした。"
+      );
+    }
+
+
+    alert(
+      (member.name ||
+        member.cardName ||
+        "会員") +
+      " 様を\n" +
+      nextRankId +
+      "へステータスアップしました。"
+    );
+
+
+    /*
+     * MembersとActivity_Logの更新後、
+     * 最新状態を再取得する。
+     */
+    await loadStatusManagement();
+
+
+  } catch (error) {
+    if (resultArea) {
+      resultArea.textContent =
+        "更新できませんでした：" +
+        error.message;
+    }
+  }
 }
 
     async function loadReservations() {
