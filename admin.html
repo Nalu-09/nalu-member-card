@@ -389,19 +389,19 @@
     id="reservationSettingMenu"
     class="menu"
   >
-    <button
-      id="newReservationButton"
-      onclick="showAdminNewReservation()"
-    >
-      新規予約
-    </button>
+   <button
+  id="newReservationButton"
+  onclick="showAdminNewEvent()"
+>
+  新規受付登録
+</button>
 
-    <button
-      id="editReservationButton"
-      onclick="showAdminReservationEdit()"
-    >
-      既存予約修正
-    </button>
+<button
+  id="editReservationButton"
+  onclick="showAdminEventEdit()"
+>
+  既存受付修正
+</button>
   </div>
 
   <div
@@ -608,6 +608,476 @@ let adminNewReservationState = {
   selectedService: null,
   selectedEvent: null
 };
+
+    async function showAdminNewEvent() {
+  showPanel("service");
+
+  const newArea =
+    document.getElementById(
+      "newReservationArea"
+    );
+
+  const editArea =
+    document.getElementById(
+      "editReservationArea"
+    );
+
+  if (editArea) {
+    editArea.style.display =
+      "none";
+  }
+
+  if (!newArea) {
+    return;
+  }
+
+  newArea.style.display =
+    "block";
+
+  newArea.innerHTML =
+    "<div class='service-card'>" +
+    "<div class='service-name'>" +
+    "新規受付登録" +
+    "</div>" +
+    "<div class='small'>" +
+    "サービス情報を読み込み中..." +
+    "</div>" +
+    "</div>";
+
+
+  try {
+    const response =
+      await fetch(
+        API_URL,
+        {
+          method: "POST",
+
+          body:
+            new URLSearchParams({
+              action:
+                "getAdminEventFormData",
+
+              idToken:
+                currentAdminIdToken
+            })
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!data.ok) {
+      throw new Error(
+        data.message ||
+        "サービス情報を取得できませんでした。"
+      );
+    }
+
+
+    renderAdminNewEventForm(
+      data.services || []
+    );
+
+
+  } catch (error) {
+    newArea.innerHTML =
+      "<div class='service-card'>" +
+      "<div class='service-name'>" +
+      "新規受付登録" +
+      "</div>" +
+      "<div class='small'>" +
+      escapeHtml(
+        "取得できませんでした：" +
+        error.message
+      ) +
+      "</div>" +
+      "</div>";
+  }
+}
+
+
+function renderAdminNewEventForm(
+  services
+) {
+  const area =
+    document.getElementById(
+      "newReservationArea"
+    );
+
+  if (!area) {
+    return;
+  }
+
+
+  let serviceOptions =
+    "<option value=''>" +
+    "イベントを選択してください" +
+    "</option>";
+
+
+  services.forEach(
+    function(service) {
+      serviceOptions +=
+        "<option value='" +
+        escapeHtml(
+          service.serviceId || ""
+        ) +
+        "'>" +
+        escapeHtml(
+          service.serviceName ||
+          service.serviceId ||
+          ""
+        ) +
+        "</option>";
+    }
+  );
+
+
+  area.innerHTML =
+    "<div class='service-card'>" +
+
+    "<div class='service-name'>" +
+    "新規受付登録" +
+    "</div>" +
+
+
+    "<label>イベント名</label>" +
+
+    "<select" +
+    " id='adminEventService'" +
+    " class='admin-input'>" +
+
+    serviceOptions +
+
+    "</select>" +
+
+
+    "<label>開催日</label>" +
+
+    "<input" +
+    " id='adminEventDate'" +
+    " class='admin-input'" +
+    " type='date'>" +
+
+
+    "<label>開始時間</label>" +
+
+    "<input" +
+    " id='adminEventStartTime'" +
+    " class='admin-input'" +
+    " type='time'>" +
+
+
+    "<label>終了時間</label>" +
+
+    "<input" +
+    " id='adminEventEndTime'" +
+    " class='admin-input'" +
+    " type='time'>" +
+
+
+    "<label>定員人数</label>" +
+
+    "<input" +
+    " id='adminEventCapacity'" +
+    " class='admin-input'" +
+    " type='number'" +
+    " min='1'" +
+    " inputmode='numeric'" +
+    " placeholder='例：8'>" +
+
+
+    "<label>予約受付開始日</label>" +
+
+    "<input" +
+    " id='adminEventReservationStart'" +
+    " class='admin-input'" +
+    " type='date'>" +
+
+
+    "<label>予約受付終了日</label>" +
+
+    "<input" +
+    " id='adminEventReservationEnd'" +
+    " class='admin-input'" +
+    " type='date'>" +
+
+
+    "<button" +
+    " id='adminEventSubmitButton'" +
+    " class='save-button'" +
+    " type='button'" +
+    " onclick='submitAdminNewEvent()'>" +
+
+    "受付を登録する" +
+
+    "</button>" +
+
+
+    "<div" +
+    " id='adminEventStatus'" +
+    " class='status-result'>" +
+    "</div>" +
+
+    "</div>";
+}
+
+
+async function submitAdminNewEvent() {
+  const serviceSelect =
+    document.getElementById(
+      "adminEventService"
+    );
+
+  const eventDateInput =
+    document.getElementById(
+      "adminEventDate"
+    );
+
+  const startTimeInput =
+    document.getElementById(
+      "adminEventStartTime"
+    );
+
+  const endTimeInput =
+    document.getElementById(
+      "adminEventEndTime"
+    );
+
+  const capacityInput =
+    document.getElementById(
+      "adminEventCapacity"
+    );
+
+  const reservationStartInput =
+    document.getElementById(
+      "adminEventReservationStart"
+    );
+
+  const reservationEndInput =
+    document.getElementById(
+      "adminEventReservationEnd"
+    );
+
+  const statusArea =
+    document.getElementById(
+      "adminEventStatus"
+    );
+
+  const submitButton =
+    document.getElementById(
+      "adminEventSubmitButton"
+    );
+
+
+  const serviceId =
+    serviceSelect
+      ? serviceSelect.value
+      : "";
+
+  const eventDate =
+    eventDateInput
+      ? eventDateInput.value
+      : "";
+
+  const startTime =
+    startTimeInput
+      ? startTimeInput.value
+      : "";
+
+  const endTime =
+    endTimeInput
+      ? endTimeInput.value
+      : "";
+
+  const capacity =
+    capacityInput
+      ? Number(
+          capacityInput.value || 0
+        )
+      : 0;
+
+  const reservationStart =
+    reservationStartInput
+      ? reservationStartInput.value
+      : "";
+
+  const reservationEnd =
+    reservationEndInput
+      ? reservationEndInput.value
+      : "";
+
+
+  if (!serviceId) {
+    alert(
+      "イベント名を選択してください。"
+    );
+    return;
+  }
+
+  if (!eventDate) {
+    alert(
+      "開催日を入力してください。"
+    );
+    return;
+  }
+
+  if (!startTime) {
+    alert(
+      "開始時間を入力してください。"
+    );
+    return;
+  }
+
+  if (!endTime) {
+    alert(
+      "終了時間を入力してください。"
+    );
+    return;
+  }
+
+  if (
+    !Number.isInteger(capacity) ||
+    capacity < 1
+  ) {
+    alert(
+      "定員人数を入力してください。"
+    );
+    return;
+  }
+
+
+  if (
+    reservationStart &&
+    reservationEnd &&
+    reservationStart >
+      reservationEnd
+  ) {
+    alert(
+      "予約受付終了日は、受付開始日以降にしてください。"
+    );
+    return;
+  }
+
+
+  if (
+    !window.confirm(
+      "この内容で受付を登録しますか？\n\n" +
+      serviceSelect.options[
+        serviceSelect.selectedIndex
+      ].text +
+      "\n" +
+      eventDate +
+      "\n" +
+      startTime +
+      "〜" +
+      endTime +
+      "\n定員：" +
+      capacity +
+      "名"
+    )
+  ) {
+    return;
+  }
+
+
+  if (submitButton) {
+    submitButton.disabled =
+      true;
+  }
+
+  if (statusArea) {
+    statusArea.textContent =
+      "登録しています...";
+  }
+
+
+  try {
+    const response =
+      await fetch(
+        API_URL,
+        {
+          method: "POST",
+
+          body:
+            new URLSearchParams({
+              action:
+                "createAdminEvent",
+
+              idToken:
+                currentAdminIdToken,
+
+              serviceId:
+                serviceId,
+
+              eventDate:
+                eventDate,
+
+              startTime:
+                startTime,
+
+              endTime:
+                endTime,
+
+              capacity:
+                String(capacity),
+
+              reservationStart:
+                reservationStart,
+
+              reservationEnd:
+                reservationEnd
+            })
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!data.ok) {
+      throw new Error(
+        data.message ||
+        "登録できませんでした。"
+      );
+    }
+
+
+    if (statusArea) {
+      statusArea.textContent =
+        "登録しました。\n" +
+        "Event ID：" +
+        (
+          data.eventId || ""
+        );
+    }
+
+
+    alert(
+      "受付を登録しました。"
+    );
+
+
+    await showAdminNewEvent();
+
+
+  } catch (error) {
+    if (statusArea) {
+      statusArea.textContent =
+        "登録できませんでした：" +
+        error.message;
+    }
+
+  } finally {
+    if (submitButton) {
+      submitButton.disabled =
+        false;
+    }
+  }
+}
 
 
 async function showAdminNewReservation() {
@@ -1353,276 +1823,7 @@ renderAdminNewReservationForm(
     html;
 }
 
-
-
-    async function submitAdminNewReservation() {
-  const member =
-    adminNewReservationState
-      .selectedMember;
-
-  const service =
-    adminNewReservationState
-      .selectedService;
-
-  const event =
-    adminNewReservationState
-      .selectedEvent;
-
-  const peopleSelect =
-    document.getElementById(
-      "adminReservationPeople"
-    );
-
-  const paymentSelect =
-    document.getElementById(
-      "adminReservationPayment"
-    );
-
-  const statusArea =
-    document.getElementById(
-      "adminReservationStatus"
-    );
-
-  if (
-    !member ||
-    !service ||
-    !event
-  ) {
-    alert(
-      "会員・サービス・開催日を選択してください。"
-    );
-
-    return;
-  }
-
-  const guestCount =
-    Number(
-      peopleSelect
-        ? peopleSelect.value
-        : 0
-    );
-
-  if (!guestCount) {
-    alert(
-      "人数を選択してください。"
-    );
-
-    return;
-  }
-
-  const paymentMethod =
-    paymentSelect
-      ? paymentSelect.value
-      : "";
-
-  if (!paymentMethod) {
-    alert(
-      "代表者の支払い方法を選択してください。"
-    );
-
-    return;
-  }
-
-
-  const nameInputs =
-    document.querySelectorAll(
-      ".admin-companion-name"
-    );
-
-  const allergyInputs =
-    document.querySelectorAll(
-      ".admin-companion-allergy"
-    );
-
-  const dislikeInputs =
-    document.querySelectorAll(
-      ".admin-companion-dislike"
-    );
-
-  const paymentInputs =
-    document.querySelectorAll(
-      ".admin-companion-payment"
-    );
-
-
-  const companions = [];
-
-  for (
-    let index = 0;
-    index < nameInputs.length;
-    index++
-  ) {
-    const name =
-      nameInputs[index]
-        .value.trim();
-
-    const companionPayment =
-      paymentInputs[index]
-        .value;
-
-    if (!name) {
-      alert(
-        "同行者" +
-        (index + 1) +
-        "の氏名を入力してください。"
-      );
-
-      return;
-    }
-
-    if (!companionPayment) {
-      alert(
-        "同行者" +
-        (index + 1) +
-        "の支払い方法を選択してください。"
-      );
-
-      return;
-    }
-
-    companions.push({
-      name:
-        name,
-
-      allergy:
-        allergyInputs[index]
-          .value.trim(),
-
-      dislikedFoods:
-        dislikeInputs[index]
-          .value.trim(),
-
-      paymentMethod:
-        companionPayment
-    });
-  }
-
-
-  if (
-    companions.length !==
-    guestCount - 1
-  ) {
-    alert(
-      "同行者情報を確認してください。"
-    );
-
-    return;
-  }
-
-
-  if (
-    !window.confirm(
-      (member.name || "") +
-      " 様の予約を登録しますか？\n\n" +
-      (service.serviceName || "") +
-      "\n" +
-      (event.eventDate || "") +
-      "\n" +
-      guestCount +
-      "名"
-    )
-  ) {
-    return;
-  }
-
-
-  if (statusArea) {
-    statusArea.textContent =
-      "予約を登録しています...";
-  }
-
-
-  try {
-    const response =
-      await fetch(
-        API_URL,
-        {
-          method: "POST",
-
-          body:
-            new URLSearchParams({
-              action:
-                "createAdminReservation",
-
-              idToken:
-                currentAdminIdToken,
-
-              memberUserId:
-                member.userId,
-
-              serviceId:
-                service.serviceId,
-
-              eventId:
-                event.eventId,
-
-              eventDate:
-                event.eventDate,
-
-              guestCount:
-                String(
-                  guestCount
-                ),
-
-              additionalAllergy:
-                document
-                  .getElementById(
-                    "adminReservationAllergy"
-                  )
-                  .value.trim(),
-
-              additionalDislikedFoods:
-                document
-                  .getElementById(
-                    "adminReservationDislike"
-                  )
-                  .value.trim(),
-
-              representativePaymentMethod:
-                paymentMethod,
-
-              companionsJson:
-                JSON.stringify(
-                  companions
-                )
-            })
-        }
-      );
-
-    const data =
-      await response.json();
-
-    if (!data.ok) {
-      throw new Error(
-        data.message ||
-        "予約を登録できませんでした。"
-      );
-    }
-
-    if (statusArea) {
-      statusArea.textContent =
-        "予約を登録しました。\n予約番号：" +
-        (
-          data.reservationId ||
-          ""
-        );
-    }
-
-    alert(
-      "予約を登録しました。"
-    );
-
-  } catch (error) {
-    if (statusArea) {
-      statusArea.textContent =
-        "登録できませんでした：" +
-        error.message;
-    }
-  }
-}
-
     
-
 
 function showAdminReservationEdit() {
   showPanel("service");
